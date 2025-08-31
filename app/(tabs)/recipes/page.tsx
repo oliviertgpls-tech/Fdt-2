@@ -26,7 +26,7 @@ export default function RecipesPage() {
     <section className="space-y-6">
       <header className="flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Recettes</h1>
+          <h1 className="text-2xl font-semibold">Recettes v2</h1>
           <p className="text-gray-600">{visible.length} / {recipes.length}</p>
         </div>
         <FilterBar onChange={setQ} />
