@@ -6,7 +6,7 @@ import { ChefHat, BookOpen, Plus, User } from "lucide-react";
 
 const tabs = [
   { href: "/recipes", label: "Recettes", Icon: ChefHat },
-  { href: "/library", label: "Bibliothèque", Icon: BookOpen },
+  { href: "/library", label: "Mon Livre", Icon: BookOpen },
   { href: "/add", label: "Ajouter", Icon: Plus },
   { href: "/profile", label: "Profil", Icon: User },
 ];
