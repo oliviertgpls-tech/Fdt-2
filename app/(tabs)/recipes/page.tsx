@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useRecipes } from "@/app/providers";
-import { RecipeCard } from "@/components/RecipeCard";
+import { RecipeCard } from "../../../components/RecipeCard";
 import { FilterBar } from "@/components/FilterBar";
 
 export default function RecipesPage() {
