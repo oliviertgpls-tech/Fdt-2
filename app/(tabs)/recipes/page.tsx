@@ -1,8 +1,8 @@
 "use client";
+
 import { useMemo, useState } from "react";
-import { useRecipes } from "@/app/providers";
+import { useRecipes } from "../../providers";
 import { RecipeCard } from "../../../components/RecipeCard";
-import { FilterBar } from "@/components/FilterBar";
 
 export default function RecipesPage() {
   const { recipes } = useRecipes();
@@ -10,26 +10,24 @@ export default function RecipesPage() {
 
   const visible = useMemo(() => {
     if (!q) return recipes;
-    return recipes.filter((r) => {
-      const hay = [
-        r.title,
-        ...(r.tags || []),
-        ...r.ingredients,
-        r.author || "",
-        (r.steps || "").slice(0, 120),
-      ].join(" ").toLowerCase();
-      return hay.includes(q);
-    });
+    return recipes.filter((r) =>
+      [r.title, ...(r.tags || []), ...r.ingredients, r.author || "", r.steps || ""]
+        .join(" ")
+        .toLowerCase()
+        .includes(q.toLowerCase())
+    );
   }, [recipes, q]);
 
   return (
     <section className="space-y-6">
-      <header className="flex items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Recettes v2</h1>
-          <p className="text-gray-600">{visible.length} / {recipes.length}</p>
-        </div>
-        <FilterBar onChange={setQ} />
+      <header>
+        <h1 className="text-2xl font-semibold">Recettes</h1>
+        <input
+          className="mt-2 w-full max-w-md rounded-md border p-2"
+          placeholder="Rechercher…"
+          onChange={(e) => setQ(e.target.value)}
+        />
+        <p className="text-gray-600">{visible.length} / {recipes.length} résultats</p>
       </header>
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -37,7 +35,4 @@ export default function RecipesPage() {
       </ul>
     </section>
   );
-}
-function SkeletonCard() {
-  return <div className="h-56 animate-pulse rounded-2xl bg-gray-100" />;
 }
