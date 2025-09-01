@@ -29,6 +29,10 @@ export default function RecipesPage() {
           <h1 className="text-2xl font-semibold">Recettes v2</h1>
           <p className="text-gray-600">{visible.length} / {recipes.length}</p>
         </div>
+        <div className="rounded-2xl border bg-white p-8 text-center">
+          <p className="text-gray-700">Aucune recette pour l’instant.</p>
+          <Link href="/add" className="mt-3 inline-block rounded-md bg-brand px-4 py-2 text-white">Ajouter votre première recette</Link>
+        </div>
         <FilterBar onChange={setQ} />
       </header>
 
