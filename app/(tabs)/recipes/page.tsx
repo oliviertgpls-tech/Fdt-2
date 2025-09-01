@@ -38,3 +38,6 @@ export default function RecipesPage() {
     </section>
   );
 }
+function SkeletonCard() {
+  return <div className="h-56 animate-pulse rounded-2xl bg-gray-100" />;
+}
