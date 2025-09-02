@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useRecipes } from "../../providers";
+import { useRecipes } from "../../../providers";
 import Image from "next/image";
 import Link from "next/link";
 
