@@ -101,7 +101,7 @@ export default function RecipesPage() {
           {filteredRecipes.map((recipe) => (
             <Link
               key={recipe.id}
-              href={`/(tabs)/recipes/${recipe.id}`}
+              href={`/recipes/${recipe.id}`}
               className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
             >
               {/* Image */}
