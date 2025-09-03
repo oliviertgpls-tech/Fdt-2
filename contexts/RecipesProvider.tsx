@@ -77,7 +77,9 @@ const initialBooks: Book[] = [
 type RecipesContextType = {
   // Recettes
   recipes: Recipe[];
-  addRecipe: (title: string) => void;
+  addRecipe: (recipeData: Omit<Recipe, 'id' | 'createdAt'>) => void;
+  updateRecipe: (id: string, recipeData: Partial<Recipe>) => void;
+  deleteRecipe: (id: string) => void;
 
   // Carnets
   books: Book[];
@@ -92,20 +94,41 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [books, setBooks] = useState<Book[]>(initialBooks);
 
-  // ➕ Ajouter une nouvelle recette (basique pour l'instant)
-  function addRecipe(title: string) {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
-
+  // ➕ Ajouter une nouvelle recette (version complète)
+  function addRecipe(recipeData: Omit<Recipe, 'id' | 'createdAt'>) {
     const newRecipe: Recipe = {
+      ...recipeData,
       id: `r-${Date.now()}`,
-      title: trimmedTitle,
-      ingredients: [],
-      steps: "",
       createdAt: Date.now()
     };
 
     setRecipes(prev => [newRecipe, ...prev]);
+  }
+
+  // ✏️ Mettre à jour une recette existante
+  function updateRecipe(id: string, recipeData: Partial<Recipe>) {
+    setRecipes(prev =>
+      prev.map(recipe =>
+        recipe.id === id
+          ? { ...recipe, ...recipeData, updatedAt: Date.now() }
+          : recipe
+      )
+    );
+  }
+
+  // 🗑️ Supprimer une recette
+  function deleteRecipe(id: string) {
+    // Supprimer la recette
+    setRecipes(prev => prev.filter(recipe => recipe.id !== id));
+    
+    // La retirer de tous les carnets
+    setBooks(prev =>
+      prev.map(book => ({
+        ...book,
+        recipeIds: book.recipeIds.filter(recipeId => recipeId !== id),
+        updatedAt: Date.now()
+      }))
+    );
   }
 
   // 📚 Créer un nouveau carnet
