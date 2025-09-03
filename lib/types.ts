@@ -1,18 +1,23 @@
 export type Recipe = {
   id: string;
   title: string;
-  imageUrl?: string;
-  ingredients: string[];
-  steps: string;
-  author?: string;       // ex: "Mamie Jeanne"
-  prepMinutes?: number;  // temps
-  tags?: string[];       // ex: ["famille", "dessert"]
+  description?: string;
+  imageUrl?: string;        // URL de l'image principale
+  ingredients: string[];    // Liste des ingrédients (1 par ligne)
+  steps: string;           // Instructions (texte libre pour commencer)
+  author?: string;         // "Mamie Jeanne", "Papa", etc.
+  prepMinutes?: number;    // Temps de préparation
+  tags?: string[];         // ["dessert", "rapide", "famille"]
+  createdAt?: number;      // Timestamp de création
+  updatedAt?: number;      // Timestamp de dernière modification
 };
 
 export type Book = {
   id: string;
-  title: string;         // ex: "Les recettes de la famille Tangopoulos"
-  coverUrl?: string;
-  recipeIds: string[];   // références aux recettes
-  createdAt: number;
+  title: string;           // "Les recettes de famille", "Carnet de Mamie"
+  description?: string;    // Description du livre
+  coverUrl?: string;       // Image de couverture
+  recipeIds: string[];     // IDs des recettes dans l'ordre souhaité
+  createdAt: number;       // Timestamp de création
+  updatedAt?: number;      // Timestamp de dernière modification
 };
