@@ -154,6 +154,8 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
       value={{
         recipes,
         addRecipe,
+        updateRecipe,
+        deleteRecipe,
         books,
         createBook,
         addRecipeToBook,
