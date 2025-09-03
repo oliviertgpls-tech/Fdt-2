@@ -256,11 +256,12 @@ export default function RecipeDetailPage() {
         
         <Link 
           href="/recipes" 
-          className="block text-center text-blue-600 underline hover:text-blue-800"
+          className="block text-center text-primary-600 underline hover:text-primary-700"
         >
           ← Retour à la liste des recettes
         </Link>
       </div>
     </article>
+    </>
   );
 }
