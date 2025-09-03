@@ -7,6 +7,7 @@ export type Recipe = {
   steps: string;           // Instructions (texte libre pour commencer)
   author?: string;         // "Mamie Jeanne", "Papa", etc.
   prepMinutes?: number;    // Temps de préparation
+  servings?: string;       // "4", "6 personnes", "8-10"
   tags?: string[];         // ["dessert", "rapide", "famille"]
   createdAt?: number;      // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification
