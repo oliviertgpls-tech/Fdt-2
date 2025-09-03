@@ -1,7 +1,8 @@
-export const dynamic = 'force-dynamic';
 "use client";
 import { useState } from "react";
 import { useRecipes } from "@/app/providers";
+
+export const dynamic = 'force-dynamic';
 
 export default function LibraryPage() {
   const { books, createBook, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
