@@ -2,7 +2,16 @@
 
 import React, { createContext, useContext, useState } from "react";
 
-export type Recipe = { id: string; title: string };
+export type Recipe = {
+  id: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  ingredients?: string[];
+  steps?: string[];
+  author?: string;
+};
+
 export type Book = { id: string; title: string; recipeIds: string[] };
 
 type RecipesContextType = {
@@ -25,7 +34,20 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
 
   // ==== Recettes ====
   function addRecipe(title: string) {
-    setRecipes((prev) => [...prev, { id: crypto.randomUUID(), title }]);
+    const t = title.trim();
+    if (!t) return;
+    setRecipes((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        title: t,
+        description: "",
+        tags: [],
+        ingredients: [],
+        steps: [],
+        author: "",
+      },
+    ]);
   }
 
   // ==== Carnets ====
