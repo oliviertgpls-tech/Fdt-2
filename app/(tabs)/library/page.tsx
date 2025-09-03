@@ -1,8 +1,10 @@
 "use client";
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 import { useState } from "react";
-import { useRecipes } from "@/app/providers";
+import { useRecipes } from "@/contexts/RecipesProvider";
 
 export default function LibraryPage() {
   const { books, createBook, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
