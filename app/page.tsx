@@ -17,7 +17,7 @@ export default function HomePage() {
       {/* Actions principales */}
       <div className="grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
         <Link 
-          href="/(tabs)/library" 
+          href="/library" 
           className="group p-8 rounded-2xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all"
         >
           <div className="space-y-3">
@@ -32,7 +32,7 @@ export default function HomePage() {
         </Link>
 
         <Link 
-          href="/(tabs)/recipes" 
+          href="/recipes" 
           className="group p-8 rounded-2xl border-2 border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all"
         >
           <div className="space-y-3">
@@ -47,7 +47,7 @@ export default function HomePage() {
         </Link>
 
         <Link 
-          href="/(tabs)/add" 
+          href="/add" 
           className="group p-8 rounded-2xl border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-all"
         >
           <div className="space-y-3">
