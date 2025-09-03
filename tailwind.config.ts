@@ -66,9 +66,9 @@ module.exports = {
         info: '#3b82f6',
       },
       fontFamily: {
-        'display': ['Crimson Text', 'serif'], // Pour les titres
-        'body': ['Inter', 'sans-serif'],      // Pour le texte
-        'sans': ['Inter', 'sans-serif'],      // Default
+        'display': ['Poppins', 'sans-serif'],    // Pour les titres - moderne et friendly
+        'body': ['Inter', 'sans-serif'],         // Pour le texte - lisible  
+        'sans': ['Inter', 'sans-serif'],         // Default
       },
       borderRadius: {
         'xs': '0.25rem',
