@@ -15,7 +15,7 @@ export default function RecipeDetailPage() {
       <div className="space-y-4">
         <p className="text-gray-600">Recette introuvable.</p>
         <Link 
-          href="/(tabs)/recipes" 
+          href="/recipes" 
           className="text-blue-600 underline hover:text-blue-800"
         >
           ← Retour à la liste des recettes
