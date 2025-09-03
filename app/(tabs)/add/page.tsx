@@ -43,7 +43,7 @@ export default function AddRecipePage() {
       };
 
       addRecipe(recipeData);
-      router.push("/(tabs)/recipes");
+      router.push("/recipes");
     } catch (error) {
       alert("Erreur lors de la sauvegarde !");
     } finally {
