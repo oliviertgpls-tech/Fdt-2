@@ -75,7 +75,7 @@ export default function HomePage() {
         <div className="space-content max-w-2xl mx-auto">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="text-4xl">🚀</div>
-            <h2 className="text-display text-responsive-lg text-primary-700">
+            <h2 className="text-display text-responsive-lg text-neutral-800">
               Bientôt disponible
             </h2>
           </div>
