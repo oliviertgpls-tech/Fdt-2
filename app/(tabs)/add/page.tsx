@@ -5,27 +5,17 @@ import { useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import type { Recipe } from "@/lib/types";
 
-interface SimpleRecipeFormProps {
-  recipeId?: string; // Si présent, on édite
-}
-
-export default function SimpleRecipeForm({ recipeId }: SimpleRecipeFormProps) {
+export default function AddRecipePage() {
   const router = useRouter();
-  const { recipes, addRecipe, updateRecipe } = useRecipes();
+  const { addRecipe } = useRecipes();
   
-  // Recette existante si édition
-  const existingRecipe = recipeId ? recipes.find(r => r.id === recipeId) : null;
-  const isEditing = !!existingRecipe;
-
   // État ultra-simple
-  const [title, setTitle] = useState(existingRecipe?.title || "");
-  const [author, setAuthor] = useState(existingRecipe?.author || "");
-  const [prepMinutes, setPrepMinutes] = useState(existingRecipe?.prepMinutes?.toString() || "");
-  const [ingredients, setIngredients] = useState(
-    existingRecipe?.ingredients.join("\n") || ""
-  );
-  const [steps, setSteps] = useState(existingRecipe?.steps || "");
-  const [imageUrl, setImageUrl] = useState(existingRecipe?.imageUrl || "");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [prepMinutes, setPrepMinutes] = useState("");
+  const [ingredients, setIngredients] = useState("");
+  const [steps, setSteps] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   
   const [isSaving, setIsSaving] = useState(false);
 
@@ -52,12 +42,7 @@ export default function SimpleRecipeForm({ recipeId }: SimpleRecipeFormProps) {
         updatedAt: Date.now()
       };
 
-      if (isEditing && existingRecipe) {
-        updateRecipe(existingRecipe.id, recipeData);
-      } else {
-        addRecipe(recipeData);
-      }
-
+      addRecipe(recipeData);
       router.push("/(tabs)/recipes");
     } catch (error) {
       alert("Erreur lors de la sauvegarde !");
@@ -71,7 +56,7 @@ export default function SimpleRecipeForm({ recipeId }: SimpleRecipeFormProps) {
       {/* En-tête simple */}
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold text-gray-900">
-          {isEditing ? "✏️ Modifier" : "✨ Nouvelle recette"}
+          ✨ Nouvelle recette
         </h1>
         <p className="text-gray-600 text-sm">
           Remplissez les champs essentiels
@@ -203,7 +188,7 @@ Simple et naturel !"
             disabled={isSaving || !title.trim()}
             className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {isSaving ? "⏳ Sauvegarde..." : (isEditing ? "💾 Sauvegarder" : "✨ Créer")}
+            {isSaving ? "⏳ Sauvegarde..." : "✨ Créer"}
           </button>
         </div>
       </div>
