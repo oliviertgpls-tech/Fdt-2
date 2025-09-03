@@ -110,13 +110,13 @@
     @apply bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-300;
   }
 
-  /* 📦 Cartes système */
+  /* 📦 Cartes système avec fond farine */
   .card {
-    @apply bg-white rounded-xl border border-neutral-200 shadow-soft hover:shadow-gentle transition-all duration-200;
+    @apply bg-white/90 rounded-xl border border-neutral-200/60 shadow-soft hover:shadow-gentle transition-all duration-200 backdrop-blur-sm;
   }
 
   .card-hover {
-    @apply card hover:-translate-y-1 hover:shadow-warm;
+    @apply card hover:-translate-y-1 hover:shadow-warm hover:bg-white/95;
   }
 
   /* 🏷️ Tags système */
