@@ -1,246 +1,118 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  /* 🎨 Variables CSS personnalisées */
-  :root {
-    --font-display: 'Crimson Text', serif;
-    --font-body: 'Inter', sans-serif;
-  }
-
-  /* 📱 Configuration de base */
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    @apply font-body text-neutral-800 bg-neutral-50;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* 🎭 Titres avec la font display */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
-  }
-
-  h1 {
-    @apply text-3xl md:text-4xl font-semibold text-primary-700;
-  }
-
-  h2 {
-    @apply text-2xl md:text-3xl font-semibold text-neutral-700;
-  }
-
-  h3 {
-    @apply text-xl md:text-2xl font-medium text-neutral-700;
-  }
-
-  /* 📝 Amélioration des inputs */
-  input[type="text"],
-  input[type="email"],
-  input[type="url"],
-  input[type="number"],
-  textarea,
-  select {
-    @apply transition-all duration-200;
-  }
-
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="url"]:focus,
-  input[type="number"]:focus,
-  textarea:focus,
-  select:focus {
-    @apply ring-2 ring-primary-200 border-primary-400;
-  }
-
-  /* 🎯 Sélection de texte */
-  ::selection {
-    @apply bg-primary-200 text-primary-800;
-  }
-
-  /* 📱 Scrollbar personnalisée */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-neutral-100;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-400;
-  }
+/* 🌾 FOND FARINE - Background principal */
+body {
+  background: 
+    /* Texture farine subtile */
+    radial-gradient(circle at 20% 30%, rgba(239, 139, 95, 0.03) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(107, 179, 107, 0.02) 0%, transparent 30%),
+    radial-gradient(circle at 40% 80%, rgba(240, 180, 41, 0.02) 0%, transparent 30%),
+    /* Pattern farine */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(245, 245, 244, 0.3) 2px,
+      rgba(245, 245, 244, 0.3) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(245, 245, 244, 0.2) 2px,
+      rgba(245, 245, 244, 0.2) 4px
+    ),
+    /* Fond principal */
+    linear-gradient(135deg, #fefcfb 0%, #faf8f6 100%);
+  font-family: 'Inter', sans-serif;
+  color: #292524; /* neutral-800 */
+  min-height: 100vh;
 }
 
-@layer components {
-  /* 🔘 Boutons système */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-primary {
-    @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
-  }
-
-  .btn-secondary {
-    @apply bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
-  }
-
-  .btn-accent {
-    @apply bg-accent-500 text-accent-900 hover:bg-accent-600 focus:ring-accent-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
-  }
-
-  .btn-outline {
-    @apply border-2 border-primary-300 text-primary-600 bg-white hover:bg-primary-50 hover:border-primary-400 focus:ring-primary-300;
-  }
-
-  .btn-ghost {
-    @apply text-primary-600 hover:bg-primary-50 focus:ring-primary-300;
-  }
-
-  .btn-danger {
-    @apply bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-300;
-  }
-
-  /* 📦 Cartes système avec fond farine */
-  .card {
-    @apply bg-white/90 rounded-xl border border-neutral-200/60 shadow-soft hover:shadow-gentle transition-all duration-200 backdrop-blur-sm;
-  }
-
-  .card-hover {
-    @apply card hover:-translate-y-1 hover:shadow-warm hover:bg-white/95;
-  }
-
-  /* 🏷️ Tags système */
-  .tag {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
-  }
-
-  .tag-primary {
-    @apply bg-primary-100 text-primary-700;
-  }
-
-  .tag-secondary {
-    @apply bg-secondary-100 text-secondary-700;
-  }
-
-  .tag-accent {
-    @apply bg-accent-100 text-accent-700;
-  }
-
-  .tag-neutral {
-    @apply bg-neutral-100 text-neutral-600;
-  }
-
-  /* 📱 Inputs système */
-  .input {
-    @apply w-full rounded-lg border border-neutral-300 px-3 py-2 text-neutral-700 placeholder-neutral-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all duration-200;
-  }
-
-  .input-lg {
-    @apply input px-4 py-3 text-lg;
-  }
-
-  /* 🎭 Animations personnalisées */
-  .animate-in {
-    @apply animate-fade-in;
-  }
-
-  .animate-slide-up {
-    @apply animate-slide-up;
-  }
-
-  /* 📝 Textes spéciaux */
-  .text-display {
-    @apply font-display;
-  }
-
-  .text-body {
-    @apply font-body;
-  }
-
-  /* 🎨 Arrière-plans dégradés */
-  .bg-gradient-warm {
-    background: linear-gradient(135deg, theme('colors.primary.50'), theme('colors.accent.50'));
-  }
-
-  .bg-gradient-fresh {
-    background: linear-gradient(135deg, theme('colors.secondary.50'), theme('colors.primary.50'));
-  }
-
-  .bg-gradient-sunset {
-    background: linear-gradient(135deg, theme('colors.primary.100'), theme('colors.accent.100'));
-  }
-
-  /* 🔥 États de focus améliorés */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2;
-  }
-
-  /* 📱 Responsive helpers */
-  .container-app {
-    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  .container-content {
-    @apply max-w-4xl mx-auto px-4 sm:px-6;
-  }
-
-  .container-narrow {
-    @apply max-w-2xl mx-auto px-4 sm:px-6;
-  }
+/* 🎭 TITRES EN GRIS FONCÉ avec Poppins */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  color: #292524 !important; /* neutral-800 - FORCE avec !important */
 }
 
-@layer utilities {
-  /* 🎭 Utilitaires d'animation */
-  .transition-base {
-    @apply transition-all duration-200 ease-in-out;
-  }
+h1 {
+  font-size: 2.25rem; /* text-4xl */
+  font-weight: 800;
+  color: #292524 !important;
+}
 
-  .transition-slow {
-    @apply transition-all duration-300 ease-in-out;
-  }
+h2 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  color: #44403c !important; /* neutral-700 */
+}
 
-  /* 📱 Utilitaires de responsive */
-  .text-responsive-xl {
-    @apply text-2xl sm:text-3xl lg:text-4xl;
-  }
+h3 {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600;
+  color: #44403c !important; /* neutral-700 */
+}
 
-  .text-responsive-lg {
-    @apply text-xl sm:text-2xl lg:text-3xl;
-  }
+/* 📦 CARTES BLANCHES sur fond farine */
+.card {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e7e5e4; /* neutral-200 */
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+}
 
-  .text-responsive-base {
-    @apply text-base sm:text-lg;
-  }
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
 
-  /* 🎨 Utilitaires de couleur */
-  .text-muted {
-    @apply text-neutral-500;
-  }
+/* 🔘 BOUTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-  .text-emphasis {
-    @apply text-primary-600 font-medium;
-  }
+.btn-primary {
+  background: #ef8b5f; /* primary-500 */
+  color: white;
+}
 
-  /* 📏 Utilitaires d'espacement */
-  .space-section {
-    @apply space-y-8 lg:space-y-12;
-  }
+.btn-primary:hover {
+  background: #e06d42; /* primary-600 */
+  transform: translateY(-1px);
+}
 
-  .space-content {
-    @apply space-y-4 lg:space-y-6;
-  }
+/* 📱 INPUTS */
+input[type="text"],
+input[type="email"], 
+input[type="url"],
+input[type="number"],
+textarea,
+select {
+  background: white;
+  border: 1px solid #d6d3d1; /* neutral-300 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+}
 
-  .space-tight {
-    @apply space-y-2 lg:space-y-3;
-  }
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #ef8b5f; /* primary-500 */
+  box-shadow: 0 0 0 3px rgba(239, 139, 95, 0.1);
 }
