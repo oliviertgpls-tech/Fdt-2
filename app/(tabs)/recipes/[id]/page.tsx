@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Image from "next/image";
 import Link from "next/link";
@@ -93,11 +93,31 @@ export default function RecipeDetailPage() {
         )}
       </div>
 
-      {/* Retour */}
-      <div className="pt-6 border-t">
+      {/* Actions */}
+      <div className="pt-6 border-t space-y-4">
+        <div className="flex gap-3">
+          <Link
+            href={`/recipes/edit/${recipe.id}`}
+            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-center"
+          >
+            ✏️ Modifier cette recette
+          </Link>
+          <button
+            onClick={() => {
+              if (window.confirm(`Êtes-vous sûr de vouloir supprimer "${recipe.title}" ?\n\nCette action est irréversible.`)) {
+                deleteRecipe(recipe.id);
+                router.push("/recipes");
+              }
+            }}
+            className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
+          >
+            🗑️ Supprimer
+          </button>
+        </div>
+        
         <Link 
-          href="/(tabs)/recipes" 
-          className="text-blue-600 underline hover:text-blue-800"
+          href="/recipes" 
+          className="block text-center text-blue-600 underline hover:text-blue-800"
         >
           ← Retour à la liste des recettes
         </Link>
