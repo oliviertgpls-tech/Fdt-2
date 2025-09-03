@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
 import React, { createContext, useContext, useState } from "react";
 
-// 👇 Type simple pour stocker tes recettes
-type Recipe = { id: string; title: string };
+export type Recipe = { id: string; title: string };
 
 type RecipesContextType = {
   recipes: Recipe[];
