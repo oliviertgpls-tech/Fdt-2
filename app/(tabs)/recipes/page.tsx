@@ -3,39 +3,64 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useState, useMemo } from "react";
 import { useRecipes } from "@/contexts/RecipesProvider";
-import { RecipeCard } from "../../../components/RecipeCard";
 
 export default function RecipesPage() {
   const { recipes } = useRecipes();
   const [q, setQ] = useState("");
 
-  const visible = useMemo(() => {
-    if (!q) return recipes;
-    return recipes.filter((r) =>
-      [r.title, ...(r.tags || []), ...r.ingredients, r.author || "", r.steps || ""]
+  const filtered = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    if (!query) return recipes;
+    return recipes.filter((r) => {
+      const haystack = [
+        r.title || "",
+        ...(r.tags || []),
+        ...(r.ingredients || []),
+        ...(r.steps || []),
+        r.author || "",
+        r.description || "",
+      ]
         .join(" ")
-        .toLowerCase()
-        .includes(q.toLowerCase())
-    );
+        .toLowerCase();
+      return haystack.includes(query);
+    });
   }, [recipes, q]);
 
   return (
-    <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Recettes</h1>
+    <div>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">Toutes les recettes</h1>
+        <Link href="/(tabs)/add" className="text-sm hover:underline">Ajouter</Link>
+      </div>
+
+      <div className="mt-4">
         <input
-          className="mt-2 w-full max-w-md rounded-md border p-2"
-          placeholder="Rechercher…"
+          className="w-full rounded border px-3 py-2"
+          placeholder="Rechercher (titre, tags, ingrédients...)"
+          value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <p className="text-gray-600">{visible.length} / {recipes.length} résultats</p>
-      </header>
+      </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((r) => <RecipeCard key={r.id} r={r} />)}
-      </ul>
-    </section>
+      {filtered.length === 0 ? (
+        <p className="mt-6 text-gray-500">Aucune recette ne correspond.</p>
+      ) : (
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {filtered.map((r) => (
+            <li key={r.id} className="rounded border p-4 hover:bg-gray-50">
+              <span className="font-medium">{r.title}</span>
+              {r.tags && r.tags.length > 0 && (
+                <div className="mt-2 text-xs text-gray-500">
+                  {r.tags.join(" · ")}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
