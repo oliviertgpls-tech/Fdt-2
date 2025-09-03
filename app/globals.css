@@ -1,3 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* 🎨 Variables CSS personnalisées */
+  :root {
+    --font-display: 'Crimson Text', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  /* 📱 Configuration de base */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply font-body text-neutral-800 bg-neutral-50;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 🎭 Titres avec la font display */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+
+  h1 {
+    @apply text-3xl md:text-4xl font-semibold text-primary-700;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl font-semibold text-neutral-700;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl font-medium text-neutral-700;
+  }
+
+  /* 📝 Amélioration des inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="url"],
+  input[type="number"],
+  textarea,
+  select {
+    @apply transition-all duration-200;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="url"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    @apply ring-2 ring-primary-200 border-primary-400;
+  }
+
+  /* 🎯 Sélection de texte */
+  ::selection {
+    @apply bg-primary-200 text-primary-800;
+  }
+
+  /* 📱 Scrollbar personnalisée */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400;
+  }
+}
+
+@layer components {
+  /* 🔘 Boutons système */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
+  }
+
+  .btn-accent {
+    @apply bg-accent-500 text-accent-900 hover:bg-accent-600 focus:ring-accent-300 shadow-soft hover:shadow-gentle hover:-translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary-300 text-primary-600 bg-white hover:bg-primary-50 hover:border-primary-400 focus:ring-primary-300;
+  }
+
+  .btn-ghost {
+    @apply text-primary-600 hover:bg-primary-50 focus:ring-primary-300;
+  }
+
+  .btn-danger {
+    @apply bg-red-100 text-red-700 hover:bg-red-200 focus:ring-red-300;
+  }
+
+  /* 📦 Cartes système */
+  .card {
+    @apply bg-white rounded-xl border border-neutral-200 shadow-soft hover:shadow-gentle transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply card hover:-translate-y-1 hover:shadow-warm;
+  }
+
+  /* 🏷️ Tags système */
+  .tag {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .tag-primary {
+    @apply bg-primary-100 text-primary-700;
+  }
+
+  .tag-secondary {
+    @apply bg-secondary-100 text-secondary-700;
+  }
+
+  .tag-accent {
+    @apply bg-accent-100 text-accent-700;
+  }
+
+  .tag-neutral {
+    @apply bg-neutral-100 text-neutral-600;
+  }
+
+  /* 📱 Inputs système */
+  .input {
+    @apply w-full rounded-lg border border-neutral-300 px-3 py-2 text-neutral-700 placeholder-neutral-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-200 focus:outline-none transition-all duration-200;
+  }
+
+  .input-lg {
+    @apply input px-4 py-3 text-lg;
+  }
+
+  /* 🎭 Animations personnalisées */
+  .animate-in {
+    @apply animate-fade-in;
+  }
+
+  .animate-slide-up {
+    @apply animate-slide-up;
+  }
+
+  /* 📝 Textes spéciaux */
+  .text-display {
+    @apply font-display;
+  }
+
+  .text-body {
+    @apply font-body;
+  }
+
+  /* 🎨 Arrière-plans dégradés */
+  .bg-gradient-warm {
+    background: linear-gradient(135deg, theme('colors.primary.50'), theme('colors.accent.50'));
+  }
+
+  .bg-gradient-fresh {
+    background: linear-gradient(135deg, theme('colors.secondary.50'), theme('colors.primary.50'));
+  }
+
+  .bg-gradient-sunset {
+    background: linear-gradient(135deg, theme('colors.primary.100'), theme('colors.accent.100'));
+  }
+
+  /* 🔥 États de focus améliorés */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2;
+  }
+
+  /* 📱 Responsive helpers */
+  .container-app {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-content {
+    @apply max-w-4xl mx-auto px-4 sm:px-6;
+  }
+
+  .container-narrow {
+    @apply max-w-2xl mx-auto px-4 sm:px-6;
+  }
+}
+
+@layer utilities {
+  /* 🎭 Utilitaires d'animation */
+  .transition-base {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .transition-slow {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* 📱 Utilitaires de responsive */
+  .text-responsive-xl {
+    @apply text-2xl sm:text-3xl lg:text-4xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-xl sm:text-2xl lg:text-3xl;
+  }
+
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+
+  /* 🎨 Utilitaires de couleur */
+  .text-muted {
+    @apply text-neutral-500;
+  }
+
+  .text-emphasis {
+    @apply text-primary-600 font-medium;
+  }
+
+  /* 📏 Utilitaires d'espacement */
+  .space-section {
+    @apply space-y-8 lg:space-y-12;
+  }
+
+  .space-content {
+    @apply space-y-4 lg:space-y-6;
+  }
+
+  .space-tight {
+    @apply space-y-2 lg:space-y-3;
+  }
+}
