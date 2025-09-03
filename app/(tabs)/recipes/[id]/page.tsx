@@ -7,7 +7,8 @@ import Link from "next/link";
 
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { recipes } = useRecipes();
+  const router = useRouter();
+  const { recipes, deleteRecipe } = useRecipes();
   const recipe = recipes.find((r) => r.id === id);
 
   if (!recipe) {
