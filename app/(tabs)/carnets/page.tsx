@@ -6,7 +6,6 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function CarnetsPage() {
-  // ✅ Fix : Utiliser la nouvelle terminologie
   const { notebooks, createNotebook, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentCarnet, setCurrentCarnet] = useState<any>(null);
@@ -15,30 +14,44 @@ export default function CarnetsPage() {
     description: ''
   });
 
+  // 🐛 État pour les messages de debug
+  const [debugMessage, setDebugMessage] = useState<string>('');
+
+  const showDebug = (message: string) => {
+    setDebugMessage(message);
+    setTimeout(() => setDebugMessage(''), 3000);
+  };
+
   const handleCreateCarnet = () => {
     if (!formData.title.trim()) return;
-    createNotebook(formData.title.trim(), formData.description.trim());
-    setFormData({ title: '', description: '' });
-    setShowCreateModal(false);
+    try {
+      createNotebook(formData.title.trim(), formData.description.trim());
+      showDebug(`✅ Carnet "${formData.title}" créé !`);
+      setFormData({ title: '', description: '' });
+      setShowCreateModal(false);
+    } catch (error) {
+      showDebug(`❌ Erreur création: ${error}`);
+    }
   };
 
   const handleAddRecipe = (carnetId: string, recipeId: string) => {
-    console.log('Ajout recette:', { carnetId, recipeId });
+    showDebug(`🔄 Tentative ajout: ${recipeId} → ${carnetId}`);
+    
     try {
       addRecipeToNotebook(carnetId, recipeId);
-      console.log('Recette ajoutée avec succès !');
+      showDebug(`✅ Recette ajoutée !`);
     } catch (error) {
-      console.error('Erreur ajout recette:', error);
+      showDebug(`❌ Erreur ajout: ${error}`);
     }
   };
 
   const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-    console.log('Suppression recette:', { carnetId, recipeId });
+    showDebug(`🔄 Suppression: ${recipeId} de ${carnetId}`);
     try {
       removeRecipeFromNotebook(carnetId, recipeId);
-      console.log('Recette supprimée avec succès !');
+      showDebug(`✅ Recette supprimée !`);
     } catch (error) {
-      console.error('Erreur suppression recette:', error);
+      showDebug(`❌ Erreur suppression: ${error}`);
     }
   };
 
@@ -86,18 +99,6 @@ export default function CarnetsPage() {
               />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="text-blue-500 text-xl">💡</div>
-                <div>
-                  <h4 className="font-medium text-blue-800 mb-1">Astuce</h4>
-                  <p className="text-sm text-blue-700">
-                    Les carnets vous aident à organiser vos recettes. Plus tard, vous pourrez créer des livres à imprimer à partir de vos carnets !
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <div className="flex gap-3 pt-4">
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -127,6 +128,10 @@ export default function CarnetsPage() {
           <p className="text-gray-600 mt-1">
             Organisez vos recettes par thème et créez vos livres
           </p>
+          {/* 🐛 Info debug visible */}
+          <div className="mt-2 text-xs bg-yellow-100 px-2 py-1 rounded">
+            📊 {notebooks.length} carnets • {recipes.length} recettes
+          </div>
         </div>
         
         <button
@@ -171,8 +176,8 @@ export default function CarnetsPage() {
                 </p>
                 
                 <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span>{carnet.recipeIds.length} recettes</span>
-                  {carnet.recipeIds.length > 0 && (
+                  <span>{carnet.recipeIds?.length || 0} recettes</span>
+                  {(carnet.recipeIds?.length || 0) > 0 && (
                     <span className="text-green-600">Prêt à imprimer</span>
                   )}
                 </div>
@@ -199,22 +204,26 @@ export default function CarnetsPage() {
   const CarnetEditor = () => {
     if (!currentCarnet) return null;
     
-    console.log('Current carnet:', currentCarnet);
-    console.log('All recipes:', recipes);
-    console.log('Carnet recipe IDs:', currentCarnet.recipeIds);
+    // 🔧 Rechercher le carnet mis à jour
+    const actualCarnet = notebooks.find(n => n.id === currentCarnet.id) || currentCarnet;
     
     const carnetRecipes = recipes.filter(recipe => 
-      currentCarnet.recipeIds && currentCarnet.recipeIds.includes(recipe.id)
+      actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
     );
     const availableRecipes = recipes.filter(recipe => 
-      !currentCarnet.recipeIds || !currentCarnet.recipeIds.includes(recipe.id)
+      !actualCarnet.recipeIds || !actualCarnet.recipeIds.includes(recipe.id)
     );
-    
-    console.log('Carnet recipes:', carnetRecipes);
-    console.log('Available recipes:', availableRecipes);
 
     return (
       <div className="space-y-8">
+        
+        {/* 🐛 Message de debug affiché en haut */}
+        {debugMessage && (
+          <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-center">
+            <p className="text-blue-800 font-medium">{debugMessage}</p>
+          </div>
+        )}
+        
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -224,10 +233,14 @@ export default function CarnetsPage() {
               ← Retour aux carnets
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{currentCarnet.title}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{actualCarnet.title}</h1>
               <p className="text-gray-600">
-                {currentCarnet.recipeIds ? currentCarnet.recipeIds.length : 0} recettes dans ce carnet
+                {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans ce carnet
               </p>
+              {/* Info debug */}
+              <div className="text-xs bg-yellow-100 px-2 py-1 rounded mt-1">
+                ID: {actualCarnet.id} • {availableRecipes.length} dispo • {carnetRecipes.length} dedans
+              </div>
             </div>
           </div>
         </div>
@@ -262,8 +275,8 @@ export default function CarnetsPage() {
                       </div>
                       <button
                         onClick={() => {
-                          console.log('Clic sur ajouter recette:', recipe.id);
-                          handleAddRecipe(currentCarnet.id, recipe.id);
+                          showDebug(`🔄 Clic bouton ! ${recipe.title}`);
+                          handleAddRecipe(actualCarnet.id, recipe.id);
                         }}
                         className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start flex items-center gap-1"
                       >
@@ -315,10 +328,7 @@ export default function CarnetsPage() {
                       </div>
                       
                       <button
-                        onClick={() => {
-                          console.log('Clic sur supprimer recette:', recipe.id);
-                          handleRemoveRecipe(currentCarnet.id, recipe.id);
-                        }}
+                        onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
                         className="text-gray-400 hover:text-red-600 transition-colors self-start p-1"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -342,7 +352,7 @@ export default function CarnetsPage() {
                 Transformez ce carnet en un beau livre à imprimer avec toutes ses recettes
               </p>
               <Link
-                href={`/livres/nouveau?carnet=${currentCarnet.id}`}
+                href={`/livres/nouveau?carnet=${actualCarnet.id}`}
                 className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
               >
                 Créer un livre avec {carnetRecipes.length} recettes
