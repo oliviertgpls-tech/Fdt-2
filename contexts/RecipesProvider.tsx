@@ -38,7 +38,7 @@ Servir immédiatement avec du persil frais et du parmesan supplémentaire.`,
     prepMinutes: 35,
     servings: "4",
     tags: ["italien", "végétarien", "réconfortant"],
-    createdAt: Date.now() - 432000000 // Il y a 5 jours
+    createdAt: Date.now() - 432000000
   },
   {
     id: "r2",
@@ -75,7 +75,7 @@ Laisser reposer 10 minutes avant de découper.`,
     prepMinutes: 90,
     servings: "4-6",
     tags: ["plat principal", "familial", "méditerranéen"],
-    createdAt: Date.now() - 345600000 // Il y a 4 jours
+    createdAt: Date.now() - 345600000
   },
   {
     id: "r3",
@@ -110,7 +110,7 @@ Laisser tiédir 5 minutes puis démouler d'un geste franc sur un plat de service
     prepMinutes: 60,
     servings: "6-8",
     tags: ["dessert", "traditionnel", "français"],
-    createdAt: Date.now() - 259200000 // Il y a 3 jours
+    createdAt: Date.now() - 259200000
   },
   {
     id: "r4",
@@ -151,7 +151,7 @@ Servir à température ambiante ou légèrement tiède.`,
     prepMinutes: 45,
     servings: "4",
     tags: ["salade", "végétarien", "healthy"],
-    createdAt: Date.now() - 172800000 // Il y a 2 jours
+    createdAt: Date.now() - 172800000
   },
   {
     id: "r5",
@@ -187,38 +187,22 @@ Servir immédiatement avec une boule de glace vanille.`,
     prepMinutes: 25,
     servings: "6",
     tags: ["dessert", "chocolat", "gourmand"],
-    createdAt: Date.now() - 86400000 // Il y a 1 jour
-  }
-];
-
-// 📚 Un carnet d'exemple
-const initialBooks: Book[] = [
-  {
-    id: "b1",
-    title: "Recettes de famille",
-    description: "Les meilleures recettes transmises de génération en génération",
-    recipeIds: ["r1"], // Contient déjà le risotto
     createdAt: Date.now() - 86400000
   }
 ];
 
+const initialBooks: Book[] = [];
+
 type RecipesContextType = {
-  // Recettes
   recipes: Recipe[];
   addRecipe: (recipeData: Omit<Recipe, 'id' | 'createdAt'>) => void;
   updateRecipe: (id: string, recipeData: Partial<Recipe>) => void;
   deleteRecipe: (id: string) => void;
-
-  // Carnets
   books: Book[];
-  carnets: Book[];
   createBook: (title: string, description?: string) => Book;
-  createCarnet: (title: string, description?: string) => Book;
   addRecipeToBook: (bookId: string, recipeId: string) => void;
-  addRecipeToCarnet: (carnetId: string, recipeId: string) => void;
   removeRecipeFromBook: (bookId: string, recipeId: string) => void;
-  removeRecipeFromCarnet: (carnetId: string, recipeId: string) => void;
-  };
+};
 
 const RecipesContext = createContext<RecipesContextType | undefined>(undefined);
 
@@ -226,7 +210,6 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const [books, setBooks] = useState<Book[]>(initialBooks);
 
-  // ➕ Ajouter une nouvelle recette (version complète)
   function addRecipe(recipeData: Omit<Recipe, 'id' | 'createdAt'>) {
     const newRecipe: Recipe = {
       ...recipeData,
@@ -237,7 +220,6 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     setRecipes(prev => [newRecipe, ...prev]);
   }
 
-  // ✏️ Mettre à jour une recette existante
   function updateRecipe(id: string, recipeData: Partial<Recipe>) {
     setRecipes(prev =>
       prev.map(recipe =>
@@ -248,12 +230,9 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // 🗑️ Supprimer une recette
   function deleteRecipe(id: string) {
-    // Supprimer la recette
     setRecipes(prev => prev.filter(recipe => recipe.id !== id));
     
-    // La retirer de tous les carnets
     setBooks(prev =>
       prev.map(book => ({
         ...book,
@@ -263,7 +242,6 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // 📚 Créer un nouveau livre avec description
   function createBook(title: string, description?: string): Book {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) throw new Error('Title is required');
@@ -280,18 +258,21 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     return newBook;
   }
 
-  // ➕ Ajouter une recette à un carnet
   function addRecipeToBook(bookId: string, recipeId: string) {
     setBooks(prev =>
-      prev.map(book =>
-        book.id === bookId && !book.recipeIds.includes(recipeId)
-          ? { ...book, recipeIds: [...book.recipeIds, recipeId], updatedAt: Date.now() }
-          : book
-      )
+      prev.map(book => {
+        if (book.id === bookId && !book.recipeIds.includes(recipeId)) {
+          return {
+            ...book,
+            recipeIds: [...book.recipeIds, recipeId],
+            updatedAt: Date.now()
+          };
+        }
+        return book;
+      })
     );
   }
 
-  // ➖ Retirer une recette d'un carnet
   function removeRecipeFromBook(bookId: string, recipeId: string) {
     setBooks(prev =>
       prev.map(book =>
@@ -314,18 +295,15 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
         updateRecipe,
         deleteRecipe,
         books,
-        carnets: books,  // Alias pour les carnets
         createBook,
-        createCarnet: createBook,  // Alias pour créer un carnet
         addRecipeToBook,
-        addRecipeToCarnet: addRecipeToBook,  // Alias pour ajouter à un carnet
         removeRecipeFromBook,
-        removeRecipeFromCarnet: removeRecipeFromBook,  // Alias pour retirer d'un carnet
       }}
     >
       {children}
     </RecipesContext.Provider>
   );
+}
 
 export function useRecipes() {
   const context = useContext(RecipesContext);
