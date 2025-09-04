@@ -300,23 +300,39 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // 📚 Créer un nouveau livre avec description
+  function createBook(title: string, description?: string) {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
+    const newBook: Book = {
+      id: `b-${Date.now()}`,
+      title: trimmedTitle,
+      description: description?.trim(),
+      recipeIds: [],
+      createdAt: Date.now()
+    };
+
+    setBooks(prev => [newBook, ...prev]);
+    return newBook;
+  }
+
   return (
-    <RecipesContext.Provider
-      value={{
-        recipes,
-        addRecipe,
-        updateRecipe,
-        deleteRecipe,
-        books,
-        createBook,
-        addRecipeToBook,
-        removeRecipeFromBook,
-      }}
-    >
-      {children}
-    </RecipesContext.Provider>
-  );
-}
+  <RecipesContext.Provider
+    value={{
+      recipes,
+      addRecipe,
+      updateRecipe,
+      deleteRecipe,
+      books,
+      createBook,  // ← AJOUTE CETTE LIGNE
+      addRecipeToBook,
+      removeRecipeFromBook,
+    }}
+  >
+    {children}
+  </RecipesContext.Provider>
+);
 
 export function useRecipes() {
   const context = useContext(RecipesContext);
