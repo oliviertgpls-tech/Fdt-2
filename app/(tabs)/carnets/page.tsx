@@ -6,8 +6,8 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function CarnetsPage() {
-  // Utilisation directe sans alias pour éviter la confusion
-  const { books, createBook, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
+  // ✅ Fix : Utiliser la nouvelle terminologie
+  const { notebooks, createNotebook, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentCarnet, setCurrentCarnet] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -17,17 +17,29 @@ export default function CarnetsPage() {
 
   const handleCreateCarnet = () => {
     if (!formData.title.trim()) return;
-    createBook(formData.title.trim(), formData.description.trim());
+    createNotebook(formData.title.trim(), formData.description.trim());
     setFormData({ title: '', description: '' });
     setShowCreateModal(false);
   };
 
   const handleAddRecipe = (carnetId: string, recipeId: string) => {
-    addRecipeToBook(carnetId, recipeId);
+    console.log('Ajout recette:', { carnetId, recipeId });
+    try {
+      addRecipeToNotebook(carnetId, recipeId);
+      console.log('Recette ajoutée avec succès !');
+    } catch (error) {
+      console.error('Erreur ajout recette:', error);
+    }
   };
 
   const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-    removeRecipeFromBook(carnetId, recipeId);
+    console.log('Suppression recette:', { carnetId, recipeId });
+    try {
+      removeRecipeFromNotebook(carnetId, recipeId);
+      console.log('Recette supprimée avec succès !');
+    } catch (error) {
+      console.error('Erreur suppression recette:', error);
+    }
   };
 
   const CreateCarnetModal = () => (
@@ -126,7 +138,7 @@ export default function CarnetsPage() {
         </button>
       </div>
 
-      {books.length === 0 ? (
+      {notebooks.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
           <div className="text-6xl mb-4">📋</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -144,7 +156,7 @@ export default function CarnetsPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {books.map((carnet) => (
+          {notebooks.map((carnet) => (
             <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
                 📋
@@ -187,8 +199,19 @@ export default function CarnetsPage() {
   const CarnetEditor = () => {
     if (!currentCarnet) return null;
     
-    const carnetRecipes = recipes.filter(recipe => currentCarnet.recipeIds.includes(recipe.id));
-    const availableRecipes = recipes.filter(recipe => !currentCarnet.recipeIds.includes(recipe.id));
+    console.log('Current carnet:', currentCarnet);
+    console.log('All recipes:', recipes);
+    console.log('Carnet recipe IDs:', currentCarnet.recipeIds);
+    
+    const carnetRecipes = recipes.filter(recipe => 
+      currentCarnet.recipeIds && currentCarnet.recipeIds.includes(recipe.id)
+    );
+    const availableRecipes = recipes.filter(recipe => 
+      !currentCarnet.recipeIds || !currentCarnet.recipeIds.includes(recipe.id)
+    );
+    
+    console.log('Carnet recipes:', carnetRecipes);
+    console.log('Available recipes:', availableRecipes);
 
     return (
       <div className="space-y-8">
@@ -202,7 +225,9 @@ export default function CarnetsPage() {
             </button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">{currentCarnet.title}</h1>
-              <p className="text-gray-600">{currentCarnet.recipeIds.length} recettes dans ce carnet</p>
+              <p className="text-gray-600">
+                {currentCarnet.recipeIds ? currentCarnet.recipeIds.length : 0} recettes dans ce carnet
+              </p>
             </div>
           </div>
         </div>
@@ -210,7 +235,7 @@ export default function CarnetsPage() {
         <div className="grid lg:grid-cols-2 gap-8">
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              📝 Recettes disponibles
+              📝 Recettes disponibles ({availableRecipes.length})
             </h2>
             
             {availableRecipes.length === 0 ? (
@@ -224,20 +249,25 @@ export default function CarnetsPage() {
                   <div key={recipe.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
                     <div className="flex gap-4">
                       <img 
-                        src={recipe.imageUrl} 
+                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
                         alt={recipe.title}
                         className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author}</p>
-                        <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes}min</p>
+                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ⏱️ {recipe.prepMinutes || '?'}min
+                        </p>
                       </div>
                       <button
-                        onClick={() => handleAddRecipe(currentCarnet.id, recipe.id)}
-                        className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start"
+                        onClick={() => {
+                          console.log('Clic sur ajouter recette:', recipe.id);
+                          handleAddRecipe(currentCarnet.id, recipe.id);
+                        }}
+                        className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start flex items-center gap-1"
                       >
-                        <Plus className="w-4 h-4 mr-1 inline" />
+                        <Plus className="w-4 h-4" />
                         Ajouter
                       </button>
                     </div>
@@ -249,7 +279,7 @@ export default function CarnetsPage() {
 
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-6">
-              📋 Dans le carnet
+              📋 Dans le carnet ({carnetRecipes.length})
             </h2>
             
             {carnetRecipes.length === 0 ? (
@@ -271,19 +301,24 @@ export default function CarnetsPage() {
                       </div>
                       
                       <img 
-                        src={recipe.imageUrl} 
+                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
                         alt={recipe.title}
                         className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                       />
                       
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author}</p>
-                        <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes}min</p>
+                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ⏱️ {recipe.prepMinutes || '?'}min
+                        </p>
                       </div>
                       
                       <button
-                        onClick={() => handleRemoveRecipe(currentCarnet.id, recipe.id)}
+                        onClick={() => {
+                          console.log('Clic sur supprimer recette:', recipe.id);
+                          handleRemoveRecipe(currentCarnet.id, recipe.id);
+                        }}
                         className="text-gray-400 hover:text-red-600 transition-colors self-start p-1"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -296,7 +331,7 @@ export default function CarnetsPage() {
           </div>
         </div>
 
-        {/* BOUTON AJOUTER AU LIVRE */}
+        {/* BOUTON CRÉER UN LIVRE */}
         {carnetRecipes.length > 0 && (
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 text-center">
             <div className="max-w-md mx-auto">
@@ -310,7 +345,7 @@ export default function CarnetsPage() {
                 href={`/livres/nouveau?carnet=${currentCarnet.id}`}
                 className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
               >
-                Ajouter les {carnetRecipes.length} recettes à mon livre
+                Créer un livre avec {carnetRecipes.length} recettes
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
