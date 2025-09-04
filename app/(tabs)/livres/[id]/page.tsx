@@ -386,13 +386,32 @@ export default function LivreEditorPage() {
                           <button
                             onClick={() => {
                               if (showPreview) {
-                                setCurrentPage((index * 2) + 1); // Photo page
+                                // Aller à la page photo de cette recette
+                                const photoPageIndex = pages.findIndex(p => p === `photo-${recipe.id}`);
+                                if (photoPageIndex !== -1) {
+                                  setCurrentPage(photoPageIndex);
+                                }
                               }
                             }}
                             className="opacity-50 group-hover:opacity-100 p-1 hover:bg-blue-200 rounded transition-all text-blue-600"
                             title="Voir la photo dans l'aperçu"
                           >
-                            <Eye className="w-4 h-4" />
+                            📸
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (showPreview) {
+                                // Aller à la page recette de cette recette
+                                const recipePageIndex = pages.findIndex(p => p === `recipe-${recipe.id}`);
+                                if (recipePageIndex !== -1) {
+                                  setCurrentPage(recipePageIndex);
+                                }
+                              }
+                            }}
+                            className="opacity-50 group-hover:opacity-100 p-1 hover:bg-blue-200 rounded transition-all text-green-600"
+                            title="Voir la recette dans l'aperçu"
+                          >
+                            📄
                           </button>
                           <button
                             onClick={() => removeRecipeFromBook(book.id, recipe.id)}
