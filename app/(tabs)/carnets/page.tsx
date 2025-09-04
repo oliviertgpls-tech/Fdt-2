@@ -14,45 +14,19 @@ export default function CarnetsPage() {
     description: ''
   });
 
-  // 🐛 État pour les messages de debug
-  const [debugMessage, setDebugMessage] = useState<string>('');
-
-  const showDebug = (message: string) => {
-    setDebugMessage(message);
-    setTimeout(() => setDebugMessage(''), 3000);
-  };
-
   const handleCreateCarnet = () => {
     if (!formData.title.trim()) return;
-    try {
-      createNotebook(formData.title.trim(), formData.description.trim());
-      showDebug(`✅ Carnet "${formData.title}" créé !`);
-      setFormData({ title: '', description: '' });
-      setShowCreateModal(false);
-    } catch (error) {
-      showDebug(`❌ Erreur création: ${error}`);
-    }
+    createNotebook(formData.title.trim(), formData.description.trim());
+    setFormData({ title: '', description: '' });
+    setShowCreateModal(false);
   };
 
   const handleAddRecipe = (carnetId: string, recipeId: string) => {
-    showDebug(`🔄 Tentative ajout: ${recipeId} → ${carnetId}`);
-    
-    try {
-      addRecipeToNotebook(carnetId, recipeId);
-      showDebug(`✅ Recette ajoutée !`);
-    } catch (error) {
-      showDebug(`❌ Erreur ajout: ${error}`);
-    }
+    addRecipeToNotebook(carnetId, recipeId);
   };
 
   const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-    showDebug(`🔄 Suppression: ${recipeId} de ${carnetId}`);
-    try {
-      removeRecipeFromNotebook(carnetId, recipeId);
-      showDebug(`✅ Recette supprimée !`);
-    } catch (error) {
-      showDebug(`❌ Erreur suppression: ${error}`);
-    }
+    removeRecipeFromNotebook(carnetId, recipeId);
   };
 
   const CreateCarnetModal = () => (
@@ -99,6 +73,18 @@ export default function CarnetsPage() {
               />
             </div>
 
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="text-blue-500 text-xl">💡</div>
+                <div>
+                  <h4 className="font-medium text-blue-800 mb-1">Astuce</h4>
+                  <p className="text-sm text-blue-700">
+                    Les carnets vous aident à organiser vos recettes. Plus tard, vous pourrez créer des livres à imprimer à partir de vos carnets !
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="flex gap-3 pt-4">
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -128,10 +114,6 @@ export default function CarnetsPage() {
           <p className="text-gray-600 mt-1">
             Organisez vos recettes par thème et créez vos livres
           </p>
-          {/* 🐛 Info debug visible */}
-          <div className="mt-2 text-xs bg-yellow-100 px-2 py-1 rounded">
-            📊 {notebooks.length} carnets • {recipes.length} recettes
-          </div>
         </div>
         
         <button
@@ -204,7 +186,7 @@ export default function CarnetsPage() {
   const CarnetEditor = () => {
     if (!currentCarnet) return null;
     
-    // 🔧 Rechercher le carnet mis à jour
+    // Rechercher le carnet mis à jour dans le state
     const actualCarnet = notebooks.find(n => n.id === currentCarnet.id) || currentCarnet;
     
     const carnetRecipes = recipes.filter(recipe => 
@@ -216,14 +198,6 @@ export default function CarnetsPage() {
 
     return (
       <div className="space-y-8">
-        
-        {/* 🐛 Message de debug affiché en haut */}
-        {debugMessage && (
-          <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-center">
-            <p className="text-blue-800 font-medium">{debugMessage}</p>
-          </div>
-        )}
-        
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -237,10 +211,6 @@ export default function CarnetsPage() {
               <p className="text-gray-600">
                 {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans ce carnet
               </p>
-              {/* Info debug */}
-              <div className="text-xs bg-yellow-100 px-2 py-1 rounded mt-1">
-                ID: {actualCarnet.id} • {availableRecipes.length} dispo • {carnetRecipes.length} dedans
-              </div>
             </div>
           </div>
         </div>
@@ -274,10 +244,7 @@ export default function CarnetsPage() {
                         </p>
                       </div>
                       <button
-                        onClick={() => {
-                          showDebug(`🔄 Clic bouton ! ${recipe.title}`);
-                          handleAddRecipe(actualCarnet.id, recipe.id);
-                        }}
+                        onClick={() => handleAddRecipe(actualCarnet.id, recipe.id)}
                         className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start flex items-center gap-1"
                       >
                         <Plus className="w-4 h-4" />
