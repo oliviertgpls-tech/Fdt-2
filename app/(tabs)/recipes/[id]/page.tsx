@@ -258,7 +258,7 @@ export default function RecipeDetailPage() {
           )}
         </div>
 
-        {/* Actions */}
+      {/* Actions */}
         <div className="pt-6 border-t space-y-4">
           <div className="flex gap-3">
             <Link
@@ -267,15 +267,20 @@ export default function RecipeDetailPage() {
             >
               ✏️ Modifier cette recette
             </Link>
+            
             <button
               onClick={() => {
-                // TODO: Logique d'ajout au livre
-                alert("Fonctionnalité à venir !");
+                // Fonction d'ajout au livre - sera connectée
+                if (window.confirm('Ajouter cette recette à un livre ?')) {
+                  // Logique d'ajout
+                  window.location.href = `/library?add=${recipe.id}`;
+                }
               }}
-              className="bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 transition-colors font-medium"
+              className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium flex items-center gap-2"
             >
               📚 Ajouter à mon livre
             </button>
+            
             <button
               onClick={() => {
                 if (window.confirm(`Êtes-vous sûr de vouloir supprimer "${recipe.title}" ?\n\nCette action est irréversible.`)) {
@@ -288,6 +293,14 @@ export default function RecipeDetailPage() {
               🗑️
             </button>
           </div>
+          
+          <Link 
+            href="/recipes" 
+            className="block text-center text-primary-600 underline hover:text-primary-700"
+          >
+            ← Retour à la liste des recettes
+          </Link>
+        </div>
           
           <Link 
             href="/recipes" 
