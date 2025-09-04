@@ -116,20 +116,16 @@ export default function LivreEditorPage() {
         alt={recipe.title}
         className="w-full h-full object-cover"
       />
+      
+      {/* Overlay très subtil pour unifier */}
       <div className="absolute inset-0 bg-brown-900 opacity-5"></div>
+      
+      {/* Badge qualité photo en bas à droite */}
       {recipe.photoQuality === 'low' && (
         <div className="absolute bottom-8 right-8 bg-orange-500 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg">
           ⚠️ Photo à améliorer
         </div>
       )}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent p-8">
-        <h1 className="font-serif text-4xl text-white mb-2 drop-shadow-lg">
-          {recipe.title}
-        </h1>
-        <p className="text-white/90 text-lg italic font-light drop-shadow">
-          par {recipe.author}
-        </p>
-      </div>
     </div>
   );
 
