@@ -182,7 +182,7 @@ Enfourner 25 minutes.
 Simple et naturel !"
           />
           <p className="text-xs text-gray-500 mt-1">
-            💡 Écrivez naturellement, laissez une ligne vide pour créer une étape supplémentaire !
+            💡 Écrivez naturellement, laisser une ligne vide pour générer une autre étape !
           </p>
         </div>
 
