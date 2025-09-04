@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-4 mb-6">
           <div className="text-6xl">🍽️</div>
           <h1 style={{ color: '#292524' }}>
-            Carnets de Recettes Familiaux
+            Préservez le patrimoine culinaire de votre famille !
           </h1>
         </div>
         
