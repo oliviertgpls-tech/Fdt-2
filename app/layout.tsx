@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="flex items-center gap-6 text-sm">
               <Link 
                 href="/carnets" 
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-orange-600 transition-colors"
               >
                 📚 Mes Carnets
               </Link>
@@ -25,13 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <Link 
                 href="/recipes" 
-                className="hover:text-blue-600 transition-colors"
+                className="hover:text-orange-600 transition-colors"
               >
                 📝 Mes Recettes
               </Link>
               <Link 
                 href="/add" 
-                className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 transition-colors"
+                className="bg-primary-600 text-white px-3 py-1 rounded-md hover:bg-primary-700 transition-colors"
               >
                 + Ajouter
               </Link>
