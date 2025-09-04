@@ -191,15 +191,38 @@ Servir immédiatement avec une boule de glace vanille.`,
   }
 ];
 
-const initialBooks: Book[] = [];
+// 📚 Pas de carnets/livres au départ
+const initialNotebooks: Book[] = [];
+
+// Type pour les livres imprimables (différent des carnets)
+type PrintableBook = {
+  id: string;
+  title: string;
+  recipeIds: string[];
+  templateStyle?: string;
+  status: 'draft' | 'ready' | 'ordered' | 'printed';
+  createdAt: number;
+  updatedAt?: number;
+};
+
+const initialPrintableBooks: PrintableBook[] = [];
 
 type RecipesContextType = {
+  // 🍽️ RECETTES
   recipes: Recipe[];
   addRecipe: (recipeData: Omit<Recipe, 'id' | 'createdAt'>) => void;
   updateRecipe: (id: string, recipeData: Partial<Recipe>) => void;
   deleteRecipe: (id: string) => void;
-  books: Book[];
-  createBook: (title: string, description?: string) => Book;
+  
+  // 📚 CARNETS (collections thématiques)
+  notebooks: Book[];
+  createNotebook: (title: string, description?: string) => Book;
+  addRecipeToNotebook: (notebookId: string, recipeId: string) => void;
+  removeRecipeFromNotebook: (notebookId: string, recipeId: string) => void;
+  
+  // 📖 LIVRES IMPRIMABLES (versions print avec recettes sélectionnées)
+  books: PrintableBook[];
+  createBook: (title: string, selectedRecipeIds: string[]) => PrintableBook;
   addRecipeToBook: (bookId: string, recipeId: string) => void;
   removeRecipeFromBook: (bookId: string, recipeId: string) => void;
 };
@@ -208,15 +231,16 @@ const RecipesContext = createContext<RecipesContextType | undefined>(undefined);
 
 export function RecipesProvider({ children }: { children: React.ReactNode }) {
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
-  const [books, setBooks] = useState<Book[]>(initialBooks);
+  const [notebooks, setNotebooks] = useState<Book[]>(initialNotebooks);
+  const [books, setBooks] = useState<PrintableBook[]>(initialPrintableBooks);
 
+  // 🍽️ GESTION DES RECETTES
   function addRecipe(recipeData: Omit<Recipe, 'id' | 'createdAt'>) {
     const newRecipe: Recipe = {
       ...recipeData,
       id: `r-${Date.now()}`,
       createdAt: Date.now()
     };
-
     setRecipes(prev => [newRecipe, ...prev]);
   }
 
@@ -233,6 +257,15 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   function deleteRecipe(id: string) {
     setRecipes(prev => prev.filter(recipe => recipe.id !== id));
     
+    // Nettoyer les carnets et livres
+    setNotebooks(prev =>
+      prev.map(notebook => ({
+        ...notebook,
+        recipeIds: notebook.recipeIds.filter(recipeId => recipeId !== id),
+        updatedAt: Date.now()
+      }))
+    );
+    
     setBooks(prev =>
       prev.map(book => ({
         ...book,
@@ -242,15 +275,60 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  function createBook(title: string, description?: string): Book {
+  // 📚 GESTION DES CARNETS (collections thématiques)
+  function createNotebook(title: string, description?: string): Book {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) throw new Error('Title is required');
 
-    const newBook: Book = {
-      id: `b-${Date.now()}`,
+    const newNotebook: Book = {
+      id: `notebook-${Date.now()}`,
       title: trimmedTitle,
       description: description?.trim(),
       recipeIds: [],
+      createdAt: Date.now()
+    };
+
+    setNotebooks(prev => [newNotebook, ...prev]);
+    return newNotebook;
+  }
+
+  function addRecipeToNotebook(notebookId: string, recipeId: string) {
+    setNotebooks(prev =>
+      prev.map(notebook => {
+        if (notebook.id === notebookId && !notebook.recipeIds.includes(recipeId)) {
+          return {
+            ...notebook,
+            recipeIds: [...notebook.recipeIds, recipeId],
+            updatedAt: Date.now()
+          };
+        }
+        return notebook;
+      })
+    );
+  }
+
+  function removeRecipeFromNotebook(notebookId: string, recipeId: string) {
+    setNotebooks(prev =>
+      prev.map(notebook =>
+        notebook.id === notebookId
+          ? { 
+              ...notebook, 
+              recipeIds: notebook.recipeIds.filter(id => id !== recipeId),
+              updatedAt: Date.now()
+            }
+          : notebook
+      )
+    );
+  }
+
+  // 📖 GESTION DES LIVRES IMPRIMABLES
+  function createBook(title: string, selectedRecipeIds: string[]): PrintableBook {
+    const newBook: PrintableBook = {
+      id: `book-${Date.now()}`,
+      title: title.trim(),
+      recipeIds: [...selectedRecipeIds],
+      templateStyle: 'classic',
+      status: 'draft',
       createdAt: Date.now()
     };
 
@@ -290,10 +368,19 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   return (
     <RecipesContext.Provider
       value={{
+        // Recettes
         recipes,
         addRecipe,
         updateRecipe,
         deleteRecipe,
+        
+        // Carnets (collections thématiques)
+        notebooks,
+        createNotebook,
+        addRecipeToNotebook,
+        removeRecipeFromNotebook,
+        
+        // Livres (versions imprimables)
         books,
         createBook,
         addRecipeToBook,
