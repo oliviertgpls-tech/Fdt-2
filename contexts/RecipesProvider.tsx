@@ -314,15 +314,18 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
         updateRecipe,
         deleteRecipe,
         books,
+        carnets: books,  // Alias pour les carnets
         createBook,
+        createCarnet: createBook,  // Alias pour créer un carnet
         addRecipeToBook,
+        addRecipeToCarnet: addRecipeToBook,  // Alias pour ajouter à un carnet
         removeRecipeFromBook,
+        removeRecipeFromCarnet: removeRecipeFromBook,  // Alias pour retirer d'un carnet
       }}
     >
       {children}
     </RecipesContext.Provider>
   );
-}
 
 export function useRecipes() {
   const context = useContext(RecipesContext);
