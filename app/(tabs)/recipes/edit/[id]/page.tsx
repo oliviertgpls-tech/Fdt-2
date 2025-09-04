@@ -17,12 +17,14 @@ export default function EditRecipePage() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [prepMinutes, setPrepMinutes] = useState("");
+  const [servings, setServings] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showHelpModal, setShowHelpModal] = useState(true); // Modale d'explication
 
   // Pré-remplir le formulaire avec les données existantes
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function EditRecipePage() {
       setTitle(recipe.title);
       setAuthor(recipe.author || "");
       setPrepMinutes(recipe.prepMinutes?.toString() || "");
+      setServings(recipe.servings || "");
       setIngredients(recipe.ingredients.join("\n"));
       setSteps(recipe.steps || "");
       setImageUrl(recipe.imageUrl || "");
@@ -55,6 +58,7 @@ export default function EditRecipePage() {
         title: title.trim(),
         author: author.trim() || undefined,
         prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
+        servings: servings.trim() || undefined,
         imageUrl: imageUrl.trim() || undefined,
         // Transformer le textarea en array (1 ligne = 1 ingrédient)
         ingredients: ingredients
@@ -93,7 +97,7 @@ export default function EditRecipePage() {
         <p className="text-gray-600 mb-6">Cette recette n'existe pas ou a été supprimée.</p>
         <button
           onClick={() => router.push("/recipes")}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
         >
           ← Retour aux recettes
         </button>
@@ -102,146 +106,193 @@ export default function EditRecipePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* En-tête */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-gray-900">
-          ✏️ Modifier "{recipe.title}"
-        </h1>
-        <p className="text-gray-600 text-sm">
-          Modifiez votre recette et sauvegardez les changements
-        </p>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-        
-        {/* Titre - OBLIGATOIRE */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Nom de la recette *
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-            placeholder="Ex: Gâteau de Mamie"
-            required
-          />
-        </div>
-
-        {/* Rangée rapide : Auteur + Temps */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Par qui ?
-            </label>
-            <input
-              type="text"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-              placeholder="Mamie, Papa..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Temps (min)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="999"
-              value={prepMinutes}
-              onChange={(e) => setPrepMinutes(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-              placeholder="30"
-            />
+    <div>
+      {/* Mini-modale d'explication pour la saisie */}
+      {showHelpModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
+            <div className="text-center space-y-4">
+              <div className="text-3xl">✍️</div>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Saisie des étapes
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Pour créer des étapes séparées, <strong>laissez une ligne vide</strong> entre chaque étape dans le champ instructions.
+                <br/><br/>
+                Exemple :<br/>
+                <code className="bg-gray-100 p-2 rounded text-xs block mt-2">
+                  Étape 1 : Préchauffer le four...
+                  <br/><br/>
+                  Étape 2 : Mélanger les ingrédients...
+                </code>
+              </p>
+              <button
+                onClick={() => setShowHelpModal(false)}
+                className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors font-medium"
+              >
+                J'ai compris
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Photo (optionnel) */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Photo (optionnel)
-          </label>
-          <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-            placeholder="Collez un lien d'image..."
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Bientôt : photo depuis votre téléphone !
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* En-tête */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-bold text-gray-900">
+            ✏️ Modifier "{recipe.title}"
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Modifiez votre recette et sauvegardez les changements
           </p>
         </div>
 
-        {/* Ingrédients - SIMPLE textarea */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            🥄 Ingrédients
-          </label>
-          <textarea
-            rows={6}
-            value={ingredients}
-            onChange={(e) => setIngredients(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Tapez chaque ingrédient sur une nouvelle ligne :
+        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+          
+          {/* Titre - OBLIGATOIRE */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Nom de la recette *
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+              placeholder="Ex: Gâteau de Mamie"
+              required
+            />
+          </div>
+
+          {/* Rangée rapide : Auteur + Temps + Personnes */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Par qui ?
+              </label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                placeholder="Mamie, Papa..."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Temps (min)
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="999"
+                value={prepMinutes}
+                onChange={(e) => setPrepMinutes(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                placeholder="30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Personnes
+              </label>
+              <input
+                type="text"
+                value={servings}
+                onChange={(e) => setServings(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                placeholder="4, 6-8..."
+              />
+            </div>
+          </div>
+
+          {/* Photo (optionnel) */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Photo (optionnel)
+            </label>
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              placeholder="Collez un lien d'image..."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Bientôt : photo depuis votre téléphone !
+            </p>
+          </div>
+
+          {/* Ingrédients - SIMPLE textarea */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              🥄 Ingrédients
+            </label>
+            <textarea
+              rows={6}
+              value={ingredients}
+              onChange={(e) => setIngredients(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
+              placeholder="Tapez chaque ingrédient sur une nouvelle ligne :
 
 200g de farine
 3 œufs
 100ml de lait
 1 pincée de sel"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Un ingrédient par ligne, c'est tout !
-          </p>
-        </div>
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Un ingrédient par ligne, c'est tout !
+            </p>
+          </div>
 
-        {/* Étapes - SIMPLE textarea */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            📋 Instructions
-          </label>
-          <textarea
-            rows={8}
-            value={steps}
-            onChange={(e) => setSteps(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Écrivez les étapes comme vous le feriez naturellement :
+          {/* Étapes - SIMPLE textarea */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              📋 Instructions
+            </label>
+            <textarea
+              rows={8}
+              value={steps}
+              onChange={(e) => setSteps(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
+              placeholder="Écrivez les étapes comme vous le feriez naturellement :
 
 Préchauffer le four à 180°C.
+
 Mélanger la farine et le sucre dans un saladier.
+
 Ajouter les œufs un par un...
+
 Enfourner 25 minutes.
 
 Simple et naturel !"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Écrivez naturellement, chaque ligne vide ajoute une étape !
-          </p>
-        </div>
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Laissez une ligne vide entre chaque étape pour une navigation plus facile !
+            </p>
+          </div>
 
-        {/* Actions */}
-        <div className="flex gap-3 pt-4">
-          <button
-            type="button"
-            onClick={() => router.push(`/recipes/${recipe.id}`)}
-            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-          >
-            Annuler
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || !title.trim()}
-            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {isSaving ? "⏳ Sauvegarde..." : "💾 Sauvegarder"}
-          </button>
+          {/* Actions */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => router.push(`/recipes/${recipe.id}`)}
+              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || !title.trim()}
+              className="flex-1 bg-primary-500 text-white py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
+            >
+              {isSaving ? "⏳ Sauvegarde..." : "💾 Sauvegarder"}
+            </button>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
