@@ -269,6 +269,15 @@ export default function RecipeDetailPage() {
             </Link>
             <button
               onClick={() => {
+                // TODO: Logique d'ajout au livre
+                alert("Fonctionnalité à venir !");
+              }}
+              className="bg-accent-100 text-accent-700 px-4 py-2 rounded-lg hover:bg-accent-200 transition-colors font-medium"
+            >
+              📚 Ajouter à mon livre
+            </button>
+            <button
+              onClick={() => {
                 if (window.confirm(`Êtes-vous sûr de vouloir supprimer "${recipe.title}" ?\n\nCette action est irréversible.`)) {
                   deleteRecipe(recipe.id);
                   router.push("/recipes");
@@ -276,7 +285,7 @@ export default function RecipeDetailPage() {
               }}
               className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
             >
-              🗑️ Supprimer
+              🗑️
             </button>
           </div>
           
