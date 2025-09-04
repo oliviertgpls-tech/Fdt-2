@@ -220,8 +220,8 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderCurrentPage = () => {
-    const page = pages[currentPage];
+  const renderPageByIndex = (pageIndex: number) => {
+    const page = pages[pageIndex];
     
     if (page === 'cover') return renderCoverPage();
     if (page?.startsWith('photo-')) {
@@ -236,6 +236,10 @@ export default function LivreEditorPage() {
     }
     
     return <div className="cookbook-page bg-cream flex items-center justify-center text-brown-600">Page non trouvée</div>;
+  };
+
+  const renderCurrentPage = () => {
+    return renderPageByIndex(currentPage);
   };
 
   const getPageLabel = (pageIndex: number) => {
