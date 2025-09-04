@@ -13,6 +13,7 @@ export default function AddRecipePage() {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [prepMinutes, setPrepMinutes] = useState("");
+  const [servings, setServings] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
   const [imageUrl, setImageUrl] = useState("");
