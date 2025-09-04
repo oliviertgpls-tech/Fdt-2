@@ -36,7 +36,7 @@ export default function LivreEditorPage() {
   // Récupérer les recettes du livre dans l'ordre
   const bookRecipes = book.recipeIds
     .map(id => recipes.find(r => r.id === id))
-    .filter(Boolean);
+    .filter((recipe): recipe is NonNullable<typeof recipe> => recipe !== undefined);
 
   const availableRecipes = recipes.filter(recipe => !book.recipeIds.includes(recipe.id));
 
