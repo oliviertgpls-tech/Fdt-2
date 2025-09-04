@@ -198,6 +198,7 @@ const initialNotebooks: Book[] = [];
 type PrintableBook = {
   id: string;
   title: string;
+  description?: string;
   recipeIds: string[];
   templateStyle?: string;
   status: 'draft' | 'ready' | 'ordered' | 'printed';
