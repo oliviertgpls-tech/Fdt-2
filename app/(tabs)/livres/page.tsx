@@ -281,4 +281,60 @@ export default function LivresPage() {
                 key={recipe.id} 
                 className={`border rounded-xl p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
-                    ? 'border-orange
+                    ? 'border-orange-300 bg-orange-50'
+                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                }`}
+                onClick={() => toggleRecipeSelection(recipe.id)}
+              >
+                <div className="flex gap-4">
+                  <div className="relative">
+                    <img 
+                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                      alt={recipe.title}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    {selectedRecipes.includes(recipe.id) && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
+                    <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                    <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes || '?'}min</p>
+                    
+                    {/* Indicateur si la recette est dans un carnet */}
+                    {notebooks.some(n => n.recipeIds.includes(recipe.id)) && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {notebooks
+                          .filter(n => n.recipeIds.includes(recipe.id))
+                          .slice(0, 2)
+                          .map(notebook => (
+                          <span 
+                            key={notebook.id}
+                            className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded"
+                          >
+                            📚 {notebook.title}
+                          </span>
+                        ))}
+                        {notebooks.filter(n => n.recipeIds.includes(recipe.id)).length > 2 && (
+                          <span className="text-xs text-gray-500">
+                            +{notebooks.filter(n => n.recipeIds.includes(recipe.id)).length - 2}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {showCreateModal && <CreateBookModal />}
+    </div>
+  );
+}
