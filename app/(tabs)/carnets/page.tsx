@@ -9,15 +9,17 @@ export default function CarnetsPage() {
   const { notebooks, createNotebook, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentCarnet, setCurrentCarnet] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: ''
-  });
+  
+  // ✅ CORRECTION - États séparés pour éviter les conflits
+  const [newNotebookTitle, setNewNotebookTitle] = useState('');
+  const [newNotebookDescription, setNewNotebookDescription] = useState('');
 
   const handleCreateCarnet = () => {
-    if (!formData.title.trim()) return;
-    createNotebook(formData.title.trim(), formData.description.trim());
-    setFormData({ title: '', description: '' });
+    if (!newNotebookTitle.trim()) return;
+    createNotebook(newNotebookTitle.trim(), newNotebookDescription.trim());
+    // Reset des champs après création
+    setNewNotebookTitle('');
+    setNewNotebookDescription('');
     setShowCreateModal(false);
   };
 
@@ -39,7 +41,12 @@ export default function CarnetsPage() {
               <p className="text-gray-600 mt-1">Organisez vos recettes par thème</p>
             </div>
             <button 
-              onClick={() => setShowCreateModal(false)}
+              onClick={() => {
+                setShowCreateModal(false);
+                // Reset des champs à la fermeture
+                setNewNotebookTitle('');
+                setNewNotebookDescription('');
+              }}
               className="text-gray-400 hover:text-gray-600 p-2"
             >
               <X className="w-5 h-5" />
@@ -53,10 +60,11 @@ export default function CarnetsPage() {
               </label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                value={newNotebookTitle}
+                onChange={(e) => setNewNotebookTitle(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
                 placeholder="Ex: Desserts de Mamie, Plats du dimanche, Recettes végé..."
+                autoFocus
               />
             </div>
 
@@ -66,8 +74,8 @@ export default function CarnetsPage() {
               </label>
               <textarea
                 rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                value={newNotebookDescription}
+                onChange={(e) => setNewNotebookDescription(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
                 placeholder="Décrivez le thème de ce carnet..."
               />
@@ -87,14 +95,18 @@ export default function CarnetsPage() {
 
             <div className="flex gap-3 pt-4">
               <button
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setNewNotebookTitle('');
+                  setNewNotebookDescription('');
+                }}
                 className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateCarnet}
-                disabled={!formData.title.trim()}
+                disabled={!newNotebookTitle.trim()}
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
