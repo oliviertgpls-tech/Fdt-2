@@ -12,10 +12,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <div className="flex items-center gap-6 text-sm">
               <Link 
-                href="/library" 
+                href="/carnets" 
                 className="hover:text-blue-600 transition-colors"
               >
                 📚 Mes Carnets
+              </Link>
+              <Link 
+                href="/livres" 
+                className="hover:text-orange-600 transition-colors"
+              >
+                📖 Mes Livres
               </Link>
               <Link 
                 href="/recipes" 
