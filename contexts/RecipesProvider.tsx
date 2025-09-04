@@ -211,10 +211,14 @@ type RecipesContextType = {
 
   // Carnets
   books: Book[];
+  carnets: Book[];
   createBook: (title: string, description?: string) => Book;
+  createCarnet: (title: string, description?: string) => Book;
   addRecipeToBook: (bookId: string, recipeId: string) => void;
+  addRecipeToCarnet: (carnetId: string, recipeId: string) => void;
   removeRecipeFromBook: (bookId: string, recipeId: string) => void;
-};
+  removeRecipeFromCarnet: (carnetId: string, recipeId: string) => void;
+  };
 
 const RecipesContext = createContext<RecipesContextType | undefined>(undefined);
 
