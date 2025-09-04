@@ -6,9 +6,9 @@ export default function HomePage() {
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="flex items-center justify-center gap-4 mb-6">
-          <div className="text-6xl">🍽️</div>
+          <div className="text-6xl"></div>
           <h1 style={{ color: '#292524' }}>
-            Préservez le patrimoine culinaire de votre famille !
+            Les recettes sont votre patrimoine !
           </h1>
         </div>
         
