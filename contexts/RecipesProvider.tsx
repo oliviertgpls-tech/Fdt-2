@@ -224,6 +224,7 @@ type RecipesContextType = {
   // 📖 LIVRES IMPRIMABLES (versions print avec recettes sélectionnées)
   books: PrintableBook[];
   createBook: (title: string, selectedRecipeIds: string[]) => PrintableBook;
+  updateBook: (id: string, bookData: Partial<PrintableBook>) => void;
   addRecipeToBook: (bookId: string, recipeId: string) => void;
   removeRecipeFromBook: (bookId: string, recipeId: string) => void;
 };
@@ -337,6 +338,16 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     return newBook;
   }
 
+  function updateBook(id: string, bookData: Partial<PrintableBook>) {
+    setBooks(prev =>
+      prev.map(book =>
+        book.id === id
+          ? { ...book, ...bookData, updatedAt: Date.now() }
+          : book
+      )
+    );
+  }
+
   function addRecipeToBook(bookId: string, recipeId: string) {
     setBooks(prev =>
       prev.map(book => {
@@ -384,6 +395,7 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
         // Livres (versions imprimables)
         books,
         createBook,
+        updateBook,
         addRecipeToBook,
         removeRecipeFromBook,
       }}
