@@ -386,11 +386,11 @@ export default function LivreEditorPage() {
                           <button
                             onClick={() => {
                               if (showPreview) {
-                                setCurrentPage(index + 1); // +1 car index 0 = couverture
+                                setCurrentPage((index * 2) + 1); // Photo page
                               }
                             }}
                             className="opacity-50 group-hover:opacity-100 p-1 hover:bg-blue-200 rounded transition-all text-blue-600"
-                            title="Voir dans l'aperçu"
+                            title="Voir la photo dans l'aperçu"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
