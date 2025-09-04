@@ -9,12 +9,15 @@ import Link from "next/link";
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { recipes, deleteRecipe } = useRecipes();
+  const { recipes, deleteRecipe, books, addRecipeToBook } = useRecipes();
   const recipe = recipes.find((r) => r.id === id);
 
   // État pour gérer l'étape courante
   const [currentStep, setCurrentStep] = useState(0);
-  const [showHelpModal, setShowHelpModal] = useState(true); // Modale d'explication
+  const [showHelpModal, setShowHelpModal] = useState(true);
+
+  // États pour l'ajout au livre
+  const [showBookModal, setShowBookModal] = useState(false);
 
   if (!recipe) {
     return (
@@ -29,6 +32,27 @@ export default function RecipeDetailPage() {
       </div>
     );
   }
+
+  // Fonction pour ajouter au livre
+  const handleAddToBook = () => {
+    if (books.length === 0) {
+      alert("Créez d'abord un livre pour ajouter cette recette !");
+      router.push("/library");
+      return;
+    }
+    
+    if (books.length === 1) {
+      const book = books[0];
+      if (book.recipeIds.includes(recipe.id)) {
+        alert("Cette recette est déjà dans votre livre !");
+        return;
+      }
+      addRecipeToBook(book.id, recipe.id);
+      alert("Recette ajoutée au livre !");
+    } else {
+      setShowBookModal(true);
+    }
+  };
 
   // Transformer les étapes par saut de ligne
   const processSteps = (stepsText: string) => {
@@ -63,6 +87,75 @@ export default function RecipeDetailPage() {
 
   const resetSteps = () => {
     setCurrentStep(0);
+  };
+
+  // Modale de sélection de livre
+  const BookSelectionModal = () => {
+    const availableBooks = books.filter(book => !book.recipeIds.includes(recipe.id));
+    
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Ajouter à un livre
+              </h3>
+              <button 
+                onClick={() => setShowBookModal(false)}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <img 
+                  src={recipe.imageUrl} 
+                  alt={recipe.title}
+                  className="w-12 h-12 object-cover rounded-lg"
+                />
+                <div>
+                  <h4 className="font-medium text-gray-900">{recipe.title}</h4>
+                  <p className="text-sm text-gray-600">par {recipe.author}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {availableBooks.map((book) => (
+                <button
+                  key={book.id}
+                  onClick={() => {
+                    addRecipeToBook(book.id, recipe.id);
+                    setShowBookModal(false);
+                    alert("Recette ajoutée au livre !");
+                  }}
+                  className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors"
+                >
+                  <h4 className="font-medium text-gray-900">{book.title}</h4>
+                  <p className="text-sm text-gray-600">{book.recipeIds.length} recettes</p>
+                </button>
+              ))}
+            </div>
+
+            {availableBooks.length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-gray-600 mb-4">Cette recette est déjà dans tous vos livres !</p>
+                <Link
+                  href="/library"
+                  className="text-orange-600 hover:text-orange-700 font-medium"
+                  onClick={() => setShowBookModal(false)}
+                >
+                  Créer un nouveau livre
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -104,9 +197,21 @@ export default function RecipeDetailPage() {
           </div>
         )}
 
-        {/* Titre et infos */}
+        {/* Titre et infos avec CTA */}
         <div className="space-y-3">
-          <h1 className="text-3xl font-semibold">{recipe.title}</h1>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-3xl font-semibold">{recipe.title}</h1>
+            </div>
+            
+            {/* CTA Ajouter au livre */}
+            <button
+              onClick={handleAddToBook}
+              className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium flex items-center gap-2 ml-6 flex-shrink-0"
+            >
+              📚 Ajouter à mon livre
+            </button>
+          </div>
           
           <div className="flex flex-wrap items-center gap-4 text-gray-600">
             {recipe.author && <span>par {recipe.author}</span>}
@@ -258,7 +363,7 @@ export default function RecipeDetailPage() {
           )}
         </div>
 
-      {/* Actions */}
+        {/* Actions */}
         <div className="pt-6 border-t space-y-4">
           <div className="flex gap-3">
             <Link
@@ -269,13 +374,7 @@ export default function RecipeDetailPage() {
             </Link>
             
             <button
-              onClick={() => {
-                // Fonction d'ajout au livre - sera connectée
-                if (window.confirm('Ajouter cette recette à un livre ?')) {
-                  // Logique d'ajout
-                  window.location.href = `/library?add=${recipe.id}`;
-                }
-              }}
+              onClick={handleAddToBook}
               className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium flex items-center gap-2"
             >
               📚 Ajouter à mon livre
@@ -294,13 +393,17 @@ export default function RecipeDetailPage() {
             </button>
           </div>
           
-          <Link 
-            href="/recipes" 
-            className="block text-center text-primary-600 underline hover:text-primary-700"
-          >
-            ← Retour à la liste des recettes
-          </Link>
-        </div>
+          <div className="text-center">
+            <button
+              onClick={handleAddToBook}
+              className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium"
+            >
+              📚 Ajouter cette recette à mon livre
+            </button>
+            <p className="text-sm text-gray-500 mt-2">
+              Créez un beau livre de famille avec vos recettes préférées
+            </p>
+          </div>
           
           <Link 
             href="/recipes" 
@@ -310,6 +413,9 @@ export default function RecipeDetailPage() {
           </Link>
         </div>
       </article>
+
+      {/* Modale sélection livre */}
+      {showBookModal && <BookSelectionModal />}
     </div>
   );
 }
