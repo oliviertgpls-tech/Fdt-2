@@ -1,16 +1,27 @@
-"use client";
+))}
+          </div>
+        )}
+      </div>
+
+      {showCreateModal && <CreateBookModal />}
+    </div>
+  );
+}"use client";
 
 import React, { useState } from 'react';
-import { Plus, Eye, Search } from 'lucide-react';
+import { Plus, BookOpen, Eye, Upload, Move, Trash2, X, Filter, Search } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function LivresPage() {
+  // ✅ Fix : Utiliser notebooks pour carnets et books pour livres imprimables
   const { notebooks, recipes, books, createBook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotebook, setSelectedNotebook] = useState<string>('all');
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  // ✅ CORRECTION - État séparé pour éviter les conflits
   const [newBookTitle, setNewBookTitle] = useState('');
 
   const toggleRecipeSelection = (recipeId: string) => {
@@ -35,12 +46,14 @@ export default function LivresPage() {
     }
     
     createBook(newBookTitle.trim(), selectedRecipes);
+    // Reset après création
     setNewBookTitle('');
     setSelectedRecipes([]);
     setShowCreateModal(false);
     alert(`Livre "${newBookTitle}" créé avec ${selectedRecipes.length} recettes !`);
   };
 
+  // Filtrer les recettes
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          recipe.author?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -48,6 +61,76 @@ export default function LivresPage() {
                          notebooks.find(n => n.id === selectedNotebook)?.recipeIds.includes(recipe.id);
     return matchesSearch && matchesNotebook;
   });
+
+  const CreateBookModal = () => (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Créer un nouveau livre</h2>
+            <button 
+              onClick={() => {
+                setShowCreateModal(false);
+                setNewBookTitle('');
+              }} 
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Titre du livre
+              </label>
+              <input
+                type="text"
+                value={newBookTitle}
+                onChange={(e) => setNewBookTitle(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                placeholder="Mon livre de recettes"
+                autoFocus
+              />
+            </div>
+
+            {selectedRecipes.length > 0 && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-sm text-orange-800">
+                  <strong>{selectedRecipes.length} recettes sélectionnées</strong>
+                </p>
+                <p className="text-xs text-orange-600 mt-1">
+                  Vous pourrez les réorganiser après création
+                </p>
+                <p className="text-xs text-orange-500 mt-1">
+                  Prix estimé : {Math.max(8, selectedRecipes.length * 1.5 + 6).toFixed(2)}€
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setNewBookTitle('');
+                }}
+                className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleCreateBook}
+                disabled={!newBookTitle.trim() || selectedRecipes.length === 0}
+                className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
+              >
+                Créer le livre
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8">
@@ -75,7 +158,8 @@ export default function LivresPage() {
           <h2 className="text-xl font-semibold text-gray-800">Mes livres en cours</h2>
           <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
             {books.map((book) => {
-              const pageCount = 1 + (book.recipeIds.length * 2);
+              const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));
+              const pageCount = 1 + (book.recipeIds.length * 2); // 1 couverture + 2 pages par recette
               const estimatedPrice = Math.max(8, book.recipeIds.length * 1.5 + 6);
               
               return (
@@ -89,6 +173,12 @@ export default function LivresPage() {
                     <div className="text-sm text-gray-600 space-y-1 mb-3">
                       <p>{book.recipeIds.length} recettes • {pageCount} pages</p>
                       <p className="text-orange-600 font-medium">≈ {estimatedPrice.toFixed(2)}€</p>
+                      <p className="text-xs text-gray-500">
+                        {book.status === 'draft' && '📝 Brouillon'}
+                        {book.status === 'ready' && '✅ Prêt'}
+                        {book.status === 'ordered' && '🚚 Commandé'}
+                        {book.status === 'printed' && '📚 Imprimé'}
+                      </p>
                     </div>
                     
                     <div className="flex gap-2">
@@ -199,128 +289,4 @@ export default function LivresPage() {
                 key={recipe.id} 
                 className={`border rounded-xl p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
-                    ? 'border-orange-300 bg-orange-50'
-                    : 'border-gray-200 hover:border-gray-300 bg-white'
-                }`}
-                onClick={() => toggleRecipeSelection(recipe.id)}
-              >
-                <div className="flex gap-4">
-                  <div className="relative">
-                    <img 
-                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                      alt={recipe.title}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    {selectedRecipes.includes(recipe.id) && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        ✓
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                    <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                    <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes || '?'}min</p>
-                    
-                    {notebooks.some(n => n.recipeIds.includes(recipe.id)) && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {notebooks
-                          .filter(n => n.recipeIds.includes(recipe.id))
-                          .slice(0, 2)
-                          .map(notebook => (
-                          <span 
-                            key={notebook.id}
-                            className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded"
-                          >
-                            📚 {notebook.title}
-                          </span>
-                        ))}
-                        {notebooks.filter(n => n.recipeIds.includes(recipe.id)).length > 2 && (
-                          <span className="text-xs text-gray-500">
-                            +{notebooks.filter(n => n.recipeIds.includes(recipe.id)).length - 2}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Modale de création */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Créer un nouveau livre</h2>
-                <button 
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    setNewBookTitle('');
-                  }} 
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Titre du livre
-                  </label>
-                  <input
-                    type="text"
-                    value={newBookTitle}
-                    onChange={(e) => setNewBookTitle(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                    placeholder="Mon livre de recettes"
-                    autoFocus
-                  />
-                </div>
-
-                {selectedRecipes.length > 0 && (
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <p className="text-sm text-orange-800">
-                      <strong>{selectedRecipes.length} recettes sélectionnées</strong>
-                    </p>
-                    <p className="text-xs text-orange-600 mt-1">
-                      Vous pourrez les réorganiser après création
-                    </p>
-                    <p className="text-xs text-orange-500 mt-1">
-                      Prix estimé : {Math.max(8, selectedRecipes.length * 1.5 + 6).toFixed(2)}€
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => {
-                      setShowCreateModal(false);
-                      setNewBookTitle('');
-                    }}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={handleCreateBook}
-                    disabled={!newBookTitle.trim() || selectedRecipes.length === 0}
-                    className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
-                  >
-                    Créer le livre
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+                    ? 'border-orange
