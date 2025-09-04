@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, BookOpen, Eye, Move, Trash2, X, ArrowRight } from 'lucide-react';
+import { Plus, Eye, Move, Trash2, X, ArrowRight } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function CarnetsPage() {
-  const { books: carnets, createBook: createCarnet, recipes, addRecipeToBook: addRecipeToCarnet, removeRecipeFromBook: removeRecipeFromCarnet } = useRecipes();
+  const { books: carnets, createBook: createCarnet, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentCarnet, setCurrentCarnet] = useState<any>(null);
 
@@ -48,7 +48,10 @@ export default function CarnetsPage() {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData(prev => ({ ...prev, title: value }));
+                }}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
                 placeholder="Ex: Desserts de Mamie, Plats du dimanche, Recettes végé..."
               />
@@ -61,7 +64,10 @@ export default function CarnetsPage() {
               <textarea
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData(prev => ({ ...prev, description: value }));
+                }}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
                 placeholder="Décrivez le thème de ce carnet..."
               />
@@ -227,7 +233,7 @@ export default function CarnetsPage() {
                         <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes}min</p>
                       </div>
                       <button
-                        onClick={() => addRecipeToCarnet(currentCarnet.id, recipe.id)}
+                        onClick={() => addRecipeToBook(currentCarnet.id, recipe.id)}
                         className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start"
                       >
                         <Plus className="w-4 h-4 mr-1 inline" />
@@ -276,7 +282,7 @@ export default function CarnetsPage() {
                       </div>
                       
                       <button
-                        onClick={() => removeRecipeFromCarnet(currentCarnet.id, recipe.id)}
+                        onClick={() => removeRecipeFromBook(currentCarnet.id, recipe.id)}
                         className="text-gray-400 hover:text-red-600 transition-colors self-start p-1"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -289,7 +295,7 @@ export default function CarnetsPage() {
           </div>
         </div>
 
-        {/* BOUTON AJOUTER AU LIVRE - LE POINT CLÉ ! */}
+        {/* BOUTON AJOUTER AU LIVRE */}
         {carnetRecipes.length > 0 && (
           <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 text-center">
             <div className="max-w-md mx-auto">
