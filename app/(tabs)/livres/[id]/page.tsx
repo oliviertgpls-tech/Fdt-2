@@ -110,7 +110,7 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderRecipePage = (recipe) => (
+  const renderRecipePage = (recipe: any) => (
     <div className="cookbook-page bg-cream p-16">
       <div className="h-full flex flex-col">
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-brown-200">
