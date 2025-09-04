@@ -6,32 +6,21 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function LivresPage() {
-  const { books: carnets, recipes } = useRecipes();
+  // ✅ Fix : Utiliser notebooks pour carnets et books pour livres imprimables
+  const { notebooks, recipes, books, createBook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCarnet, setSelectedCarnet] = useState<string>('all');
+  const [selectedNotebook, setSelectedNotebook] = useState<string>('all');
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [bookTitle, setBookTitle] = useState('');
-
-  // Livres simulés (en attendant la vraie structure)
-  const [books, setBooks] = useState([
-    {
-      id: 'l1',
-      title: 'Le Grand Livre de Famille',
-      description: 'Toutes nos recettes préférées dans un beau livre',
-      recipeIds: ['r1', 'r2'],
-      createdAt: Date.now(),
-      status: 'draft'
-    }
-  ]);
 
   // Filtrer les recettes
   const filteredRecipes = recipes.filter(recipe => {
     const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          recipe.author?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCarnet = selectedCarnet === 'all' || 
-                         carnets.find(c => c.id === selectedCarnet)?.recipeIds.includes(recipe.id);
-    return matchesSearch && matchesCarnet;
+    const matchesNotebook = selectedNotebook === 'all' || 
+                         notebooks.find(n => n.id === selectedNotebook)?.recipeIds.includes(recipe.id);
+    return matchesSearch && matchesNotebook;
   });
 
   const toggleRecipeSelection = (recipeId: string) => {
@@ -42,11 +31,24 @@ export default function LivresPage() {
     );
   };
 
-  const selectAllFromCarnet = (carnetId: string) => {
-    const carnet = carnets.find(c => c.id === carnetId);
-    if (carnet) {
-      setSelectedRecipes(prev => [...new Set([...prev, ...carnet.recipeIds])]);
+  const selectAllFromNotebook = (notebookId: string) => {
+    const notebook = notebooks.find(n => n.id === notebookId);
+    if (notebook) {
+      setSelectedRecipes(prev => [...new Set([...prev, ...notebook.recipeIds])]);
     }
+  };
+
+  const handleCreateBook = () => {
+    if (!bookTitle.trim() || selectedRecipes.length === 0) {
+      alert("Veuillez saisir un titre et sélectionner au moins une recette !");
+      return;
+    }
+    
+    createBook(bookTitle.trim(), selectedRecipes);
+    setBookTitle('');
+    setSelectedRecipes([]);
+    setShowCreateModal(false);
+    alert(`Livre "${bookTitle}" créé avec ${selectedRecipes.length} recettes !`);
   };
 
   const CreateBookModal = () => (
@@ -82,6 +84,9 @@ export default function LivresPage() {
                 <p className="text-xs text-orange-600 mt-1">
                   Vous pourrez les réorganiser après création
                 </p>
+                <p className="text-xs text-orange-500 mt-1">
+                  Prix estimé : {Math.max(8, selectedRecipes.length * 0.5 + 6).toFixed(2)}€
+                </p>
               </div>
             )}
 
@@ -93,23 +98,8 @@ export default function LivresPage() {
                 Annuler
               </button>
               <button
-                onClick={() => {
-                  if (bookTitle.trim()) {
-                    const newBook = {
-                      id: `l-${Date.now()}`,
-                      title: bookTitle.trim(),
-                      description: '',
-                      recipeIds: [...selectedRecipes],
-                      createdAt: Date.now(),
-                      status: 'draft'
-                    };
-                    setBooks(prev => [newBook, ...prev]);
-                    setBookTitle('');
-                    setSelectedRecipes([]);
-                    setShowCreateModal(false);
-                  }
-                }}
-                disabled={!bookTitle.trim()}
+                onClick={handleCreateBook}
+                disabled={!bookTitle.trim() || selectedRecipes.length === 0}
                 className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 Créer le livre
@@ -146,32 +136,45 @@ export default function LivresPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-800">Mes livres en cours</h2>
           <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
-            {books.map((book) => (
-              <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="aspect-[2/1] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-4xl">
-                  📖
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2">{book.title}</h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    {book.recipeIds.length} recettes • {(book.recipeIds.length * 2) + 2} pages
-                  </p>
+            {books.map((book) => {
+              const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));
+              const pageCount = (book.recipeIds.length * 2) + 2; // 2 pages par recette + couverture
+              const estimatedPrice = Math.max(8, book.recipeIds.length * 0.5 + 6);
+              
+              return (
+                <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="aspect-[2/1] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-4xl">
+                    📖
+                  </div>
                   
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/livres/${book.id}`}
-                      className="flex-1 bg-orange-100 text-orange-700 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium text-sm text-center"
-                    >
-                      Éditer
-                    </Link>
-                    <button className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <Eye className="w-4 h-4" />
-                    </button>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-2">{book.title}</h3>
+                    <div className="text-sm text-gray-600 space-y-1 mb-3">
+                      <p>{book.recipeIds.length} recettes • {pageCount} pages</p>
+                      <p className="text-orange-600 font-medium">≈ {estimatedPrice.toFixed(2)}€</p>
+                      <p className="text-xs text-gray-500">
+                        {book.status === 'draft' && '📝 Brouillon'}
+                        {book.status === 'ready' && '✅ Prêt'}
+                        {book.status === 'ordered' && '🚚 Commandé'}
+                        {book.status === 'printed' && '📚 Imprimé'}
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/livres/${book.id}`}
+                        className="flex-1 bg-orange-100 text-orange-700 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium text-sm text-center"
+                      >
+                        Éditer
+                      </Link>
+                      <button className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -211,24 +214,33 @@ export default function LivresPage() {
           </div>
           
           <select
-            value={selectedCarnet}
-            onChange={(e) => setSelectedCarnet(e.target.value)}
+            value={selectedNotebook}
+            onChange={(e) => setSelectedNotebook(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
           >
             <option value="all">Toutes les recettes</option>
-            {carnets.map((carnet) => (
-              <option key={carnet.id} value={carnet.id}>
-                {carnet.title} ({carnet.recipeIds.length})
+            {notebooks.map((notebook) => (
+              <option key={notebook.id} value={notebook.id}>
+                📚 {notebook.title} ({notebook.recipeIds.length})
               </option>
             ))}
           </select>
 
-          {selectedCarnet !== 'all' && (
+          {selectedNotebook !== 'all' && (
             <button
-              onClick={() => selectAllFromCarnet(selectedCarnet)}
-              className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+              onClick={() => selectAllFromNotebook(selectedNotebook)}
+              className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors text-sm whitespace-nowrap"
             >
               Tout sélectionner
+            </button>
+          )}
+          
+          {selectedRecipes.length > 0 && (
+            <button
+              onClick={() => setSelectedRecipes([])}
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+            >
+              Tout désélectionner
             </button>
           )}
         </div>
@@ -238,6 +250,16 @@ export default function LivresPage() {
           <div className="text-center py-12">
             <div className="text-4xl mb-3">🔍</div>
             <p className="text-gray-600">Aucune recette trouvée</p>
+            {notebooks.length === 0 && (
+              <div className="mt-4">
+                <Link 
+                  href="/carnets" 
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  Créer votre premier carnet de recettes
+                </Link>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -254,7 +276,7 @@ export default function LivresPage() {
                 <div className="flex gap-4">
                   <div className="relative">
                     <img 
-                      src={recipe.imageUrl} 
+                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
                       alt={recipe.title}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
@@ -267,8 +289,30 @@ export default function LivresPage() {
                   
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                    <p className="text-sm text-gray-600">par {recipe.author}</p>
-                    <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes}min</p>
+                    <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                    <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes || '?'}min</p>
+                    
+                    {/* Indicateur si la recette est dans un carnet */}
+                    {notebooks.some(n => n.recipeIds.includes(recipe.id)) && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {notebooks
+                          .filter(n => n.recipeIds.includes(recipe.id))
+                          .slice(0, 2)
+                          .map(notebook => (
+                          <span 
+                            key={notebook.id}
+                            className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded"
+                          >
+                            📚 {notebook.title}
+                          </span>
+                        ))}
+                        {notebooks.filter(n => n.recipeIds.includes(recipe.id)).length > 2 && (
+                          <span className="text-xs text-gray-500">
+                            +{notebooks.filter(n => n.recipeIds.includes(recipe.id)).length - 2}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
