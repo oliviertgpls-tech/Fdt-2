@@ -117,10 +117,8 @@ export default function LivreEditorPage() {
         className="w-full h-full object-cover"
       />
       
-      {/* Overlay très subtil pour unifier */}
       <div className="absolute inset-0 bg-brown-900 opacity-5"></div>
       
-      {/* Badge qualité photo en bas à droite */}
       {recipe.photoQuality === 'low' && (
         <div className="absolute bottom-8 right-8 bg-orange-500 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg">
           ⚠️ Photo à améliorer
@@ -236,26 +234,6 @@ export default function LivreEditorPage() {
     }
     
     return <div className="cookbook-page bg-cream flex items-center justify-center text-brown-600">Page non trouvée</div>;
-  };
-
-  const renderCurrentPage = () => {
-    return renderPageByIndex(currentPage);
-  };
-
-  const getPageLabel = (pageIndex: number) => {
-    const page = pages[pageIndex];
-    if (page === 'cover') return 'Couverture';
-    if (page?.startsWith('photo-')) {
-      const recipeId = page.replace('photo-', '');
-      const recipe = previewBook.recipes.find(r => r.id === recipeId);
-      return `Photo: ${recipe?.title || 'Recette'}`;
-    }
-    if (page?.startsWith('recipe-')) {
-      const recipeId = page.replace('recipe-', '');
-      const recipe = previewBook.recipes.find(r => r.id === recipeId);
-      return `Recette: ${recipe?.title || 'Recette'}`;
-    }
-    return `Page ${pageIndex + 1}`;
   };
 
   return (
@@ -463,46 +441,111 @@ export default function LivreEditorPage() {
           </div>
 
           {showPreview && bookRecipes.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              {/* Contrôles navigation */}
               <div className="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium text-gray-700">Aperçu PDF</span>
+                  <span className="text-sm font-medium text-gray-700">Aperçu Livre</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {getPageLabel(currentPage)} ({currentPage + 1} / {pages.length})
+                    Pages {Math.floor(currentPage / 2) * 2 + 1}-{Math.floor(currentPage / 2) * 2 + 2} / {pages.length}
                   </span>
                 </div>
                 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-                    disabled={currentPage === 0}
-                    className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    onClick={() => setCurrentPage(Math.max(0, currentPage - 2))}
+                    disabled={currentPage <= 1}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ArrowDownLeft className="w-4 h-4" />
+                    ← Double page précédente
                   </button>
                   
                   <button
-                    onClick={() => setCurrentPage(Math.min(pages.length - 1, currentPage + 1))}
-                    disabled={currentPage === pages.length - 1}
-                    className="p-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    onClick={() => setCurrentPage(Math.min(pages.length - 1, currentPage + 2))}
+                    disabled={currentPage >= pages.length - 2}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ArrowRight className="w-4 h-4" />
+                    Double page suivante →
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white shadow-xl mx-auto" style={{ 
-                width: '420px',
-                height: '594px',
-                transformOrigin: 'top center'
-              }}>
-                <div style={{
-                  width: '210mm',
-                  height: '297mm',
-                  transform: 'scale(0.5)',
-                  transformOrigin: 'top left'
-                }}>
-                  {renderCurrentPage()}
+              {/* Aperçu livre ouvert - Double page avec effet d'ombre */}
+              <div className="flex justify-center">
+                <div className="relative">
+                  {/* Ombre du livre */}
+                  <div className="absolute inset-0 bg-black opacity-20 blur-xl transform translate-y-8 scale-105"></div>
+                  
+                  {/* Livre ouvert */}
+                  <div className="relative bg-gray-800 p-2 rounded-lg shadow-2xl" style={{ 
+                    width: '840px',
+                    height: '600px'
+                  }}>
+                    {/* Reliure centrale */}
+                    <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-900 transform -translate-x-0.5 z-10"></div>
+                    
+                    <div className="flex h-full gap-1">
+                      {/* Page de gauche */}
+                      <div className="flex-1 bg-white shadow-lg relative overflow-hidden" style={{
+                        transform: 'perspective(1000px) rotateY(2deg)',
+                        transformOrigin: 'right center'
+                      }}>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-gray-200 opacity-30 pointer-events-none"></div>
+                        <div style={{
+                          width: '210mm',
+                          height: '297mm',
+                          transform: 'scale(0.25)',
+                          transformOrigin: 'top left'
+                        }}>
+                          {renderPageByIndex(Math.floor(currentPage / 2) * 2)}
+                        </div>
+                      </div>
+                      
+                      {/* Page de droite */}
+                      <div className="flex-1 bg-white shadow-lg relative overflow-hidden" style={{
+                        transform: 'perspective(1000px) rotateY(-2deg)',
+                        transformOrigin: 'left center'
+                      }}>
+                        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-gray-200 opacity-30 pointer-events-none"></div>
+                        <div style={{
+                          width: '210mm',
+                          height: '297mm',
+                          transform: 'scale(0.25)',
+                          transformOrigin: 'top left'
+                        }}>
+                          {Math.floor(currentPage / 2) * 2 + 1 < pages.length 
+                            ? renderPageByIndex(Math.floor(currentPage / 2) * 2 + 1)
+                            : <div className="cookbook-page bg-cream"></div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Effet de brillance subtil */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white via-transparent to-transparent opacity-10 pointer-events-none rounded-lg"></div>
+                </div>
+              </div>
+
+              {/* Navigation par miniatures */}
+              <div className="bg-white rounded-lg border p-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Navigation rapide</h4>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {Array.from({ length: Math.ceil(pages.length / 2) }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i * 2)}
+                      className={`flex-shrink-0 w-16 h-20 border-2 rounded text-xs p-1 transition-colors ${
+                        Math.floor(currentPage / 2) === i 
+                          ? 'border-orange-500 bg-orange-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-gray-600">
+                        {i * 2 + 1}-{Math.min(i * 2 + 2, pages.length)}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
