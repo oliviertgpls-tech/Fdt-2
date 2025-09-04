@@ -8,9 +8,9 @@ import Link from 'next/link';
 export default function LibraryPage() {
   const { books, createBook, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [currentBook, setCurrentBook] = useState(null);
+  const [currentBook, setCurrentBook] = useState<any>(null);
   const [showBookModal, setShowBookModal] = useState(false);
-  const [selectedRecipeForBook, setSelectedRecipeForBook] = useState(null);
+  const [selectedRecipeForBook, setSelectedRecipeForBook] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -25,7 +25,7 @@ export default function LibraryPage() {
     setShowCreateModal(false);
   };
 
-  const handleAddToBook = (recipeId) => {
+  const handleAddToBook = (recipeId: string) => {
     if (books.length === 0) {
       alert("Créez d'abord un livre pour ajouter cette recette !");
       setShowCreateModal(true);
@@ -129,7 +129,7 @@ export default function LibraryPage() {
 
   const BookSelectionModal = () => {
     const recipe = recipes.find(r => r.id === selectedRecipeForBook);
-    const availableBooks = books.filter(book => !book.recipeIds.includes(selectedRecipeForBook));
+    const availableBooks = books.filter(book => selectedRecipeForBook && !book.recipeIds.includes(selectedRecipeForBook));
     
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -147,28 +147,33 @@ export default function LibraryPage() {
               </button>
             </div>
             
-            <div className="mb-6">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <img 
-                  src={recipe?.imageUrl} 
-                  alt={recipe?.title}
-                  className="w-12 h-12 object-cover rounded-lg"
-                />
-                <div>
-                  <h4 className="font-medium text-gray-900">{recipe?.title}</h4>
-                  <p className="text-sm text-gray-600">par {recipe?.author}</p>
+            {recipe && (
+              <div className="mb-6">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <img 
+                    src={recipe.imageUrl} 
+                    alt={recipe.title}
+                    className="w-12 h-12 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h4 className="font-medium text-gray-900">{recipe.title}</h4>
+                    <p className="text-sm text-gray-600">par {recipe.author}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {availableBooks.map((book) => (
                 <button
                   key={book.id}
                   onClick={() => {
-                    addRecipeToBook(book.id, selectedRecipeForBook);
-                    setShowBookModal(false);
-                    setSelectedRecipeForBook(null);
+                    if (selectedRecipeForBook) {
+                      addRecipeToBook(book.id, selectedRecipeForBook);
+                      setShowBookModal(false);
+                      setSelectedRecipeForBook(null);
+                      alert("Recette ajoutée au livre !");
+                    }
                   }}
                   className="w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors"
                 >
@@ -261,12 +266,9 @@ export default function LibraryPage() {
                   >
                     Éditer
                   </button>
-                  <Link
-                    href={`/library/preview/${book.id}`}
-                    className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors flex items-center justify-center"
-                  >
+                  <button className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors">
                     <Eye className="w-4 h-4" />
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -277,6 +279,8 @@ export default function LibraryPage() {
   );
 
   const BookEditor = () => {
+    if (!currentBook) return null;
+    
     const bookRecipes = recipes.filter(recipe => currentBook.recipeIds.includes(recipe.id));
     const availableRecipes = recipes.filter(recipe => !currentBook.recipeIds.includes(recipe.id));
 
@@ -297,13 +301,10 @@ export default function LibraryPage() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Link
-              href={`/library/preview/${currentBook.id}`}
-              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
-            >
-              <Eye className="w-4 h-4" />
+            <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+              <Eye className="w-4 h-4 mr-2 inline" />
               Aperçu
-            </Link>
+            </button>
             <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium">
               <Upload className="w-4 h-4 mr-2 inline" />
               Imprimer
@@ -415,11 +416,6 @@ export default function LibraryPage() {
       
       {showCreateModal && <CreateBookModal />}
       {showBookModal && <BookSelectionModal />}
-
-      {/* Fonction globale pour les autres pages */}
-      <div style={{ display: 'none' }}>
-        <div id="addToBookFunction" onClick={() => handleAddToBook} />
-      </div>
     </section>
   );
 }
