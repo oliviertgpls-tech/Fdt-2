@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       colors: {
         // 🌸 Couleurs principales - Corail très doux
-       primary: {
+        primary: {
           50: '#fff7ed',   // orange très clair
           100: '#ffedd5',  // orange clair
           200: '#fed7aa',  // orange pâle
@@ -19,7 +19,7 @@ module.exports = {
           700: '#c2410c',  // orange très foncé
           800: '#9a3412',  // orange brun
           900: '#7c2d12',  // orange très brun
-        }
+        },
         // 🌿 Couleurs secondaires - Vert plus doux
         secondary: {
           50: '#f6fbf6',
