@@ -8,18 +8,18 @@ module.exports = {
     extend: {
       colors: {
         // 🌸 Couleurs principales - Corail très doux
-        primary: {
-          50: '#fef9f7',
-          100: '#fef2ed',
-          200: '#fce1d3',
-          300: '#f9c8af',
-          400: '#f5a881',
-          500: '#ef8b5f', 
-          600: '#e06d42',
-          700: '#c55a35',
-          800: '#a04a2f',
-          900: '#823e2a',
-        },
+       primary: {
+          50: '#fff7ed',   // orange très clair
+          100: '#ffedd5',  // orange clair
+          200: '#fed7aa',  // orange pâle
+          300: '#fdba74',  // orange doux
+          400: '#fb923c',  // orange moyen
+          500: '#f97316',  // orange principal ⭐
+          600: '#ea580c',  // orange foncé
+          700: '#c2410c',  // orange très foncé
+          800: '#9a3412',  // orange brun
+          900: '#7c2d12',  // orange très brun
+        }
         // 🌿 Couleurs secondaires - Vert plus doux
         secondary: {
           50: '#f6fbf6',
