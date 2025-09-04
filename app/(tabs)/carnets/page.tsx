@@ -6,10 +6,10 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function CarnetsPage() {
-  const { books: carnets, createBook: createCarnet, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
+  // Utilisation directe sans alias pour éviter la confusion
+  const { books, createBook, recipes, addRecipeToBook, removeRecipeFromBook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentCarnet, setCurrentCarnet] = useState<any>(null);
-
   const [formData, setFormData] = useState({
     title: '',
     description: ''
@@ -17,10 +17,17 @@ export default function CarnetsPage() {
 
   const handleCreateCarnet = () => {
     if (!formData.title.trim()) return;
-
-    createCarnet(formData.title.trim(), formData.description.trim());
+    createBook(formData.title.trim(), formData.description.trim());
     setFormData({ title: '', description: '' });
     setShowCreateModal(false);
+  };
+
+  const handleAddRecipe = (carnetId: string, recipeId: string) => {
+    addRecipeToBook(carnetId, recipeId);
+  };
+
+  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
+    removeRecipeFromBook(carnetId, recipeId);
   };
 
   const CreateCarnetModal = () => (
@@ -48,10 +55,7 @@ export default function CarnetsPage() {
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setFormData(prev => ({ ...prev, title: value }));
-                }}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
                 placeholder="Ex: Desserts de Mamie, Plats du dimanche, Recettes végé..."
               />
@@ -64,10 +68,7 @@ export default function CarnetsPage() {
               <textarea
                 rows={3}
                 value={formData.description}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setFormData(prev => ({ ...prev, description: value }));
-                }}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
                 placeholder="Décrivez le thème de ce carnet..."
               />
@@ -125,7 +126,7 @@ export default function CarnetsPage() {
         </button>
       </div>
 
-      {carnets.length === 0 ? (
+      {books.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
           <div className="text-6xl mb-4">📋</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
@@ -143,7 +144,7 @@ export default function CarnetsPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {carnets.map((carnet) => (
+          {books.map((carnet) => (
             <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
                 📋
@@ -233,7 +234,7 @@ export default function CarnetsPage() {
                         <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes}min</p>
                       </div>
                       <button
-                        onClick={() => addRecipeToBook(currentCarnet.id, recipe.id)}
+                        onClick={() => handleAddRecipe(currentCarnet.id, recipe.id)}
                         className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start"
                       >
                         <Plus className="w-4 h-4 mr-1 inline" />
@@ -282,7 +283,7 @@ export default function CarnetsPage() {
                       </div>
                       
                       <button
-                        onClick={() => removeRecipeFromBook(currentCarnet.id, recipe.id)}
+                        onClick={() => handleRemoveRecipe(currentCarnet.id, recipe.id)}
                         className="text-gray-400 hover:text-red-600 transition-colors self-start p-1"
                       >
                         <Trash2 className="w-4 h-4" />
