@@ -197,7 +197,7 @@ const initialBooks: Book[] = [
     id: "b1",
     title: "Recettes de famille",
     description: "Les meilleures recettes transmises de génération en génération",
-    recipeIds: ["r1"], // Contient déjà le pesto
+    recipeIds: ["r1"], // Contient déjà le risotto
     createdAt: Date.now() - 86400000
   }
 ];
@@ -211,7 +211,7 @@ type RecipesContextType = {
 
   // Carnets
   books: Book[];
-  createBook: (title: string) => void;
+  createBook: (title: string, description?: string) => Book;
   addRecipeToBook: (bookId: string, recipeId: string) => void;
   removeRecipeFromBook: (bookId: string, recipeId: string) => void;
 };
@@ -259,19 +259,21 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // 📚 Créer un nouveau carnet
-  function createBook(title: string) {
+  // 📚 Créer un nouveau livre avec description
+  function createBook(title: string, description?: string): Book {
     const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
+    if (!trimmedTitle) throw new Error('Title is required');
 
     const newBook: Book = {
       id: `b-${Date.now()}`,
       title: trimmedTitle,
+      description: description?.trim(),
       recipeIds: [],
       createdAt: Date.now()
     };
 
     setBooks(prev => [newBook, ...prev]);
+    return newBook;
   }
 
   // ➕ Ajouter une recette à un carnet
@@ -300,39 +302,23 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // 📚 Créer un nouveau livre avec description
-  function createBook(title: string, description?: string) {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
-
-    const newBook: Book = {
-      id: `b-${Date.now()}`,
-      title: trimmedTitle,
-      description: description?.trim(),
-      recipeIds: [],
-      createdAt: Date.now()
-    };
-
-    setBooks(prev => [newBook, ...prev]);
-    return newBook;
-  }
-
   return (
-  <RecipesContext.Provider
-    value={{
-      recipes,
-      addRecipe,
-      updateRecipe,
-      deleteRecipe,
-      books,
-      createBook,  // ← AJOUTE CETTE LIGNE
-      addRecipeToBook,
-      removeRecipeFromBook,
-    }}
-  >
-    {children}
-  </RecipesContext.Provider>
-);
+    <RecipesContext.Provider
+      value={{
+        recipes,
+        addRecipe,
+        updateRecipe,
+        deleteRecipe,
+        books,
+        createBook,
+        addRecipeToBook,
+        removeRecipeFromBook,
+      }}
+    >
+      {children}
+    </RecipesContext.Provider>
+  );
+}
 
 export function useRecipes() {
   const context = useContext(RecipesContext);
