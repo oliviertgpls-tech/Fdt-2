@@ -145,10 +145,10 @@ export default function LivresPage() {
       {books.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-gray-800">Mes livres en cours</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-4">
             {books.map((book) => (
-              <div key={book.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-[3/4] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-6xl">
+              <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div className="aspect-[2/1] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-4xl">
                   📖
                 </div>
                 
