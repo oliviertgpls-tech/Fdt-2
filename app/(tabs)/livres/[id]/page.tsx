@@ -151,7 +151,7 @@ export default function LivreEditorPage() {
               Ingrédients
             </h3>
             <div className="space-y-3">
-              {recipe.ingredients.map((ingredient, index) => (
+              {recipe.ingredients.map((ingredient: string, index: number) => (
                 <div key={index} className="flex items-start gap-3 text-sm leading-relaxed">
                   <span className="w-1 h-1 bg-brown-400 rounded-full mt-2.5 flex-shrink-0"></span>
                   <span className="text-brown-700">{ingredient}</span>
@@ -181,7 +181,7 @@ export default function LivreEditorPage() {
             </p>
             
             <div className="space-y-6">
-              {recipe.steps.map((step, index) => (
+              {recipe.steps.map((step: string, index: number) => (
                 <div key={index} className="flex gap-4">
                   <div className="flex-shrink-0 w-6 h-6 bg-brown-900 text-cream text-xs font-medium flex items-center justify-center">
                     {index + 1}
