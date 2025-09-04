@@ -80,8 +80,8 @@ export default function AddRecipePage() {
           />
         </div>
 
-        {/* Rangée rapide : Auteur + Temps */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Rangée rapide : Auteur + Temps + Personnes */}
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Par qui ?
@@ -106,6 +106,18 @@ export default function AddRecipePage() {
               onChange={(e) => setPrepMinutes(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="30"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Personnes
+            </label>
+            <input
+              type="text"
+              value={servings}
+              onChange={(e) => setServings(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              placeholder="4, 6-8..."
             />
           </div>
         </div>
