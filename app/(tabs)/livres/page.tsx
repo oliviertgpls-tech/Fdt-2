@@ -98,6 +98,7 @@ export default function LivresPage() {
                     const newBook = {
                       id: `l-${Date.now()}`,
                       title: bookTitle.trim(),
+                      description: '',
                       recipeIds: [...selectedRecipes],
                       createdAt: Date.now(),
                       status: 'draft'
