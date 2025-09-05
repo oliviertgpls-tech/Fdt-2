@@ -86,12 +86,12 @@ h3 {
 }
 
 .btn-primary {
-  background: #ef8b5f; /* primary-500 */
+  background: #ef8b5f; /* orange au lieu de bleu */
   color: white;
 }
 
 .btn-primary:hover {
-  background: #e06d42; /* primary-600 */
+  background: #e06d42; /* orange foncé au lieu de bleu */
   transform: translateY(-1px);
 }
 
@@ -113,6 +113,6 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #ef8b5f; /* primary-500 */
+  border-color: #ef8b5f; /* orange au lieu de bleu */
   box-shadow: 0 0 0 3px rgba(239, 139, 95, 0.1);
 }
