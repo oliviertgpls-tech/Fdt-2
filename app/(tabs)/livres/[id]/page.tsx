@@ -468,11 +468,11 @@ export default function LivreEditorPage() {
             </div>
           </div>
 
-          {/* Preview */}
+          {/* Preview mobile/desktop adaptatif */}
           {showPreview && (
-            <div className="space-y-4">
+            <div className="space-y-4 order-first lg:order-last">
               {/* Navigation */}
-              <div className="bg-white rounded-lg border p-4 flex items-center justify-between">
+              <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-4">
                   <span className="text-sm font-medium text-gray-700">Aperçu Livre</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -484,40 +484,40 @@ export default function LivreEditorPage() {
                   <button
                     onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                     disabled={currentPage === 0}
-                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    ← Précédente
+                    ← <span className="hidden sm:inline">Précédente</span>
                   </button>
                   
                   <button
                     onClick={() => setCurrentPage(Math.min(allPages.length - 1, currentPage + 1))}
                     disabled={currentPage === allPages.length - 1}
-                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Suivante →
+                    <span className="hidden sm:inline">Suivante</span> →
                   </button>
                 </div>
               </div>
 
-              {/* Aperçu livre - Simple et efficace */}
-              <div className="flex justify-center">
+              {/* Aperçu livre - Responsive */}
+              <div className="flex justify-center overflow-x-auto">
                 {(() => {
                   const displayPages = getCurrentDisplayPages();
                   const isDouble = displayPages.length === 2;
                   
                   if (isDouble) {
-                    // Double page simple
+                    // Double page responsive
                     return (
-                      <div className="flex gap-4 p-4 bg-gray-50 rounded-xl shadow-lg">
+                      <div className="flex gap-2 md:gap-4 p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg min-w-fit">
                         {/* Page de gauche */}
                         <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
-                          width: '400px',
-                          height: '565px'
+                          width: '180px',
+                          height: '250px'
                         }}>
                           <div style={{
                             width: '210mm',
                             height: '297mm',
-                            transform: 'scale(0.48)',
+                            transform: 'scale(0.21)',
                             transformOrigin: 'top left'
                           }}>
                             {renderPageByIndex(displayPages[0])}
@@ -526,13 +526,13 @@ export default function LivreEditorPage() {
                         
                         {/* Page de droite */}
                         <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
-                          width: '400px',
-                          height: '565px'
+                          width: '180px',
+                          height: '250px'
                         }}>
                           <div style={{
                             width: '210mm',
                             height: '297mm',
-                            transform: 'scale(0.48)',
+                            transform: 'scale(0.21)',
                             transformOrigin: 'top left'
                           }}>
                             {renderPageByIndex(displayPages[1])}
@@ -541,17 +541,17 @@ export default function LivreEditorPage() {
                       </div>
                     );
                   } else {
-                    // Page seule
+                    // Page seule responsive
                     return (
-                      <div className="p-4 bg-gray-50 rounded-xl shadow-lg">
+                      <div className="p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg">
                         <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
-                          width: '400px',
-                          height: '565px'
+                          width: '180px',
+                          height: '250px'
                         }}>
                           <div style={{
                             width: '210mm',
                             height: '297mm',
-                            transform: 'scale(0.48)',
+                            transform: 'scale(0.21)',
                             transformOrigin: 'top left'
                           }}>
                             {renderPageByIndex(displayPages[0])}
