@@ -499,97 +499,68 @@ export default function LivreEditorPage() {
                 </div>
               </div>
 
-              {/* Aperçu livre */}
+              {/* Aperçu livre - Simple et efficace */}
               <div className="flex justify-center">
-                <div className="relative">
-                  {/* Ombre du livre */}
-                  <div className="absolute inset-0 bg-black opacity-15 blur-xl transform translate-y-6 scale-105"></div>
+                {(() => {
+                  const displayPages = getCurrentDisplayPages();
+                  const isDouble = displayPages.length === 2;
                   
-                  {(() => {
-                    const displayPages = getCurrentDisplayPages();
-                    const isDouble = displayPages.length === 2;
-                    
-                    if (isDouble) {
-                      // Double page avec reliure
-                      return (
-                        <div className="relative bg-gray-800 p-2 rounded-lg shadow-2xl" style={{ 
-                          width: '800px',
-                          height: '580px'
+                  if (isDouble) {
+                    // Double page simple
+                    return (
+                      <div className="flex gap-4 p-4 bg-gray-50 rounded-xl shadow-lg">
+                        {/* Page de gauche */}
+                        <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
+                          width: '400px',
+                          height: '565px'
                         }}>
-                          {/* Reliure centrale */}
-                          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-900 transform -translate-x-0.5 z-10"></div>
-                          
-                          <div className="flex h-full gap-1">
-                            {/* Page de gauche */}
-                            <div className="flex-1 bg-white shadow-lg relative overflow-hidden" style={{
-                              transform: 'perspective(1200px) rotateY(3deg)',
-                              transformOrigin: 'right center'
-                            }}>
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-gray-300 opacity-25 pointer-events-none"></div>
-                              <div style={{
-                                width: '100%',
-                                height: '100%',
-                                transform: 'scale(1)',
-                                overflow: 'hidden'
-                              }}>
-                                <div style={{
-                                  width: '210mm',
-                                  height: '297mm',
-                                  transform: 'scale(0.19)',
-                                  transformOrigin: 'top left'
-                                }}>
-                                  {renderPageByIndex(displayPages[0])}
-                                </div>
-                              </div>
-                            </div>
-                            
-                            {/* Page de droite */}
-                            <div className="flex-1 bg-white shadow-lg relative overflow-hidden" style={{
-                              transform: 'perspective(1200px) rotateY(-3deg)',
-                              transformOrigin: 'left center'
-                            }}>
-                              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-gray-300 opacity-25 pointer-events-none"></div>
-                              <div style={{
-                                width: '100%',
-                                height: '100%',
-                                transform: 'scale(1)',
-                                overflow: 'hidden'
-                              }}>
-                                <div style={{
-                                  width: '210mm',
-                                  height: '297mm',
-                                  transform: 'scale(0.19)',
-                                  transformOrigin: 'top left'
-                                }}>
-                                  {renderPageByIndex(displayPages[1])}
-                                </div>
-                              </div>
-                            </div>
+                          <div style={{
+                            width: '210mm',
+                            height: '297mm',
+                            transform: 'scale(0.48)',
+                            transformOrigin: 'top left'
+                          }}>
+                            {renderPageByIndex(displayPages[0])}
                           </div>
                         </div>
-                      );
-                    } else {
-                      // Page seule (couverture, 4e de couv)
-                      return (
-                        <div className="relative bg-gray-800 p-3 rounded-lg shadow-2xl" style={{ 
-                          width: '420px',
-                          height: '580px'
+                        
+                        {/* Page de droite */}
+                        <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
+                          width: '400px',
+                          height: '565px'
                         }}>
-                          <div className="bg-white shadow-lg h-full overflow-hidden">
-                            <div style={{
-                              width: '210mm',
-                              height: '297mm',
-                              transform: 'scale(0.19)',
-                              transformOrigin: 'top left'
-                            }}>
-                              {renderPageByIndex(displayPages[0])}
-                            </div>
+                          <div style={{
+                            width: '210mm',
+                            height: '297mm',
+                            transform: 'scale(0.48)',
+                            transformOrigin: 'top left'
+                          }}>
+                            {renderPageByIndex(displayPages[1])}
                           </div>
                         </div>
-                      );
-                    }
-                  })()}
-                </div>
+                      </div>
+                    );
+                  } else {
+                    // Page seule
+                    return (
+                      <div className="p-4 bg-gray-50 rounded-xl shadow-lg">
+                        <div className="bg-white shadow-md rounded-lg overflow-hidden" style={{
+                          width: '400px',
+                          height: '565px'
+                        }}>
+                          <div style={{
+                            width: '210mm',
+                            height: '297mm',
+                            transform: 'scale(0.48)',
+                            transformOrigin: 'top left'
+                          }}>
+                            {renderPageByIndex(displayPages[0])}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             </div>
           )}
