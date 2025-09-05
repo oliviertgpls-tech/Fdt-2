@@ -107,7 +107,7 @@ export default function CarnetsPage() {
               <button
                 onClick={handleCreateCarnet}
                 disabled={!newNotebookTitle.trim()}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
               </button>
@@ -127,14 +127,6 @@ export default function CarnetsPage() {
             Organisez vos recettes par thème et créez vos livres
           </p>
         </div>
-        
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          Nouveau carnet
-        </button>
       </div>
 
       {notebooks.length === 0 ? (
@@ -144,14 +136,11 @@ export default function CarnetsPage() {
             Aucun carnet pour l'instant
           </h3>
           <p className="text-gray-600 mb-6">
-            Créez votre premier carnet pour organiser vos recettes
+            Les carnets permettent d'organiser vos recettes par thème
           </p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            Créer mon premier carnet
-          </button>
+          <p className="text-sm text-gray-500">
+            Utilisez le menu "+ Ajouter" pour créer votre premier carnet
+          </p>
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
