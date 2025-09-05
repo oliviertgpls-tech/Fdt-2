@@ -107,7 +107,7 @@ export default function LivresPage() {
               </button>
               <button
                 onClick={handleCreateBook}
-                disabled={!newBookTitle.trim() || selectedRecipes.length === 0}
+                disabled={!newBookTitle.trim()}
                 className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors text-sm md:text-base"
               >
                 Créer le livre
