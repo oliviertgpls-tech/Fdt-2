@@ -409,9 +409,9 @@ export default function LivreEditorPage() {
       case 'back-cover':
         return renderBackCover();
       case 'recipe-photo':
-        return renderRecipePhoto(page.recipe);
+        return page.recipe ? renderRecipePhoto(page.recipe) : <div className="cookbook-page bg-cream">Recette manquante</div>;
       case 'recipe-content':
-        return renderRecipeContent(page.recipe);
+        return page.recipe ? renderRecipeContent(page.recipe) : <div className="cookbook-page bg-cream">Recette manquante</div>;
       default:
         return <div className="cookbook-page bg-cream">Type de page inconnu</div>;
     }
