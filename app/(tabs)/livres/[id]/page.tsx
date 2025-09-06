@@ -664,7 +664,7 @@ export default function LivreEditorPage() {
 
           {/* Preview responsive */}
           {showPreview && (
-            <div className="space-y-3 md:space-y-4 order-first lg:order-last min-w-0">
+            <div className="space-y-3 md:space-y-4 order-1 lg:order-2 min-w-0">
               {/* Navigation intelligente */}
               <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
                 <div className="flex items-center gap-3 md:gap-4 min-w-0 overflow-hidden">
