@@ -502,8 +502,8 @@ export default function LivreEditorPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:gap-8" style={{ gridTemplateColumns: showPreview ? '1fr 1.2fr' : '1fr' }}>
-          <div className="space-y-4 md:space-y-6">
+        <div className="grid gap-6 md:gap-8 grid-cols-1" style={{ gridTemplateColumns: showPreview ? (window.innerWidth < 1024 ? '1fr' : '1fr 1.2fr') : '1fr' }}>
+          <div className="space-y-4 md:space-y-6 min-w-0 overflow-hidden">
             {/* Description du livre */}
             <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
               <div className="flex items-center justify-between mb-4">
@@ -540,11 +540,165 @@ export default function LivreEditorPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
+                <p className="text-gray-600 text-xs md:text-sm leading-relaxed break-words">
                   {bookDescription}
                 </p>
               )}
             </div>
+
+            {/* Contenu du livre */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 min-w-0">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">📖 Contenu du livre</h2>
+              
+              {bookRecipes.length === 0 ? (
+                <div className="text-center py-8 md:py-12 text-gray-500">
+                  <div className="text-3xl md:text-4xl mb-3">📖</div>
+                  <p className="text-sm md:text-base">Livre vide - ajoutez des recettes</p>
+                </div>
+              ) : (
+                <div className="space-y-2 md:space-y-3 overflow-hidden">
+                  <div className="bg-orange-50 rounded-lg p-3 md:p-4 border border-orange-200">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-6 h-6 md:w-8 md:h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">1</span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Couverture</h4>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">{book.title}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">3</span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Description</h4>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">À propos de ce livre</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 rounded-lg p-3 md:p-4 border border-green-200">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">4-5</span>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Sommaire</h4>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">Liste des recettes + index</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {bookRecipes.map((recipe, index) => (
+                    <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group min-w-0 overflow-hidden">
+                      <div className="flex gap-3 md:gap-4 min-w-0">
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white text-xs md:text-sm rounded-full flex items-center justify-center font-medium">
+                            {6 + (index * 2)}-{7 + (index * 2)}
+                          </span>
+                          <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all hidden md:block">
+                            <GripVertical className="w-3 h-3 md:w-4 md:h-4 text-gray-500" />
+                          </button>
+                        </div>
+                        
+                        <img 
+                          src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                          alt={recipe.title}
+                          className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
+                        />
+                        
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">{recipe.title}</h4>
+                          <p className="text-xs md:text-sm text-gray-600 truncate">par {recipe.author || 'Famille'}</p>
+                          <p className="text-xs text-gray-500 mt-1 truncate">
+                            Double page • ⏱️ {recipe.prepMinutes || 30}min
+                          </p>
+                        </div>
+                        
+                        <button
+                          onClick={() => removeRecipeFromBook(book.id, recipe.id)}
+                          className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
+                        >
+                          <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Ajouter des recettes */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 min-w-0">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">➕ Ajouter des recettes</h3>
+              
+              {availableRecipes.length === 0 ? (
+                <div className="text-center py-6 md:py-8 text-gray-500">
+                  <div className="text-2xl md:text-3xl mb-2">🎉</div>
+                  <p className="text-xs md:text-sm">Toutes vos recettes sont dans ce livre !</p>
+                </div>
+              ) : (
+                <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
+                  {availableRecipes.map((recipe) => (
+                    <div 
+                      key={recipe.id} 
+                      className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer min-w-0 overflow-hidden"
+                      onClick={() => addRecipeToBook(book.id, recipe.id)}
+                    >
+                      <div className="flex gap-3 min-w-0">
+                        <img 
+                          src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
+                          alt={recipe.title}
+                          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <h5 className="font-medium text-gray-900 text-xs md:text-sm truncate">{recipe.title}</h5>
+                          <p className="text-xs text-gray-600 truncate">{recipe.author || 'Famille'}</p>
+                        </div>
+                        <Plus className="w-3 h-3 md:w-4 md:h-4 text-gray-400 self-center flex-shrink-0" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Preview responsive */}
+          {showPreview && (
+            <div className="space-y-3 md:space-y-4 order-first lg:order-last min-w-0">
+              {/* Navigation intelligente */}
+              <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
+                <div className="flex items-center gap-3 md:gap-4 min-w-0 overflow-hidden">
+                  <span className="text-xs md:text-sm font-medium text-gray-700 flex-shrink-0">Aperçu Livre</span>
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                    {allPages[currentPage]?.title || 'Page inconnue'}
+                  </span>
+                  <span className="text-xs text-gray-500 flex-shrink-0">
+                    {currentPage + 1} / {allPages.length}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => navigatePages('prev')}
+                    disabled={currentPage === 0}
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    ← <span className="hidden sm:inline">
+                      {getNavigationStep(Math.max(0, currentPage - getNavigationStep(currentPage))) === 1 ? 'Page' : 'Double'}
+                    </span>
+                  </button>
+                  
+                  <button
+                    onClick={() => navigatePages('next')}
+                    disabled={currentPage >= allPages.length - 1}
+                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <span className="hidden sm:inline">
+                      {getNavigationStep(currentPage) === 1 ? 'Page' : 'Double'}
+                    </span> →
+                  </button>
+                </div>
+              </div>
 
             {/* Contenu du livre */}
             <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
