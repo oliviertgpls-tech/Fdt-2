@@ -119,30 +119,24 @@ export default function CarnetsPage() {
   );
 
   const CarnetsLibrary = () => (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">📚 Mes Carnets</h1>
           <p className="text-gray-600 mt-1">
             Organisez vos recettes par thème et créez vos livres
           </p>
         </div>
+        
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-sm md:text-base"
+        >
+          <Plus className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="hidden sm:inline">Nouveau carnet</span>
+          <span className="sm:hidden">Nouveau</span>
+        </button>
       </div>
-
-      {notebooks.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl">
-          <div className="text-6xl mb-4">📋</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Aucun carnet pour l'instant
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Les carnets permettent d'organiser vos recettes par thème
-          </p>
-          <p className="text-sm text-gray-500">
-            Utilisez le menu "+ Ajouter" pour créer votre premier carnet
-          </p>
-        </div>
-      ) : (
+    
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {notebooks.map((carnet) => (
             <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
