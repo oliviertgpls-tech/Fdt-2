@@ -700,12 +700,10 @@ export default function LivreEditorPage() {
                       <div className="flex gap-1 md:gap-4 p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg min-w-fit">
                         <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
                           <div 
-                            className="origin-top-left"
+                            className="w-full h-full"
                             style={{
-                              width: '210mm',
-                              height: '297mm',
-                              transform: 'scale(0.165)',
-                              transformOrigin: 'top left'
+                              transform: 'scale(1)',
+                              transformOrigin: 'center'
                             }}
                           >
                             {renderPageByIndex(displayPages[0])}
@@ -714,12 +712,10 @@ export default function LivreEditorPage() {
                         
                         <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
                           <div 
-                            className="origin-top-left"
+                            className="w-full h-full"
                             style={{
-                              width: '210mm',
-                              height: '297mm',
-                              transform: 'scale(0.165)',
-                              transformOrigin: 'top left'
+                              transform: 'scale(1)',
+                              transformOrigin: 'center'
                             }}
                           >
                             {renderPageByIndex(displayPages[1])}
@@ -732,12 +728,10 @@ export default function LivreEditorPage() {
                       <div className="p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg">
                         <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
                           <div 
-                            className="origin-top-left"
+                            className="w-full h-full"
                             style={{
-                              width: '210mm',
-                              height: '297mm',
-                              transform: 'scale(0.165)',
-                              transformOrigin: 'top left'
+                              transform: 'scale(1)',
+                              transformOrigin: 'center'
                             }}
                           >
                             {renderPageByIndex(displayPages[0])}
