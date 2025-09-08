@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Trash2, Plus, Eye, Upload, GripVertical, Edit3 } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, Eye, Upload, GripVertical, Edit3, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 
 export default function LivreEditorPage() {
@@ -11,10 +11,10 @@ export default function LivreEditorPage() {
   const { recipes, books, addRecipeToBook, removeRecipeFromBook, updateBook } = useRecipes();
 
   const book = books.find(b => b.id === id);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [showPreview, setShowPreview] = useState(true);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<'preview' | 'edit'>('preview');
   const [editingDescription, setEditingDescription] = useState(false);
-  const [bookDescription, setBookDescription] = useState(book?.description || "Un recueil précieux de recettes familiales, transmises avec amour de génération en génération. Chaque plat raconte une histoire, chaque saveur évoque des souvenirs partagés autour de la table familiale.");
+  const [bookDescription, setBookDescription] = useState(book?.description || "Un recueil précieux de recettes familiales, transmises avec amour de génération en génération.");
 
   if (!book) {
     return (
@@ -38,70 +38,214 @@ export default function LivreEditorPage() {
 
   const availableRecipes = recipes.filter(recipe => !book.recipeIds.includes(recipe.id));
 
-  // Types pour les pages
-  type PageType = {
-    type: string;
-    title: string;
-    recipe?: any;
-    recipeIndex?: number;
-  };
-
-  // Structure des pages optimisée pour l'impression
-  const createPageStructure = (): PageType[] => {
-    const pages: PageType[] = [];
+  // Structure des pages du livre
+  const createBookPages = () => {
+    const pages = [];
     
-    pages.push({ type: 'cover', title: 'Couverture' });
-    pages.push({ type: 'blank', title: 'Page technique' });
-    pages.push({ type: 'description', title: 'À propos de ce livre' });
-    pages.push({ type: 'sommaire-left', title: 'Sommaire - Recettes' });
-    pages.push({ type: 'sommaire-right', title: 'Sommaire - Index' });
+    // Page 1: Couverture
+    pages.push({
+      type: 'cover',
+      title: 'Couverture',
+      content: renderCoverPage()
+    });
     
+    // Page 2: Description
+    pages.push({
+      type: 'description',
+      title: 'À propos',
+      content: renderDescriptionPage()
+    });
+    
+    // Page 3: Sommaire
+    pages.push({
+      type: 'sommaire',
+      title: 'Sommaire',
+      content: renderSommairePage()
+    });
+    
+    // Pages recettes (2 pages par recette)
     bookRecipes.forEach((recipe, index) => {
-      pages.push({ 
-        type: 'recipe-photo', 
+      pages.push({
+        type: 'recipe-photo',
         title: `${recipe.title} - Photo`,
-        recipe,
-        recipeIndex: index 
+        content: renderRecipePhotoPage(recipe, index)
       });
-      pages.push({ 
-        type: 'recipe-content', 
+      pages.push({
+        type: 'recipe-content',
         title: `${recipe.title} - Recette`,
-        recipe,
-        recipeIndex: index 
+        content: renderRecipeContentPage(recipe, index)
       });
     });
     
-    pages.push({ type: 'back-cover', title: '4e de couverture' });
+    // Dernière page: 4e de couverture
+    pages.push({
+      type: 'back-cover',
+      title: '4e de couverture',
+      content: renderBackCoverPage()
+    });
     
     return pages;
   };
 
-  const allPages: PageType[] = createPageStructure();
-  const pageCount = allPages.length;
+  const allPages = createBookPages();
   const estimatedPrice = Math.max(8, bookRecipes.length * 1.5 + 6);
 
-  // Navigation intelligente
-  const getNavigationStep = (currentPageIndex: number) => {
-    const page = allPages[currentPageIndex];
-    if (page?.type === 'cover' || page?.type === 'back-cover') {
-      return 1;
-    }
-    return 2;
-  };
+  // Renderers optimisés pour l'aperçu
+  const renderCoverPage = () => (
+    <div className="h-full bg-gradient-to-br from-orange-100 to-orange-50 p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
+      {/* Pattern décoratif */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-4 left-4 w-16 h-16 border-2 border-orange-300 rounded-full"></div>
+        <div className="absolute top-8 right-8 w-8 h-8 border border-orange-300 rotate-45"></div>
+        <div className="absolute bottom-8 left-8 w-12 h-12 border border-orange-300"></div>
+      </div>
+      
+      <div className="relative z-10 space-y-4">
+        <div className="text-4xl mb-4">📚</div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
+          {book.title}
+        </h1>
+        <p className="text-orange-700 text-sm font-medium">
+          Carnet de transmission culinaire
+        </p>
+        <div className="flex items-center justify-center gap-2 my-4">
+          <div className="w-8 h-px bg-orange-400"></div>
+          <div className="w-1 h-1 bg-orange-400 rotate-45"></div>
+          <div className="w-8 h-px bg-orange-400"></div>
+        </div>
+        <p className="text-gray-600 text-sm">
+          {bookRecipes.length} recettes de famille
+        </p>
+      </div>
+    </div>
+  );
 
-  const navigatePages = (direction: 'prev' | 'next') => {
-    const step = getNavigationStep(currentPage);
-    
-    if (direction === 'next') {
-      const nextPage = Math.min(pageCount - 1, currentPage + step);
-      setCurrentPage(nextPage);
-    } else {
-      const prevPage = Math.max(0, currentPage - step);
-      setCurrentPage(prevPage);
-    }
-  };
+  const renderDescriptionPage = () => (
+    <div className="h-full bg-cream p-6 flex flex-col justify-center">
+      <div className="text-center space-y-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">À propos de ce livre</h2>
+        <div className="text-gray-700 text-sm leading-relaxed space-y-3">
+          {bookDescription.split('\n\n').map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <p className="text-gray-600 italic text-xs">
+            "Les recettes de famille sont les gardiens de nos souvenirs"
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 
-  // Fonction pour sauvegarder la description
+  const renderSommairePage = () => (
+    <div className="h-full bg-cream p-6">
+      <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Nos Recettes</h2>
+      <div className="space-y-2 max-h-80 overflow-y-auto">
+        {bookRecipes.map((recipe, index) => (
+          <div key={recipe.id} className="flex items-center gap-3 p-2 bg-orange-50 rounded-lg">
+            <span className="w-6 h-6 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full flex-shrink-0">
+              {index + 1}
+            </span>
+            <img 
+              src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=60'} 
+              alt={recipe.title}
+              className="w-8 h-8 object-cover rounded flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <h4 className="font-medium text-gray-900 text-sm truncate">{recipe.title}</h4>
+              <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
+            </div>
+            <span className="text-xs text-gray-500">p.{4 + (index * 2)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderRecipePhotoPage = (recipe: any, index: number) => (
+    <div className="h-full relative overflow-hidden bg-gray-100">
+      <img 
+        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=400'} 
+        alt={recipe.title}
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+      <div className="absolute bottom-4 left-4 right-4">
+        <h2 className="text-white text-xl font-bold drop-shadow-lg">{recipe.title}</h2>
+        <p className="text-white/90 text-sm drop-shadow">par {recipe.author || 'Famille'}</p>
+      </div>
+    </div>
+  );
+
+  const renderRecipeContentPage = (recipe: any, index: number) => (
+    <div className="h-full bg-cream p-4 overflow-y-auto">
+      <div className="mb-4">
+        <h1 className="text-lg font-bold text-gray-900 mb-2">{recipe.title}</h1>
+        <div className="flex gap-4 text-xs text-gray-600 mb-3">
+          <span>⏱️ {recipe.prepMinutes || 30} min</span>
+          <span>👥 {recipe.servings || '4'}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 h-80">
+        <div>
+          <h3 className="font-bold text-gray-900 mb-2 text-sm">Ingrédients</h3>
+          <div className="space-y-1">
+            {(recipe.ingredients || []).slice(0, 8).map((ingredient: string, i: number) => (
+              <div key={i} className="flex items-start gap-2 text-xs">
+                <span className="w-1 h-1 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                <span className="text-gray-700">{ingredient}</span>
+              </div>
+            ))}
+            {(recipe.ingredients || []).length > 8 && (
+              <p className="text-xs text-gray-500 italic">+ {(recipe.ingredients || []).length - 8} autres...</p>
+            )}
+          </div>
+        </div>
+        
+        <div>
+          <h3 className="font-bold text-gray-900 mb-2 text-sm">Préparation</h3>
+          <div className="space-y-2">
+            {(recipe.steps ? recipe.steps.split('\n\n').filter((step: string) => step.trim()) : []).slice(0, 4).map((step: string, i: number) => (
+              <div key={i} className="flex gap-2">
+                <div className="w-4 h-4 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full flex-shrink-0">
+                  {i + 1}
+                </div>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  {step.length > 120 ? step.substring(0, 120) + '...' : step}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderBackCoverPage = () => (
+    <div className="h-full bg-gradient-to-br from-orange-50 to-orange-100 p-6 flex flex-col justify-between">
+      <div></div>
+      <div className="text-center">
+        <h3 className="text-xl font-bold text-gray-900 mb-3">Un héritage culinaire</h3>
+        <p className="text-gray-700 text-sm leading-relaxed mb-4">
+          Ce livre rassemble {bookRecipes.length} recettes précieusement conservées et transmises de génération en génération.
+        </p>
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-6 h-px bg-orange-400"></div>
+          <div className="w-1 h-1 bg-orange-400 rotate-45"></div>
+          <div className="w-6 h-px bg-orange-400"></div>
+        </div>
+        <p className="text-orange-700 text-xs">
+          "Que chaque plat continue à rassembler et à nourrir l'amour familial"
+        </p>
+      </div>
+      <div className="text-center text-gray-600 text-xs">
+        <p>Créé avec amour sur Carnets Familiaux</p>
+      </div>
+    </div>
+  );
+
   const saveDescription = () => {
     if (updateBook) {
       updateBook(book.id, { description: bookDescription });
@@ -109,356 +253,16 @@ export default function LivreEditorPage() {
     setEditingDescription(false);
   };
 
-  // Renderers des pages
-  const renderCoverPage = () => {
-    const heroImage = bookRecipes[0]?.imageUrl || "https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=600";
-    
-    return (
-      <div className="cookbook-page bg-cream relative overflow-hidden h-full">
-        <div className="relative z-20 h-2/5 flex flex-col justify-center p-8 md:p-12">
-          <div className="text-center">
-            <p className="text-xs md:text-sm tracking-widest uppercase text-brown-600 font-medium mb-4 md:mb-6">
-              Patrimoine Culinaire
-            </p>
-            <h1 className="font-serif text-3xl md:text-6xl leading-tight text-brown-900 mb-3 md:mb-4">
-              {book.title}
-            </h1>
-            <h2 className="font-serif text-lg md:text-2xl text-brown-700 italic font-light mb-4 md:mb-6">
-              Carnet de transmission culinaire
-            </h2>
-            <div className="flex items-center justify-center gap-4 md:gap-6 mb-3 md:mb-4">
-              <div className="w-6 md:w-8 h-px bg-brown-400"></div>
-              <div className="w-2 h-2 border border-brown-400 rotate-45"></div>
-              <div className="w-6 md:w-8 h-px bg-brown-400"></div>
-            </div>
-            <p className="text-brown-600 font-light text-sm md:text-lg">
-              {bookRecipes.length} recettes de famille
-            </p>
-          </div>
-        </div>
-        
-        <div className="relative h-3/5">
-          <img 
-            src={heroImage}
-            alt="Photo de couverture"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-brown-900 opacity-15"></div>
-          <div className="absolute bottom-6 md:bottom-12 right-6 md:right-12 text-right">
-            <p className="text-cream text-sm md:text-lg font-medium tracking-wide drop-shadow-lg">
-              Famille
-            </p>
-            <div className="w-12 md:w-16 h-px bg-cream mt-2 md:mt-3 ml-auto opacity-80"></div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderBlankPage = () => (
-    <div className="cookbook-page bg-cream h-full flex items-center justify-center">
-      <p className="text-brown-300 text-xs italic">Page technique pour l'impression</p>
-    </div>
-  );
-
-  const renderDescriptionPage = () => (
-    <div className="cookbook-page bg-cream p-8 md:p-16 h-full">
-      <div className="h-full flex flex-col justify-center">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="font-serif text-2xl md:text-4xl text-brown-900 mb-6 md:mb-8">À propos de ce livre</h2>
-          <div className="text-brown-700 text-sm md:text-lg leading-relaxed space-y-4 md:space-y-6">
-            {bookDescription.split('\n\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-          <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-brown-200">
-            <p className="text-brown-600 italic text-sm md:text-base">
-              "Les recettes de famille sont bien plus que des instructions : elles sont les gardiens de nos souvenirs et les messagers de notre amour."
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSommaireLeft = () => (
-    <div className="cookbook-page bg-cream p-8 md:p-12 h-full">
-      <div className="h-full">
-        <h2 className="font-serif text-2xl md:text-3xl text-brown-900 mb-6 md:mb-8 text-center">
-          Nos Recettes
-        </h2>
-        
-        <div className="space-y-3 md:space-y-4 max-h-[80%] overflow-y-auto">
-          {bookRecipes.map((recipe, index) => (
-            <div key={recipe.id} className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-brown-50 rounded-lg">
-              <span className="w-6 h-6 md:w-8 md:h-8 bg-brown-500 text-cream text-xs md:text-sm font-bold flex items-center justify-center rounded-full flex-shrink-0">
-                {index + 1}
-              </span>
-              
-              <img 
-                src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                alt={recipe.title}
-                className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg flex-shrink-0"
-              />
-              
-              <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-brown-900 text-sm md:text-base truncate">{recipe.title}</h4>
-                <p className="text-xs md:text-sm text-brown-600">par {recipe.author || 'Famille'}</p>
-                <p className="text-xs text-brown-500">Page {6 + (index * 2)}</p>
-              </div>
-              
-              <div className="text-right text-xs md:text-sm text-brown-600">
-                <p>⏱️ {recipe.prepMinutes || 30}min</p>
-                <p>👥 {recipe.servings || '4'}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderSommaireRight = () => {
-    const recipesByAuthor = bookRecipes.reduce((acc, recipe) => {
-      const author = recipe.author || 'Recettes familiales';
-      if (!acc[author]) acc[author] = [];
-      acc[author].push(recipe);
-      return acc;
-    }, {} as Record<string, typeof bookRecipes>);
-
-    return (
-      <div className="cookbook-page bg-cream p-8 md:p-12 h-full">
-        <div className="h-full">
-          <h2 className="font-serif text-2xl md:text-3xl text-brown-900 mb-6 md:mb-8 text-center">
-            Index & Conseils
-          </h2>
-          
-          <div className="space-y-6 md:space-y-8">
-            <div>
-              <h3 className="font-serif text-lg md:text-xl text-brown-800 mb-3 md:mb-4 border-b border-brown-300 pb-2">
-                Par contributeur
-              </h3>
-              <div className="space-y-2 md:space-y-3">
-                {Object.entries(recipesByAuthor).map(([author, authorRecipes]) => (
-                  <div key={author} className="flex justify-between items-center">
-                    <span className="text-sm md:text-base text-brown-700 font-medium">{author}</span>
-                    <span className="text-xs md:text-sm text-brown-500">{authorRecipes.length} recettes</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="font-serif text-lg md:text-xl text-brown-800 mb-3 md:mb-4 border-b border-brown-300 pb-2">
-                Conseils pratiques
-              </h3>
-              <div className="text-xs md:text-sm text-brown-700 space-y-2 md:space-y-3">
-                <div>
-                  <strong>Conversions utiles :</strong>
-                  <p>1 tasse = 250ml • 1 c. à soupe = 15ml • 1 c. à café = 5ml</p>
-                </div>
-                <div>
-                  <strong>Températures four :</strong>
-                  <p>Doux 150°C • Moyen 180°C • Chaud 210°C • Très chaud 240°C</p>
-                </div>
-                <div>
-                  <strong>Conservation :</strong>
-                  <p>Notez vos modifications et ajustements dans les marges</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-auto pt-4 md:pt-6 border-t border-brown-200">
-              <p className="text-xs md:text-sm text-brown-500 text-center italic">
-                Livre créé avec Carnets Familiaux<br />
-                {bookRecipes.length} recettes • {pageCount} pages
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const renderBackCover = () => (
-    <div className="cookbook-page bg-cream p-8 md:p-16 h-full">
-      <div className="h-full flex flex-col justify-between">
-        <div></div>
-        <div className="text-center">
-          <h3 className="font-serif text-2xl md:text-3xl text-brown-900 mb-4 md:mb-6">Un héritage culinaire</h3>
-          <p className="text-brown-700 text-sm md:text-lg max-w-lg mx-auto leading-relaxed mb-6 md:mb-8">
-            Ce livre rassemble {bookRecipes.length} recettes précieusement conservées et transmises de génération en génération.
-          </p>
-          <div className="flex items-center justify-center gap-4 md:gap-6 mb-4 md:mb-6">
-            <div className="w-6 md:w-8 h-px bg-brown-400"></div>
-            <div className="w-2 h-2 border border-brown-400 rotate-45"></div>
-            <div className="w-6 md:w-8 h-px bg-brown-400"></div>
-          </div>
-          <p className="text-brown-600 text-xs md:text-sm">
-            "Que chaque plat continue à rassembler et à nourrir l'amour familial"
-          </p>
-        </div>
-        <div className="text-center text-brown-600 text-xs md:text-sm">
-          <p>Créé avec amour sur Carnets Familiaux</p>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderRecipePhoto = (recipe: any) => (
-    <div className="cookbook-page bg-cream relative overflow-hidden h-full">
-      <img 
-        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=600'} 
-        alt={recipe.title}
-        className="w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-brown-900 opacity-5"></div>
-      <div className="absolute bottom-4 md:bottom-8 left-4 md:left-8">
-        <h2 className="font-serif text-2xl md:text-4xl text-white drop-shadow-2xl">
-          {recipe.title}
-        </h2>
-        <p className="text-white/80 text-sm md:text-base mt-1 md:mt-2 drop-shadow-lg">
-          par {recipe.author || 'Famille'}
-        </p>
-      </div>
-    </div>
-  );
-
-  const renderRecipeContent = (recipe: any) => (
-    <div className="cookbook-page bg-cream p-6 md:p-12 h-full">
-      <div className="h-full flex flex-col">
-        <div className="flex justify-between items-center mb-4 md:mb-6 pb-3 md:pb-4 border-b border-brown-200">
-          <div className="text-xs md:text-sm uppercase tracking-widest text-brown-500 font-medium">
-            {recipe.author || 'Recette de famille'}
-          </div>
-          <div className="text-xs md:text-sm text-brown-500">
-            {recipe.prepMinutes || 30} min • {recipe.servings || '4'} pers.
-          </div>
-        </div>
-
-        <div className="mb-6 md:mb-8">
-          <h1 className="font-serif text-2xl md:text-4xl text-brown-900 mb-3 md:mb-4 leading-tight">
-            {recipe.title}
-          </h1>
-          <p className="text-brown-600 italic text-sm md:text-base leading-relaxed">
-            {recipe.description || `Une délicieuse recette de ${recipe.author || 'famille'}.`}
-          </p>
-        </div>
-
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <div>
-            <h3 className="font-serif text-lg md:text-xl text-brown-900 mb-3 md:mb-4 pb-2 border-b border-brown-300">
-              Ingrédients
-            </h3>
-            <div className="space-y-2">
-              {(recipe.ingredients || []).map((ingredient: string, index: number) => (
-                <div key={index} className="flex items-start gap-3 text-xs md:text-sm">
-                  <span className="w-1.5 h-1.5 bg-brown-500 rounded-full mt-2 flex-shrink-0"></span>
-                  <span className="text-brown-700 leading-relaxed">{ingredient}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="font-serif text-lg md:text-xl text-brown-900 mb-3 md:mb-4 pb-2 border-b border-brown-300">
-              Préparation
-            </h3>
-            <div className="space-y-3">
-              {(recipe.steps ? recipe.steps.split('\n\n').filter((step: string) => step.trim()) : []).map((step: string, index: number) => (
-                <div key={index} className="flex gap-3">
-                  <div className="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-brown-900 text-cream text-xs font-bold flex items-center justify-center rounded-full">
-                    {index + 1}
-                  </div>
-                  <p className="text-xs md:text-sm text-brown-700 leading-relaxed flex-1 pt-0.5">
-                    {step}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderPageByIndex = (pageIndex: number) => {
-    const page = allPages[pageIndex];
-    if (!page) return <div className="cookbook-page bg-cream">Page non trouvée</div>;
-    
-    switch (page.type) {
-      case 'cover':
-        return renderCoverPage();
-      case 'blank':
-        return renderBlankPage();
-      case 'description':
-        return renderDescriptionPage();
-      case 'sommaire-left':
-        return renderSommaireLeft();
-      case 'sommaire-right':
-        return renderSommaireRight();
-      case 'back-cover':
-        return renderBackCover();
-      case 'recipe-photo':
-        return page.recipe ? renderRecipePhoto(page.recipe) : <div className="cookbook-page bg-cream">Recette manquante</div>;
-      case 'recipe-content':
-        return page.recipe ? renderRecipeContent(page.recipe) : <div className="cookbook-page bg-cream">Recette manquante</div>;
-      default:
-        return <div className="cookbook-page bg-cream">Type de page inconnu</div>;
-    }
-  };
-
-  // Détermine si on affiche une ou deux pages
-  const getCurrentDisplayPages = () => {
-    const page = allPages[currentPage];
-    
-    // Pages seules : SEULEMENT couverture et 4e de couverture
-    if (page?.type === 'cover' || page?.type === 'back-cover') {
-      return [currentPage];
-    }
-    
-    // TOUTES les autres pages sont en doubles pages avec page paire à gauche
-    if (currentPage % 2 === 0) {
-      const nextPageExists = currentPage + 1 < allPages.length;
-      return nextPageExists ? [currentPage, currentPage + 1] : [currentPage];
-    } else {
-      return [currentPage - 1, currentPage];
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-gray-50">
       <style jsx global>{`
         .bg-cream { background-color: #fefcf8; }
-        .text-brown-900 { color: #2c1810; }
-        .text-brown-700 { color: #52341f; }
-        .text-brown-600 { color: #6b4423; }
-        .text-brown-500 { color: #8b5a2b; }
-        .text-brown-400 { color: #a67c52; }
-        .text-brown-300 { color: #c4a484; }
-        .text-brown-200 { color: #e2d5c7; }
-        .text-cream { color: #fefcf8; }
-        .bg-brown-900 { background-color: #2c1810; }
-        .bg-brown-50 { background-color: #f9f6f2; }
-        .bg-brown-500 { background-color: #8b5a2b; }
-        .border-brown-600 { border-color: #6b4423; }
-        .border-brown-400 { border-color: #a67c52; }
-        .border-brown-300 { border-color: #c4a484; }
-        .border-brown-200 { border-color: #e2d5c7; }
-        .font-serif { font-family: 'Crimson Text', 'Times New Roman', serif; }
-        .cookbook-page {
-          font-family: 'Source Serif Pro', Georgia, serif;
-          font-size: 16px;
-          line-height: 1.6;
-          color: #52341f;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
       `}</style>
 
-      <div className="max-w-7xl mx-auto pt-4 md:pt-8 px-4 md:px-8">
-        {/* En-tête responsive */}
-        <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-6 md:mb-8">
-          <div className="flex items-center gap-3 md:gap-4">
+      <div className="max-w-7xl mx-auto p-4">
+        {/* En-tête */}
+        <div className="bg-white rounded-lg shadow-sm border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
               className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
@@ -468,181 +272,223 @@ export default function LivreEditorPage() {
             </button>
             
             <div>
-              <h1 className="text-lg md:text-xl font-semibold text-gray-800">{book.title}</h1>
-              <p className="text-xs md:text-sm text-gray-600">
-                {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
+              <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
+              <p className="text-sm text-gray-600">
+                {bookRecipes.length} recettes • {allPages.length} pages • ≈ {estimatedPrice.toFixed(2)}€
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-3">
             <button 
-              onClick={() => setShowPreview(!showPreview)}
-              className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
+              onClick={() => setViewMode(viewMode === 'preview' ? 'edit' : 'preview')}
+              className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2"
             >
               <Eye className="w-4 h-4" />
-              {showPreview ? 'Masquer' : 'Voir'} aperçu
+              {viewMode === 'preview' ? 'Éditer' : 'Aperçu'}
             </button>
             
-            <button className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm">
+            <button className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Commander ({estimatedPrice.toFixed(2)}€)
             </button>
           </div>
         </div>
 
-        <div className={`grid gap-6 md:gap-8 ${showPreview ? 'grid-cols-1 lg:grid-cols-[1fr_1.2fr]' : 'grid-cols-1'}`}>
-          <div className="space-y-4 md:space-y-6 min-w-0 overflow-hidden order-2 lg:order-1">
-            {/* Description du livre */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base md:text-lg font-semibold text-gray-800">📝 Description du livre</h2>
-                <button
-                  onClick={() => setEditingDescription(!editingDescription)}
-                  className="text-gray-500 hover:text-gray-700 p-1"
-                >
-                  <Edit3 className="w-4 h-4" />
-                </button>
+        {viewMode === 'preview' ? (
+          /* MODE APERÇU - Navigation livre */
+          <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
+            {/* Navigation pages */}
+            <div className="bg-white rounded-lg border p-4">
+              <h3 className="font-semibold text-gray-800 mb-4">Pages du livre</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {allPages.map((page, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPageIndex(index)}
+                    className={`w-full text-left p-3 rounded-lg border transition-all ${
+                      currentPageIndex === index 
+                        ? 'border-orange-500 bg-orange-50' 
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                        {index + 1}
+                      </span>
+                      <div>
+                        <p className="font-medium text-gray-900 text-sm">{page.title}</p>
+                        <p className="text-xs text-gray-500">{page.type}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
               </div>
-              
-              {editingDescription ? (
-                <div className="space-y-3">
-                  <textarea
-                    value={bookDescription}
-                    onChange={(e) => setBookDescription(e.target.value)}
-                    className="w-full h-24 md:h-32 p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none text-sm md:text-base"
-                    placeholder="Décrivez ce livre de recettes..."
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={saveDescription}
-                      className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs md:text-sm"
-                    >
-                      Sauvegarder
-                    </button>
-                    <button
-                      onClick={() => setEditingDescription(false)}
-                      className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs md:text-sm"
-                    >
-                      Annuler
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-600 text-xs md:text-sm leading-relaxed break-words">
-                  {bookDescription}
-                </p>
-              )}
             </div>
 
-            {/* Contenu du livre */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 min-w-0">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">📖 Contenu du livre</h2>
-              
-              {bookRecipes.length === 0 ? (
-                <div className="text-center py-8 md:py-12 text-gray-500">
-                  <div className="text-3xl md:text-4xl mb-3">📖</div>
-                  <p className="text-sm md:text-base">Livre vide - ajoutez des recettes</p>
+            {/* Aperçu page */}
+            <div className="bg-white rounded-lg border p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-semibold text-gray-800">
+                  Page {currentPageIndex + 1} : {allPages[currentPageIndex]?.title}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPageIndex(Math.max(0, currentPageIndex - 1))}
+                    disabled={currentPageIndex === 0}
+                    className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPageIndex(Math.min(allPages.length - 1, currentPageIndex + 1))}
+                    disabled={currentPageIndex === allPages.length - 1}
+                    className="p-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentPageIndex(0)}
+                    className="p-2 text-gray-600 hover:text-gray-800"
+                    title="Retour au début"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-2 md:space-y-3 overflow-hidden">
-                  <div className="bg-orange-50 rounded-lg p-3 md:p-4 border border-orange-200">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">1</span>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Couverture</h4>
-                        <p className="text-xs md:text-sm text-gray-600 truncate">{book.title}</p>
-                      </div>
+              </div>
+
+              {/* Page en taille réelle */}
+              <div className="flex justify-center">
+                <div className="bg-white shadow-lg rounded-lg overflow-hidden" style={{ width: '400px', height: '560px' }}>
+                  {allPages[currentPageIndex]?.content}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* MODE ÉDITION - Interface d'édition */
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
+            {/* Contenu du livre */}
+            <div className="space-y-6">
+              {/* Description */}
+              <div className="bg-white rounded-xl border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-gray-800">📝 Description du livre</h2>
+                  <button
+                    onClick={() => setEditingDescription(!editingDescription)}
+                    className="text-gray-500 hover:text-gray-700 p-1"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                {editingDescription ? (
+                  <div className="space-y-3">
+                    <textarea
+                      value={bookDescription}
+                      onChange={(e) => setBookDescription(e.target.value)}
+                      className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
+                      placeholder="Décrivez ce livre de recettes..."
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={saveDescription}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      >
+                        Sauvegarder
+                      </button>
+                      <button
+                        onClick={() => setEditingDescription(false)}
+                        className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                      >
+                        Annuler
+                      </button>
                     </div>
                   </div>
+                ) : (
+                  <p className="text-gray-600 text-sm leading-relaxed">{bookDescription}</p>
+                )}
+              </div>
 
-                  <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">3</span>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Description</h4>
-                        <p className="text-xs md:text-sm text-gray-600 truncate">À propos de ce livre</p>
-                      </div>
-                    </div>
+              {/* Recettes du livre */}
+              <div className="bg-white rounded-xl border p-6">
+                <h2 className="text-lg font-semibold text-gray-800 mb-6">📖 Recettes du livre</h2>
+                
+                {bookRecipes.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <div className="text-4xl mb-3">📖</div>
+                    <p>Livre vide - ajoutez des recettes</p>
                   </div>
-
-                  <div className="bg-green-50 rounded-lg p-3 md:p-4 border border-green-200">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">5</span>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Sommaire</h4>
-                        <p className="text-xs md:text-sm text-gray-600 truncate">Liste de toutes les recettes</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {bookRecipes.map((recipe, index) => (
-                    <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group min-w-0 overflow-hidden">
-                      <div className="flex gap-3 md:gap-4 min-w-0">
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white text-xs md:text-sm rounded-full flex items-center justify-center font-medium">
-                            {6 + (index * 2)}-{7 + (index * 2)}
-                          </span>
-                          <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all hidden md:block">
-                            <GripVertical className="w-3 h-3 md:w-4 md:h-4 text-gray-500" />
+                ) : (
+                  <div className="space-y-3">
+                    {bookRecipes.map((recipe, index) => (
+                      <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-4 group">
+                        <div className="flex gap-4">
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="w-8 h-8 bg-purple-500 text-white text-sm rounded-full flex items-center justify-center font-medium">
+                              {index + 1}
+                            </span>
+                            <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
+                              <GripVertical className="w-4 h-4 text-gray-500" />
+                            </button>
+                          </div>
+                          
+                          <img 
+                            src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                            alt={recipe.title}
+                            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                          />
+                          
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 text-base">{recipe.title}</h4>
+                            <p className="text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Double page • ⏱️ {recipe.prepMinutes || 30}min
+                            </p>
+                          </div>
+                          
+                          <button
+                            onClick={() => removeRecipeFromBook(book.id, recipe.id)}
+                            className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
-                        
-                        <img 
-                          src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                          alt={recipe.title}
-                          className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
-                        />
-                        
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">{recipe.title}</h4>
-                          <p className="text-xs md:text-sm text-gray-600 truncate">par {recipe.author || 'Famille'}</p>
-                          <p className="text-xs text-gray-500 mt-1 truncate">
-                            Double page • ⏱️ {recipe.prepMinutes || 30}min
-                          </p>
-                        </div>
-                        
-                        <button
-                          onClick={() => removeRecipeFromBook(book.id, recipe.id)}
-                          className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
-                        >
-                          <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                        </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Ajouter des recettes */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6 min-w-0">
-              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">➕ Ajouter des recettes</h3>
+            {/* Sidebar - Ajouter recettes */}
+            <div className="bg-white rounded-xl border p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">➕ Ajouter des recettes</h3>
               
               {availableRecipes.length === 0 ? (
-                <div className="text-center py-6 md:py-8 text-gray-500">
-                  <div className="text-2xl md:text-3xl mb-2">🎉</div>
-                  <p className="text-xs md:text-sm">Toutes vos recettes sont dans ce livre !</p>
+                <div className="text-center py-8 text-gray-500">
+                  <div className="text-3xl mb-2">🎉</div>
+                  <p className="text-sm">Toutes vos recettes sont dans ce livre !</p>
                 </div>
               ) : (
-                <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
                   {availableRecipes.map((recipe) => (
                     <div 
                       key={recipe.id} 
-                      className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer min-w-0 overflow-hidden"
+                      className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
                       onClick={() => addRecipeToBook(book.id, recipe.id)}
                     >
-                      <div className="flex gap-3 min-w-0">
+                      <div className="flex gap-3">
                         <img 
                           src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
                           alt={recipe.title}
-                          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg flex-shrink-0"
+                          className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                         />
-                        <div className="flex-1 min-w-0 overflow-hidden">
-                          <h5 className="font-medium text-gray-900 text-xs md:text-sm truncate">{recipe.title}</h5>
-                          <p className="text-xs text-gray-600 truncate">{recipe.author || 'Famille'}</p>
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-medium text-gray-900 text-sm">{recipe.title}</h5>
+                          <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
                         </div>
-                        <Plus className="w-3 h-3 md:w-4 md:h-4 text-gray-400 self-center flex-shrink-0" />
+                        <Plus className="w-4 h-4 text-gray-400 self-center flex-shrink-0" />
                       </div>
                     </div>
                   ))}
@@ -650,171 +496,7 @@ export default function LivreEditorPage() {
               )}
             </div>
           </div>
-
-          {/* Preview avec miniatures en diapositives */}
-          {showPreview && (
-            <div className="space-y-3 md:space-y-4 order-1 lg:order-2 min-w-0">
-              {/* En-tête preview */}
-              <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
-                <div className="flex items-center gap-3 md:gap-4 min-w-0 overflow-hidden">
-                  <span className="text-xs md:text-sm font-medium text-gray-700 flex-shrink-0">Aperçu Livre</span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
-                    {bookRecipes.length} recettes • {pageCount} pages
-                  </span>
-                </div>
-                
-                <button className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm">
-                  <Upload className="w-4 h-4" />
-                  Générer PDF
-                </button>
-              </div>
-
-              {/* Vue miniatures en diapositives */}
-              <div className="bg-white rounded-lg border p-3 md:p-4">
-                <h3 className="text-sm md:text-base font-medium text-gray-800 mb-3 md:mb-4">Pages du livre</h3>
-                
-                <div className="space-y-2 md:space-y-3 max-h-[60vh] overflow-y-auto">
-                  {/* Page 0 : Couverture seule */}
-                  <div 
-                    className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                      currentPage === 0 ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                    onClick={() => setCurrentPage(0)}
-                  >
-                    <div className="flex-shrink-0">
-                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">Page 1</span>
-                    </div>
-                    <div className="flex gap-2">
-                      {/* Couverture */}
-                      <div className="w-16 h-20 md:w-20 md:h-24 bg-orange-100 rounded border flex items-center justify-center text-xs md:text-sm font-medium text-orange-700">
-                        📖 Couverture
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0 flex items-center">
-                      <div>
-                        <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">{book.title}</h4>
-                        <p className="text-xs text-gray-500">Couverture du livre</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Pages par doubles pages (1-2, 3-4, 5-6, etc.) */}
-                  {(() => {
-                    const doublePagesGroups = [];
-                    for (let i = 1; i < allPages.length - 1; i += 2) {
-                      const leftPage = allPages[i];
-                      const rightPage = allPages[i + 1];
-                      
-                      doublePagesGroups.push({
-                        leftIndex: i,
-                        rightIndex: i + 1,
-                        leftPage,
-                        rightPage: rightPage || null
-                      });
-                    }
-
-                    return doublePagesGroups.map((group, groupIndex) => (
-                      <div 
-                        key={groupIndex}
-                        className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                          currentPage === group.leftIndex || currentPage === group.rightIndex 
-                            ? 'border-orange-500 bg-orange-50' 
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                        onClick={() => setCurrentPage(group.leftIndex)}
-                      >
-                        <div className="flex-shrink-0">
-                          <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                            Pages {group.leftIndex + 1}-{group.rightIndex + 1}
-                          </span>
-                        </div>
-                        
-                        <div className="flex gap-1">
-                          {/* Page de gauche */}
-                          <div className="w-16 h-20 md:w-20 md:h-24 bg-blue-100 rounded border flex items-center justify-center text-xs font-medium text-blue-700 text-center leading-tight">
-                            {group.leftPage?.type === 'blank' && '📄 Vide'}
-                            {group.leftPage?.type === 'description' && '📝 Description'}
-                            {group.leftPage?.type === 'sommaire-left' && '📋 Sommaire'}
-                            {group.leftPage?.type === 'sommaire-right' && '🗂️ Index'}
-                            {group.leftPage?.type === 'recipe-photo' && '📸 Photo'}
-                            {group.leftPage?.type === 'recipe-content' && '📖 Recette'}
-                          </div>
-                          
-                          {/* Page de droite */}
-                          {group.rightPage && (
-                            <div className="w-16 h-20 md:w-20 md:h-24 bg-blue-100 rounded border flex items-center justify-center text-xs font-medium text-blue-700 text-center leading-tight">
-                              {group.rightPage.type === 'blank' && '📄 Vide'}
-                              {group.rightPage.type === 'description' && '📝 Description'}
-                              {group.rightPage.type === 'sommaire-left' && '📋 Sommaire'}
-                              {group.rightPage.type === 'sommaire-right' && '🗂️ Index'}
-                              {group.rightPage.type === 'recipe-photo' && '📸 Photo'}
-                              {group.rightPage.type === 'recipe-content' && '📖 Recette'}
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex-1 min-w-0 flex items-center">
-                          <div>
-                            <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">
-                              {group.leftPage?.title || 'Page inconnue'}
-                              {group.rightPage && ` + ${group.rightPage.title}`}
-                            </h4>
-                            <p className="text-xs text-gray-500">
-                              {group.leftPage?.type === 'recipe-photo' || group.leftPage?.type === 'recipe-content' 
-                                ? `Recette : ${group.leftPage?.recipe?.title}` 
-                                : 'Pages de structure'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ));
-                  })()}
-
-                  {/* Dernière page : 4e de couverture seule */}
-                  <div 
-                    className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
-                      currentPage === allPages.length - 1 ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                    onClick={() => setCurrentPage(allPages.length - 1)}
-                  >
-                    <div className="flex-shrink-0">
-                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">Page {allPages.length}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      {/* 4e de couverture */}
-                      <div className="w-16 h-20 md:w-20 md:h-24 bg-orange-100 rounded border flex items-center justify-center text-xs md:text-sm font-medium text-orange-700">
-                        📚 4e couv
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0 flex items-center">
-                      <div>
-                        <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">4e de couverture</h4>
-                        <p className="text-xs text-gray-500">Fin du livre</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Preview de la page sélectionnée */}
-              <div className="bg-white rounded-lg border p-3 md:p-4">
-                <h3 className="text-sm md:text-base font-medium text-gray-800 mb-3 md:mb-4">
-                  Preview : {allPages[currentPage]?.title || 'Page inconnue'}
-                </h3>
-                
-                <div className="flex justify-center">
-                  <div className="bg-gray-50 rounded-xl p-2 md:p-4 shadow-lg">
-                    <div className="bg-white shadow-md rounded-lg overflow-hidden w-[160px] h-[220px] md:w-[200px] md:h-[280px]">
-                      <div className="w-full h-full">
-                        {renderPageByIndex(currentPage)}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
