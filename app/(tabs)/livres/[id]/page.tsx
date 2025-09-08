@@ -651,96 +651,166 @@ export default function LivreEditorPage() {
             </div>
           </div>
 
-          {/* Preview responsive */}
+          {/* Preview avec miniatures en diapositives */}
           {showPreview && (
             <div className="space-y-3 md:space-y-4 order-1 lg:order-2 min-w-0">
-              {/* Navigation intelligente */}
+              {/* En-tête preview */}
               <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
                 <div className="flex items-center gap-3 md:gap-4 min-w-0 overflow-hidden">
                   <span className="text-xs md:text-sm font-medium text-gray-700 flex-shrink-0">Aperçu Livre</span>
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
-                    {allPages[currentPage]?.title || 'Page inconnue'}
-                  </span>
-                  <span className="text-xs text-gray-500 flex-shrink-0">
-                    {currentPage + 1} / {allPages.length}
+                    {bookRecipes.length} recettes • {pageCount} pages
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => navigatePages('prev')}
-                    disabled={currentPage === 0}
-                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                <button className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm">
+                  <Upload className="w-4 h-4" />
+                  Générer PDF
+                </button>
+              </div>
+
+              {/* Vue miniatures en diapositives */}
+              <div className="bg-white rounded-lg border p-3 md:p-4">
+                <h3 className="text-sm md:text-base font-medium text-gray-800 mb-3 md:mb-4">Pages du livre</h3>
+                
+                <div className="space-y-2 md:space-y-3 max-h-[60vh] overflow-y-auto">
+                  {/* Page 0 : Couverture seule */}
+                  <div 
+                    className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                      currentPage === 0 ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setCurrentPage(0)}
                   >
-                    ← <span className="hidden sm:inline">
-                      {getNavigationStep(Math.max(0, currentPage - getNavigationStep(currentPage))) === 1 ? 'Page' : 'Double'}
-                    </span>
-                  </button>
-                  
-                  <button
-                    onClick={() => navigatePages('next')}
-                    disabled={currentPage >= allPages.length - 1}
-                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    <div className="flex-shrink-0">
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">Page 1</span>
+                    </div>
+                    <div className="flex gap-2">
+                      {/* Couverture */}
+                      <div className="w-16 h-20 md:w-20 md:h-24 bg-orange-100 rounded border flex items-center justify-center text-xs md:text-sm font-medium text-orange-700">
+                        📖 Couverture
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0 flex items-center">
+                      <div>
+                        <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">{book.title}</h4>
+                        <p className="text-xs text-gray-500">Couverture du livre</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pages par doubles pages (1-2, 3-4, 5-6, etc.) */}
+                  {(() => {
+                    const doublePagesGroups = [];
+                    for (let i = 1; i < allPages.length - 1; i += 2) {
+                      const leftPage = allPages[i];
+                      const rightPage = allPages[i + 1];
+                      
+                      doublePagesGroups.push({
+                        leftIndex: i,
+                        rightIndex: i + 1,
+                        leftPage,
+                        rightPage: rightPage || null
+                      });
+                    }
+
+                    return doublePagesGroups.map((group, groupIndex) => (
+                      <div 
+                        key={groupIndex}
+                        className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                          currentPage === group.leftIndex || currentPage === group.rightIndex 
+                            ? 'border-orange-500 bg-orange-50' 
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => setCurrentPage(group.leftIndex)}
+                      >
+                        <div className="flex-shrink-0">
+                          <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                            Pages {group.leftIndex + 1}-{group.rightIndex + 1}
+                          </span>
+                        </div>
+                        
+                        <div className="flex gap-1">
+                          {/* Page de gauche */}
+                          <div className="w-16 h-20 md:w-20 md:h-24 bg-blue-100 rounded border flex items-center justify-center text-xs font-medium text-blue-700 text-center leading-tight">
+                            {group.leftPage?.type === 'blank' && '📄 Vide'}
+                            {group.leftPage?.type === 'description' && '📝 Description'}
+                            {group.leftPage?.type === 'sommaire-left' && '📋 Sommaire'}
+                            {group.leftPage?.type === 'sommaire-right' && '🗂️ Index'}
+                            {group.leftPage?.type === 'recipe-photo' && '📸 Photo'}
+                            {group.leftPage?.type === 'recipe-content' && '📖 Recette'}
+                          </div>
+                          
+                          {/* Page de droite */}
+                          {group.rightPage && (
+                            <div className="w-16 h-20 md:w-20 md:h-24 bg-blue-100 rounded border flex items-center justify-center text-xs font-medium text-blue-700 text-center leading-tight">
+                              {group.rightPage.type === 'blank' && '📄 Vide'}
+                              {group.rightPage.type === 'description' && '📝 Description'}
+                              {group.rightPage.type === 'sommaire-left' && '📋 Sommaire'}
+                              {group.rightPage.type === 'sommaire-right' && '🗂️ Index'}
+                              {group.rightPage.type === 'recipe-photo' && '📸 Photo'}
+                              {group.rightPage.type === 'recipe-content' && '📖 Recette'}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 flex items-center">
+                          <div>
+                            <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">
+                              {group.leftPage?.title || 'Page inconnue'}
+                              {group.rightPage && ` + ${group.rightPage.title}`}
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              {group.leftPage?.type === 'recipe-photo' || group.leftPage?.type === 'recipe-content' 
+                                ? `Recette : ${group.leftPage?.recipe?.title}` 
+                                : 'Pages de structure'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ));
+                  })()}
+
+                  {/* Dernière page : 4e de couverture seule */}
+                  <div 
+                    className={`flex gap-2 p-2 md:p-3 rounded-lg border-2 transition-all cursor-pointer ${
+                      currentPage === allPages.length - 1 ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setCurrentPage(allPages.length - 1)}
                   >
-                    <span className="hidden sm:inline">
-                      {getNavigationStep(currentPage) === 1 ? 'Page' : 'Double'}
-                    </span> →
-                  </button>
+                    <div className="flex-shrink-0">
+                      <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded">Page {allPages.length}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      {/* 4e de couverture */}
+                      <div className="w-16 h-20 md:w-20 md:h-24 bg-orange-100 rounded border flex items-center justify-center text-xs md:text-sm font-medium text-orange-700">
+                        📚 4e couv
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0 flex items-center">
+                      <div>
+                        <h4 className="text-xs md:text-sm font-medium text-gray-900 truncate">4e de couverture</h4>
+                        <p className="text-xs text-gray-500">Fin du livre</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Aperçu livre */}
-              <div className="flex justify-center overflow-x-auto">
-                {(() => {
-                  const displayPages = getCurrentDisplayPages();
-                  const isDouble = displayPages.length === 2;
-                  
-                  if (isDouble) {
-                    return (
-                      <div className="flex gap-1 md:gap-4 p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg min-w-fit">
-                        <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
-                          <div 
-                            className="w-full h-full"
-                            style={{
-                              transform: 'scale(1)',
-                              transformOrigin: 'center'
-                            }}
-                          >
-                            {renderPageByIndex(displayPages[0])}
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
-                          <div 
-                            className="w-full h-full"
-                            style={{
-                              transform: 'scale(1)',
-                              transformOrigin: 'center'
-                            }}
-                          >
-                            {renderPageByIndex(displayPages[1])}
-                          </div>
-                        </div>
+              {/* Preview de la page sélectionnée */}
+              <div className="bg-white rounded-lg border p-3 md:p-4">
+                <h3 className="text-sm md:text-base font-medium text-gray-800 mb-3 md:mb-4">
+                  Preview : {allPages[currentPage]?.title || 'Page inconnue'}
+                </h3>
+                
+                <div className="flex justify-center">
+                  <div className="bg-gray-50 rounded-xl p-2 md:p-4 shadow-lg">
+                    <div className="bg-white shadow-md rounded-lg overflow-hidden w-[160px] h-[220px] md:w-[200px] md:h-[280px]">
+                      <div className="w-full h-full">
+                        {renderPageByIndex(currentPage)}
                       </div>
-                    );
-                  } else {
-                    return (
-                      <div className="p-2 md:p-4 bg-gray-50 rounded-xl shadow-lg">
-                        <div className="bg-white shadow-md rounded-lg overflow-hidden w-[140px] h-[190px] md:w-[180px] md:h-[250px]">
-                          <div 
-                            className="w-full h-full"
-                            style={{
-                              transform: 'scale(1)',
-                              transformOrigin: 'center'
-                            }}
-                          >
-                            {renderPageByIndex(displayPages[0])}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                })()}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
