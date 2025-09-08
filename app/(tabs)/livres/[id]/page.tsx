@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Trash2, Plus, Eye, Upload, GripVertical, Edit3, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trash2, Plus, Eye, Upload, Edit3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 
 export default function LivreEditorPage() {
@@ -12,7 +12,7 @@ export default function LivreEditorPage() {
 
   const book = books.find(b => b.id === id);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [viewMode, setViewMode] = useState<'preview' | 'edit'>('preview');
+  const [viewMode, setViewMode] = useState('preview');
   const [editingDescription, setEditingDescription] = useState(false);
   const [bookDescription, setBookDescription] = useState(book?.description || "Un recueil précieux de recettes familiales, transmises avec amour de génération en génération.");
 
@@ -34,100 +34,34 @@ export default function LivreEditorPage() {
 
   const bookRecipes = book.recipeIds
     .map(id => recipes.find(r => r.id === id))
-    .filter((recipe): recipe is NonNullable<typeof recipe> => recipe !== undefined);
+    .filter(recipe => recipe !== undefined);
 
   const availableRecipes = recipes.filter(recipe => !book.recipeIds.includes(recipe.id));
-
-  // Structure des pages du livre
-  const createBookPages = () => {
-    const pages = [];
-    
-    // Page 1: Couverture
-    pages.push({
-      type: 'cover',
-      title: 'Couverture',
-      content: renderCoverPage()
-    });
-    
-    // Page 2: Description
-    pages.push({
-      type: 'description',
-      title: 'À propos',
-      content: renderDescriptionPage()
-    });
-    
-    // Page 3: Sommaire
-    pages.push({
-      type: 'sommaire',
-      title: 'Sommaire',
-      content: renderSommairePage()
-    });
-    
-    // Pages recettes (2 pages par recette)
-    bookRecipes.forEach((recipe, index) => {
-      pages.push({
-        type: 'recipe-photo',
-        title: `${recipe.title} - Photo`,
-        content: renderRecipePhotoPage(recipe, index)
-      });
-      pages.push({
-        type: 'recipe-content',
-        title: `${recipe.title} - Recette`,
-        content: renderRecipeContentPage(recipe, index)
-      });
-    });
-    
-    // Dernière page: 4e de couverture
-    pages.push({
-      type: 'back-cover',
-      title: '4e de couverture',
-      content: renderBackCoverPage()
-    });
-    
-    return pages;
-  };
-
-  const allPages = createBookPages();
   const estimatedPrice = Math.max(8, bookRecipes.length * 1.5 + 6);
 
-  // Renderers optimisés pour l'aperçu
-  const renderCoverPage = () => (
-    <div className="h-full bg-gradient-to-br from-orange-100 to-orange-50 p-6 flex flex-col justify-center items-center text-center relative overflow-hidden">
-      {/* Pattern décoratif */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-4 left-4 w-16 h-16 border-2 border-orange-300 rounded-full"></div>
-        <div className="absolute top-8 right-8 w-8 h-8 border border-orange-300 rotate-45"></div>
-        <div className="absolute bottom-8 left-8 w-12 h-12 border border-orange-300"></div>
-      </div>
-      
-      <div className="relative z-10 space-y-4">
+  // Renderers des pages - Version simplifiée pour éviter les erreurs
+  const CoverPage = () => (
+    <div className="h-full bg-gradient-to-br from-orange-100 to-orange-50 p-6 flex flex-col justify-center items-center text-center">
+      <div className="space-y-4">
         <div className="text-4xl mb-4">📚</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-          {book.title}
-        </h1>
-        <p className="text-orange-700 text-sm font-medium">
-          Carnet de transmission culinaire
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{book.title}</h1>
+        <p className="text-orange-700 text-sm font-medium">Carnet de transmission culinaire</p>
         <div className="flex items-center justify-center gap-2 my-4">
           <div className="w-8 h-px bg-orange-400"></div>
           <div className="w-1 h-1 bg-orange-400 rotate-45"></div>
           <div className="w-8 h-px bg-orange-400"></div>
         </div>
-        <p className="text-gray-600 text-sm">
-          {bookRecipes.length} recettes de famille
-        </p>
+        <p className="text-gray-600 text-sm">{bookRecipes.length} recettes de famille</p>
       </div>
     </div>
   );
 
-  const renderDescriptionPage = () => (
-    <div className="h-full bg-cream p-6 flex flex-col justify-center">
+  const DescriptionPage = () => (
+    <div className="h-full bg-yellow-50 p-6 flex flex-col justify-center">
       <div className="text-center space-y-4">
         <h2 className="text-xl font-bold text-gray-900 mb-4">À propos de ce livre</h2>
         <div className="text-gray-700 text-sm leading-relaxed space-y-3">
-          {bookDescription.split('\n\n').map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+          <p>{bookDescription}</p>
         </div>
         <div className="mt-6 pt-4 border-t border-gray-200">
           <p className="text-gray-600 italic text-xs">
@@ -138,22 +72,17 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderSommairePage = () => (
-    <div className="h-full bg-cream p-6">
+  const SommairePage = () => (
+    <div className="h-full bg-yellow-50 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">Nos Recettes</h2>
-      <div className="space-y-2 max-h-80 overflow-y-auto">
-        {bookRecipes.map((recipe, index) => (
+      <div className="space-y-2">
+        {bookRecipes.slice(0, 10).map((recipe, index) => (
           <div key={recipe.id} className="flex items-center gap-3 p-2 bg-orange-50 rounded-lg">
-            <span className="w-6 h-6 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full flex-shrink-0">
+            <span className="w-6 h-6 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full">
               {index + 1}
             </span>
-            <img 
-              src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=60'} 
-              alt={recipe.title}
-              className="w-8 h-8 object-cover rounded flex-shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-gray-900 text-sm truncate">{recipe.title}</h4>
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900 text-sm">{recipe.title}</h4>
               <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
             </div>
             <span className="text-xs text-gray-500">p.{4 + (index * 2)}</span>
@@ -163,14 +92,13 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderRecipePhotoPage = (recipe: any, index: number) => (
+  const RecipePhotoPage = ({ recipe }) => (
     <div className="h-full relative overflow-hidden bg-gray-100">
       <img 
         src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=400'} 
         alt={recipe.title}
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
       <div className="absolute bottom-4 left-4 right-4">
         <h2 className="text-white text-xl font-bold drop-shadow-lg">{recipe.title}</h2>
         <p className="text-white/90 text-sm drop-shadow">par {recipe.author || 'Famille'}</p>
@@ -178,8 +106,8 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderRecipeContentPage = (recipe: any, index: number) => (
-    <div className="h-full bg-cream p-4 overflow-y-auto">
+  const RecipeContentPage = ({ recipe }) => (
+    <div className="h-full bg-yellow-50 p-4">
       <div className="mb-4">
         <h1 className="text-lg font-bold text-gray-900 mb-2">{recipe.title}</h1>
         <div className="flex gap-4 text-xs text-gray-600 mb-3">
@@ -188,31 +116,28 @@ export default function LivreEditorPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 h-80">
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <h3 className="font-bold text-gray-900 mb-2 text-sm">Ingrédients</h3>
           <div className="space-y-1">
-            {(recipe.ingredients || []).slice(0, 8).map((ingredient: string, i: number) => (
+            {(recipe.ingredients || []).slice(0, 8).map((ingredient, i) => (
               <div key={i} className="flex items-start gap-2 text-xs">
-                <span className="w-1 h-1 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                <span className="w-1 h-1 bg-orange-500 rounded-full mt-1.5"></span>
                 <span className="text-gray-700">{ingredient}</span>
               </div>
             ))}
-            {(recipe.ingredients || []).length > 8 && (
-              <p className="text-xs text-gray-500 italic">+ {(recipe.ingredients || []).length - 8} autres...</p>
-            )}
           </div>
         </div>
         
         <div>
           <h3 className="font-bold text-gray-900 mb-2 text-sm">Préparation</h3>
           <div className="space-y-2">
-            {(recipe.steps ? recipe.steps.split('\n\n').filter((step: string) => step.trim()) : []).slice(0, 4).map((step: string, i: number) => (
+            {(recipe.steps ? recipe.steps.split('\n\n').filter(step => step.trim()) : []).slice(0, 4).map((step, i) => (
               <div key={i} className="flex gap-2">
-                <div className="w-4 h-4 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full flex-shrink-0">
+                <div className="w-4 h-4 bg-orange-500 text-white text-xs font-bold flex items-center justify-center rounded-full">
                   {i + 1}
                 </div>
-                <p className="text-xs text-gray-700 leading-relaxed">
+                <p className="text-xs text-gray-700">
                   {step.length > 120 ? step.substring(0, 120) + '...' : step}
                 </p>
               </div>
@@ -223,19 +148,14 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const renderBackCoverPage = () => (
+  const BackCoverPage = () => (
     <div className="h-full bg-gradient-to-br from-orange-50 to-orange-100 p-6 flex flex-col justify-between">
       <div></div>
       <div className="text-center">
         <h3 className="text-xl font-bold text-gray-900 mb-3">Un héritage culinaire</h3>
-        <p className="text-gray-700 text-sm leading-relaxed mb-4">
-          Ce livre rassemble {bookRecipes.length} recettes précieusement conservées et transmises de génération en génération.
+        <p className="text-gray-700 text-sm mb-4">
+          Ce livre rassemble {bookRecipes.length} recettes précieusement conservées.
         </p>
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-6 h-px bg-orange-400"></div>
-          <div className="w-1 h-1 bg-orange-400 rotate-45"></div>
-          <div className="w-6 h-px bg-orange-400"></div>
-        </div>
         <p className="text-orange-700 text-xs">
           "Que chaque plat continue à rassembler et à nourrir l'amour familial"
         </p>
@@ -246,6 +166,26 @@ export default function LivreEditorPage() {
     </div>
   );
 
+  // Structure des pages
+  const allPages = [
+    { type: 'cover', title: 'Couverture', component: <CoverPage /> },
+    { type: 'description', title: 'À propos', component: <DescriptionPage /> },
+    { type: 'sommaire', title: 'Sommaire', component: <SommairePage /> },
+    ...bookRecipes.flatMap((recipe, index) => [
+      { 
+        type: 'recipe-photo', 
+        title: `${recipe.title} - Photo`, 
+        component: <RecipePhotoPage recipe={recipe} /> 
+      },
+      { 
+        type: 'recipe-content', 
+        title: `${recipe.title} - Recette`, 
+        component: <RecipeContentPage recipe={recipe} /> 
+      }
+    ]),
+    { type: 'back-cover', title: '4e de couverture', component: <BackCoverPage /> }
+  ];
+
   const saveDescription = () => {
     if (updateBook) {
       updateBook(book.id, { description: bookDescription });
@@ -255,10 +195,6 @@ export default function LivreEditorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <style jsx global>{`
-        .bg-cream { background-color: #fefcf8; }
-      `}</style>
-
       <div className="max-w-7xl mx-auto p-4">
         {/* En-tête */}
         <div className="bg-white rounded-lg shadow-sm border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -296,7 +232,7 @@ export default function LivreEditorPage() {
         </div>
 
         {viewMode === 'preview' ? (
-          /* MODE APERÇU - Navigation livre */
+          /* MODE APERÇU */
           <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
             {/* Navigation pages */}
             <div className="bg-white rounded-lg border p-4">
@@ -347,26 +283,19 @@ export default function LivreEditorPage() {
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => setCurrentPageIndex(0)}
-                    className="p-2 text-gray-600 hover:text-gray-800"
-                    title="Retour au début"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
 
               {/* Page en taille réelle */}
               <div className="flex justify-center">
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden" style={{ width: '400px', height: '560px' }}>
-                  {allPages[currentPageIndex]?.content}
+                  {allPages[currentPageIndex]?.component}
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          /* MODE ÉDITION - Interface d'édition */
+          /* MODE ÉDITION */
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6">
             {/* Contenu du livre */}
             <div className="space-y-6">
@@ -424,14 +353,9 @@ export default function LivreEditorPage() {
                     {bookRecipes.map((recipe, index) => (
                       <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-4 group">
                         <div className="flex gap-4">
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="w-8 h-8 bg-purple-500 text-white text-sm rounded-full flex items-center justify-center font-medium">
-                              {index + 1}
-                            </span>
-                            <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
-                              <GripVertical className="w-4 h-4 text-gray-500" />
-                            </button>
-                          </div>
+                          <span className="w-8 h-8 bg-purple-500 text-white text-sm rounded-full flex items-center justify-center font-medium">
+                            {index + 1}
+                          </span>
                           
                           <img 
                             src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
@@ -449,7 +373,7 @@ export default function LivreEditorPage() {
                           
                           <button
                             onClick={() => removeRecipeFromBook(book.id, recipe.id)}
-                            className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
+                            className="text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all flex-shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
