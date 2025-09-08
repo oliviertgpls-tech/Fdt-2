@@ -568,10 +568,10 @@ export default function LivreEditorPage() {
 
                   <div className="bg-green-50 rounded-lg p-3 md:p-4 border border-green-200">
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">4-5</span>
+                      <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">5</span>
                       <div className="min-w-0 flex-1">
                         <h4 className="font-medium text-gray-900 text-sm md:text-base truncate">Sommaire</h4>
-                        <p className="text-xs md:text-sm text-gray-600 truncate">Liste des recettes + index</p>
+                        <p className="text-xs md:text-sm text-gray-600 truncate">Liste de toutes les recettes</p>
                       </div>
                     </div>
                   </div>
