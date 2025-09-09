@@ -118,7 +118,7 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const RecipeContentPage = ({ recipe }: { recipe: RecipeType }) => (
+  const RecipeContentPage = ({ recipe }: { recipe: Recipe }) => (
     <div className="h-full bg-yellow-50 p-4">
       <div className="mb-4">
         <h1 className="text-lg font-bold text-gray-900 mb-2">{recipe.title}</h1>
