@@ -5,6 +5,18 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Trash2, Plus, Eye, Upload, Edit3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 
+// Types pour les recettes
+interface RecipeType {
+  id: string;
+  title: string;
+  author?: string;
+  imageUrl?: string;
+  ingredients?: string[];
+  steps?: string;
+  prepMinutes?: number;
+  servings?: string;
+}
+
 export default function LivreEditorPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -12,7 +24,7 @@ export default function LivreEditorPage() {
 
   const book = books.find(b => b.id === id);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [viewMode, setViewMode] = useState('preview');
+  const [viewMode, setViewMode] = useState<'preview' | 'edit'>('preview');
   const [editingDescription, setEditingDescription] = useState(false);
   const [bookDescription, setBookDescription] = useState(book?.description || "Un recueil précieux de recettes familiales, transmises avec amour de génération en génération.");
 
@@ -34,12 +46,12 @@ export default function LivreEditorPage() {
 
   const bookRecipes = book.recipeIds
     .map(id => recipes.find(r => r.id === id))
-    .filter(recipe => recipe !== undefined);
+    .filter((recipe): recipe is RecipeType => recipe !== undefined);
 
   const availableRecipes = recipes.filter(recipe => !book.recipeIds.includes(recipe.id));
   const estimatedPrice = Math.max(8, bookRecipes.length * 1.5 + 6);
 
-  // Renderers des pages - Version simplifiée pour éviter les erreurs
+  // Renderers des pages
   const CoverPage = () => (
     <div className="h-full bg-gradient-to-br from-orange-100 to-orange-50 p-6 flex flex-col justify-center items-center text-center">
       <div className="space-y-4">
@@ -92,7 +104,7 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const RecipePhotoPage = ({ recipe }) => (
+  const RecipePhotoPage = ({ recipe }: { recipe: RecipeType }) => (
     <div className="h-full relative overflow-hidden bg-gray-100">
       <img 
         src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=400'} 
@@ -106,7 +118,7 @@ export default function LivreEditorPage() {
     </div>
   );
 
-  const RecipeContentPage = ({ recipe }: { recipe: any }) => (
+  const RecipeContentPage = ({ recipe }: { recipe: RecipeType }) => (
     <div className="h-full bg-yellow-50 p-4">
       <div className="mb-4">
         <h1 className="text-lg font-bold text-gray-900 mb-2">{recipe.title}</h1>
