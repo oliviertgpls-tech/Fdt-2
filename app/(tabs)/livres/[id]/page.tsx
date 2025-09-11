@@ -13,6 +13,7 @@ export default function LivreEditorPage() {
   const book = books.find(b => b.id === id);
   const [currentPage, setCurrentPage] = useState(0);
   const [showPreview, setShowPreview] = useState(true);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
   const [bookDescription, setBookDescription] = useState(book?.description || "Un recueil précieux de recettes familiales, transmises avec amour de génération en génération. Chaque plat raconte une histoire, chaque saveur évoque des souvenirs partagés autour de la table familiale.");
 
@@ -80,6 +81,36 @@ export default function LivreEditorPage() {
   const allPages = createPageStructure();
   const pageCount = allPages.length;
   const estimatedPrice = Math.max(8, bookRecipes.length * 1.5 + 6);
+
+  const handleGeneratePDF = async () => {
+  setIsGeneratingPDF(true);
+  
+  try {
+    const baseUrl = window.location.origin;
+    const response = await fetch(`/api/books/${book.id}/pdf?baseUrl=${baseUrl}`);
+    
+    if (!response.ok) {
+      throw new Error('Erreur lors de la génération du PDF');
+    }
+    
+    // Créer un blob et télécharger le fichier
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${book.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    
+  } catch (error) {
+    console.error('Erreur:', error);
+    alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+  } finally {
+    setIsGeneratingPDF(false);
+    }
+  };
 
   // 🧭 NAVIGATION INTELLIGENTE
   const getNavigationStep = (currentPageIndex: number) => {
@@ -495,12 +526,14 @@ export default function LivreEditorPage() {
               {showPreview ? 'Masquer' : 'Voir'} aperçu
             </button>
             
-            <button className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm">
-              <Upload className="w-4 h-4" />
-              Commander ({estimatedPrice.toFixed(2)}€)
-            </button>
-          </div>
-        </div>
+            <button 
+              onClick={handleGeneratePDF}
+              disabled={isGeneratingPDF}
+              className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
+            >
+            <Upload className="w-4 h-4" />
+            {isGeneratingPDF ? 'Génération...' : `Télécharger PDF (${estimatedPrice.toFixed(2)}€)`}
+              </button>
 
         <div className="grid gap-6 md:gap-8" style={{ gridTemplateColumns: showPreview ? '1fr 1.2fr' : '1fr' }}>
           <div className="space-y-4 md:space-y-6">
