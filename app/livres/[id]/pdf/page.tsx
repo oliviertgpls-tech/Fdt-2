@@ -449,7 +449,7 @@ export default function LivreEditorPage() {
       default:
         return <div className="cookbook-page bg-cream">Type de page inconnu</div>;
     }
-  }; // ✅ FIX #1 : fermeture correcte de la fonction
+  };
 
   // Détermine si on affiche une ou deux pages
   const getCurrentDisplayPages = () => {
@@ -816,7 +816,7 @@ export default function LivreEditorPage() {
                 </div>
               </div>
             </div>
-          )} {/* ✅ FIX #2 : pas de point-virgule ici */}
+          )}
         </div>
       </div>
     </div>
