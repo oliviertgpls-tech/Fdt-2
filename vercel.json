@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "app/api/books/[id]/pdf/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
+    "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/google-chrome-stable"
+  }
+}
