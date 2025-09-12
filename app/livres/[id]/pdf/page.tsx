@@ -472,10 +472,10 @@ export default function LivreEditorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
-
+  
         .bg-cream { background-color: #fefcf8; }
         .text-brown-900 { color: #2c1810; }
         .text-brown-700 { color: #52341f; }
@@ -500,247 +500,242 @@ export default function LivreEditorPage() {
           color: #52341f;
         }
       `}</style>
-
-      <div className="max-w-7xl mx-auto pt-4 md:pt-8 px-4 md:px-8">
-        {/* En-tête responsive */}
-        <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-6 md:mb-8">
-          <div className="flex items-center gap-3 md:gap-4">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Retour</span>
-            </button>
-
-            <div>
-              <h1 className="text-lg md:text-xl font-semibold text-gray-800">{book.title}</h1>
-              <p className="text-xs md:text-sm text-gray-600">
-                {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            <button
-              onClick={() => setShowPreview(!showPreview)}
-              className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
-            >
-              <Eye className="w-4 h-4" />
-              {showPreview ? 'Masquer' : 'Voir'} aperçu
-            </button>
-
-            <button
-              onClick={handleGeneratePDF}
-              disabled={isGeneratingPDF}
-              className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
-            >
-              <Upload className="w-4 h-4" />
-              {isGeneratingPDF ? 'Génération...' : `Télécharger PDF (${estimatedPrice.toFixed(2)}€)`}
-            </button>
-          </div>
-        </div>
-
-        <div className="grid gap-6 md:gap-8" style={{ gridTemplateColumns: showPreview ? '1fr 1.2fr' : '1fr' }}>
-          <div className="space-y-4 md:space-y-6">
-            {/* Description du livre */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base md:text-lg font-semibold text-gray-800">📝 Description du livre</h2>
-                <button
-                  onClick={() => setEditingDescription(!editingDescription)}
-                  className="text-gray-500 hover:text-gray-700 p-1"
-                >
-                  <Edit3 className="w-4 h-4" />
-                </button>
-              </div>
-
-              {editingDescription ? (
-                <div className="space-y-3">
-                  <textarea
-                    value={bookDescription}
-                    onChange={(e) => setBookDescription(e.target.value)}
-                    className="w-full h-24 md:h-32 p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none text-sm md:text-base"
-                    placeholder="Décrivez ce livre de recettes..."
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={saveDescription}
-                      className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs md:text-sm"
-                    >
-                      Sauvegarder
-                    </button>
-                    <button
-                      onClick={() => setEditingDescription(false)}
-                      className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs md:text-sm"
-                    >
-                      Annuler
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
-                  {bookDescription}
+      <div className="min-h-screen bg-stone-100">
+        <div className="max-w-7xl mx-auto pt-4 md:pt-8 px-4 md:px-8">
+          {/* En-tête responsive */}
+          <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-6 md:mb-8">
+            <div className="flex items-center gap-3 md:gap-4">
+              <button
+                onClick={() => router.back()}
+                className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden sm:inline">Retour</span>
+              </button>
+  
+              <div>
+                <h1 className="text-lg md:text-xl font-semibold text-gray-800">{book.title}</h1>
+                <p className="text-xs md:text-sm text-gray-600">
+                  {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
                 </p>
-              )}
+              </div>
             </div>
-
-            {/* Contenu du livre */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">📖 Contenu du livre</h2>
-
-              {bookRecipes.length === 0 ? (
-                <div className="text-center py-8 md:py-12 text-gray-500">
-                  <div className="text-3xl md:text-4xl mb-3">📖</div>
-                  <p className="text-sm md:text-base">Livre vide - ajoutez des recettes</p>
+  
+            <div className="flex items-center gap-2 md:gap-3">
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
+              >
+                <Eye className="w-4 h-4" />
+                {showPreview ? 'Masquer' : 'Voir'} aperçu
+              </button>
+  
+              <button
+                onClick={handleGeneratePDF}
+                disabled={isGeneratingPDF}
+                className="bg-orange-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2 text-xs md:text-sm"
+              >
+                <Upload className="w-4 h-4" />
+                {isGeneratingPDF ? 'Génération...' : `Télécharger PDF (${estimatedPrice.toFixed(2)}€)`}
+              </button>
+            </div>
+          </div>
+  
+          <div className="grid gap-6 md:gap-8" style={{ gridTemplateColumns: showPreview ? '1fr 1.2fr' : '1fr' }}>
+            <div className="space-y-4 md:space-y-6">
+              {/* Description du livre */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-base md:text-lg font-semibold text-gray-800">📝 Description du livre</h2>
+                  <button
+                    onClick={() => setEditingDescription(!editingDescription)}
+                    className="text-gray-500 hover:text-gray-700 p-1"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-2 md:space-y-3">
-                  <div className="bg-orange-50 rounded-lg p-3 md:p-4 border border-orange-200">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">1</span>
-                      <div>
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base">Couverture</h4>
-                        <p className="text-xs md:text-sm text-gray-600">{book.title}</p>
-                      </div>
+  
+                {editingDescription ? (
+                  <div className="space-y-3">
+                    <textarea
+                      value={bookDescription}
+                      onChange={(e) => setBookDescription(e.target.value)}
+                      className="w-full h-24 md:h-32 p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none text-sm md:text-base"
+                      placeholder="Décrivez ce livre de recettes..."
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={saveDescription}
+                        className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs md:text-sm"
+                      >
+                        Sauvegarder
+                      </button>
+                      <button
+                        onClick={() => setEditingDescription(false)}
+                        className="bg-gray-100 text-gray-700 px-3 md:px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs md:text-sm"
+                      >
+                        Annuler
+                      </button>
                     </div>
                   </div>
-
-                  <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">3</span>
-                      <div>
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base">Description</h4>
-                        <p className="text-xs md:text-sm text-gray-600">À propos de ce livre</p>
+                ) : (
+                  <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
+                    {bookDescription}
+                  </p>
+                )}
+              </div>
+  
+              {/* Contenu du livre */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+                <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6">📖 Contenu du livre</h2>
+  
+                {bookRecipes.length === 0 ? (
+                  <div className="text-center py-8 md:py-12 text-gray-500">
+                    <div className="text-3xl md:text-4xl mb-3">📖</div>
+                    <p className="text-sm md:text-base">Livre vide - ajoutez des recettes</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 md:space-y-3">
+                    <div className="bg-orange-50 rounded-lg p-3 md:p-4 border border-orange-200">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 md:w-8 md:h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">1</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm md:text-base">Couverture</h4>
+                          <p className="text-xs md:text-sm text-gray-600">{book.title}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="bg-green-50 rounded-lg p-3 md:p-4 border border-green-200">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">4-5</span>
-                      <div>
-                        <h4 className="font-medium text-gray-900 text-sm md:text-base">Sommaire</h4>
-                        <p className="text-xs md:text-sm text-gray-600">Liste des recettes + index</p>
+  
+                    <div className="bg-blue-50 rounded-lg p-3 md:p-4 border border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 md:w-8 md:h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">3</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm md:text-base">Description</h4>
+                          <p className="text-xs md:text-sm text-gray-600">À propos de ce livre</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  {bookRecipes.map((recipe) => {
-                    const index = bookRecipes.findIndex(r => r.id === recipe.id);
-                    return (
-                      <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group">
-                        <div className="flex gap-3 md:gap-4">
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white text-xs md:text-sm rounded-full flex items-center justify-center font-medium">
-                              {6 + (index * 2)}-{7 + (index * 2)}
-                            </span>
-                            <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
-                              <GripVertical className="w-3 h-3 md:w-4 md:h-4 text-gray-500" />
+  
+                    <div className="bg-green-50 rounded-lg p-3 md:p-4 border border-green-200">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 md:w-8 md:h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">4-5</span>
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm md:text-base">Sommaire</h4>
+                          <p className="text-xs md:text-sm text-gray-600">Liste des recettes + index</p>
+                        </div>
+                      </div>
+                    </div>
+  
+                    {bookRecipes.map((recipe) => {
+                      const index = bookRecipes.findIndex(r => r.id === recipe.id);
+                      return (
+                        <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group">
+                          <div className="flex gap-3 md:gap-4">
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white text-xs md:text-sm rounded-full flex items-center justify-center font-medium">
+                                {6 + (index * 2)}-{7 + (index * 2)}
+                              </span>
+                              <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
+                                <GripVertical className="w-3 h-3 md:w-4 md:h-4 text-gray-500" />
+                              </button>
+                            </div>
+  
+                            <img
+                              src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
+                              alt={recipe.title}
+                              className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
+                            />
+  
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-gray-900 text-sm md:text-base">{recipe.title}</h4>
+                              <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Double page • ⏱️ {recipe.prepMinutes || 30}min
+                              </p>
+                            </div>
+  
+                            <button
+                              onClick={() => removeRecipeFromBook(book.id, recipe.id)}
+                              className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all"
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                             </button>
                           </div>
-
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+  
+              {/* Ajouter des recettes */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">➕ Ajouter des recettes</h3>
+  
+                {availableRecipes.length === 0 ? (
+                  <div className="text-center py-6 md:py-8 text-gray-500">
+                    <div className="text-2xl md:text-3xl mb-2">🎉</div>
+                    <p className="text-xs md:text-sm">Toutes vos recettes sont dans ce livre !</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
+                    {availableRecipes.map((recipe) => (
+                      <div
+                        key={recipe.id}
+                        className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
+                        onClick={() => addRecipeToBook(book.id, recipe.id)}
+                      >
+                        <div className="flex gap-3">
                           <img
                             src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
                             alt={recipe.title}
-                            className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg flex-shrink-0"
+                            className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg flex-shrink-0"
                           />
-
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-sm md:text-base">{recipe.title}</h4>
-                            <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Double page • ⏱️ {recipe.prepMinutes || 30}min
-                            </p>
+                            <h5 className="font-medium text-gray-900 text-xs md:text-sm truncate">{recipe.title}</h5>
+                            <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
                           </div>
-
-                          <button
-                            onClick={() => removeRecipeFromBook(book.id, recipe.id)}
-                            className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all"
-                          >
-                            <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                          </button>
+                          <Plus className="w-3 h-3 md:w-4 md:h-4 text-gray-400 self-center" />
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Ajouter des recettes */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">➕ Ajouter des recettes</h3>
-
-              {availableRecipes.length === 0 ? (
-                <div className="text-center py-6 md:py-8 text-gray-500">
-                  <div className="text-2xl md:text-3xl mb-2">🎉</div>
-                  <p className="text-xs md:text-sm">Toutes vos recettes sont dans ce livre !</p>
-                </div>
-              ) : (
-                <div className="space-y-2 md:space-y-3 max-h-60 md:max-h-80 overflow-y-auto">
-                  {availableRecipes.map((recipe) => (
-                    <div
-                      key={recipe.id}
-                      className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
-                      onClick={() => addRecipeToBook(book.id, recipe.id)}
-                    >
-                      <div className="flex gap-3">
-                        <img
-                          src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
-                          alt={recipe.title}
-                          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h5 className="font-medium text-gray-900 text-xs md:text-sm truncate">{recipe.title}</h5>
-                          <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
-                        </div>
-                        <Plus className="w-3 h-3 md:w-4 md:h-4 text-gray-400 self-center" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Preview responsive */}
-          {showPreview && (
-            <div className="space-y-3 md:space-y-4 order-first lg:order-last">
-              {/* Navigation intelligente */}
-              <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3 md:gap-4">
-                  <span className="text-xs md:text-sm font-medium text-gray-700">Aperçu Livre</span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {allPages[currentPage]?.title || 'Page inconnue'}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {currentPage + 1} / {allPages.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => navigatePages('prev')}
-                    disabled={currentPage === 0}
-                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    ← <span className="hidden sm:inline">
-                      {getNavigationStep(Math.max(0, currentPage - getNavigationStep(currentPage))) === 1 ? 'Page' : 'Double'}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => navigatePages('next')}
-                    disabled={currentPage >= allPages.length - 1}
-                    className="px-2 md:px-3 py-1 text-xs md:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    <span className="hidden sm:inline">
-                      {getNavigationStep(currentPage) === 1 ? 'Page' : 'Double'}
-                    </span> →
-                  </button>
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
+            </div>
+  
+            {/* Preview responsive */}
+            {showPreview && (
+              <div className="space-y-3 md:space-y-4 order-first lg:order-last">
+                {/* Navigation intelligente */}
+                <div className="bg-white rounded-lg border p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <span className="text-xs md:text-sm font-medium text-gray-700">Aperçu Livre</span>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      {allPages[currentPage]?.title || 'Page inconnue'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {currentPage + 1} / {allPages.length}
+                    </span>
+                  </div>
+  
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => navigatePages('prev')}
+                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={currentPage === 0}
+                    >
+                      Précédent
+                    </button>
+                    <button
+                      onClick={() => navigatePages('next')}
+                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={currentPage >= pageCount - 1}
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                </div>
 
               {/* Aperçu livre - Ultra responsive */}
               <div className="flex justify-center overflow-x-auto">
