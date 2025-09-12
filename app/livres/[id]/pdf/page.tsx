@@ -808,7 +808,7 @@ export default function LivreEditorPage() {
                 </div>
               </div>
             </div>
-          )}
+          )};
         </div>
       </div>
     </div>
