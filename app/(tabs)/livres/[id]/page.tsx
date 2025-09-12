@@ -466,7 +466,7 @@ export default function LivreEditorPage() {
       // Page impaire, on affiche avec la précédente
       return [currentPage - 1, currentPage];
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-stone-100">
