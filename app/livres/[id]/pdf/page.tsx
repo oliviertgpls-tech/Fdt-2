@@ -447,29 +447,30 @@ export default function LivreEditorPage() {
         return <div className="cookbook-page bg-cream">Type de page inconnu</div>;
     }
 
-  // Détermine si on affiche une ou deux pages
-  const getCurrentDisplayPages = () => {
-    const page = allPages[currentPage];
-    
-    // Pages seules
-    if (page?.type === 'cover' || page?.type === 'description' || page?.type === 'back-cover') {
-      return [currentPage];
-    }
-    
-    // Doubles pages
-    if (currentPage % 2 === 0) {
-      // Page paire, on peut afficher la suivante
-      const nextPageExists = currentPage + 1 < allPages.length;
-      return nextPageExists ? [currentPage, currentPage + 1] : [currentPage];
-    } else {
-      // Page impaire, on affiche avec la précédente
-      return [currentPage - 1, currentPage];
-    }
- 
-    return (
-      <div className="min-h-screen bg-stone-100">
-        <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+// Détermine si on affiche une ou deux pages
+const getCurrentDisplayPages = () => {
+  const page = allPages[currentPage];
+  
+  // Pages seules
+  if (page?.type === 'cover' || page?.type === 'description' || page?.type === 'back-cover') {
+    return [currentPage];
+  }
+  
+  // Doubles pages
+  if (currentPage % 2 === 0) {
+    // Page paire, on peut afficher la suivante
+    const nextPageExists = currentPage + 1 < allPages.length;
+    return nextPageExists ? [currentPage, currentPage + 1] : [currentPage];
+  } else {
+    // Page impaire, on affiche avec la précédente
+    return [currentPage - 1, currentPage];
+  }
+}; 
+
+  return (
+    <div className="min-h-screen bg-stone-100">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
           
           .bg-cream { background-color: #fefcf8; }
           .text-brown-900 { color: #2c1810; }
