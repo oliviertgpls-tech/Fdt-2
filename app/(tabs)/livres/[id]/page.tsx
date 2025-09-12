@@ -458,44 +458,45 @@ export default function LivreEditorPage() {
     }
     
     // Doubles pages
-    if (currentPage % 2 === 0) {
-      // Page paire, on peut afficher la suivante
-      const nextPageExists = currentPage + 1 < allPages.length;
-      return nextPageExists ? [currentPage, currentPage + 1] : [currentPage];
-    } else {
-      // Page impaire, on affiche avec la précédente
-      return [currentPage - 1, currentPage];
-    }
-  };
+  if (currentPage % 2 === 0) {
+    // Page paire, on peut afficher la suivante
+    const nextPageExists = currentPage + 1 < allPages.length;
+    return nextPageExists ? [currentPage, currentPage + 1] : [currentPage];
+  } else {
+    // Page impaire, on affiche avec la précédente
+    return [currentPage - 1, currentPage];
+  }
+  }; // ← Cette accolade manquait !
 
   return (
-    <div className="min-h-screen bg-stone-100">
-      <style jsx global>{`
-        .bg-cream { background-color: #fefcf8; }
-        .text-brown-900 { color: #2c1810; }
-        .text-brown-700 { color: #52341f; }
-        .text-brown-600 { color: #6b4423; }
-        .text-brown-500 { color: #8b5a2b; }
-        .text-brown-400 { color: #a67c52; }
-        .text-brown-300 { color: #c4a484; }
-        .text-brown-200 { color: #e2d5c7; }
-        .text-cream { color: #fefcf8; }
-        .bg-brown-900 { background-color: #2c1810; }
-        .bg-brown-50 { background-color: #f9f6f2; }
-        .bg-brown-500 { background-color: #8b5a2b; }
-        .border-brown-600 { border-color: #6b4423; }
-        .border-brown-400 { border-color: #a67c52; }
-        .border-brown-300 { border-color: #c4a484; }
-        .border-brown-200 { border-color: #e2d5c7; }
-        .font-serif { font-family: 'Crimson Text', 'Times New Roman', serif; }
-        .cookbook-page {
-          font-family: 'Source Serif Pro', Georgia, serif;
-          font-size: 16px;
-          line-height: 1.6;
-          color: #52341f;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
-      `}</style>
+  <div className="min-h-screen bg-stone-100">
+    <style jsx global>{`
+      @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Source+Serif+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+      
+      .bg-cream { background-color: #fefcf8; }
+      .text-brown-900 { color: #2c1810; }
+      .text-brown-700 { color: #52341f; }
+      .text-brown-600 { color: #6b4423; }
+      .text-brown-500 { color: #8b5a2b; }
+      .text-brown-400 { color: #a67c52; }
+      .text-brown-300 { color: #c4a484; }
+      .text-brown-200 { color: #e2d5c7; }
+      .text-cream { color: #fefcf8; }
+      .bg-brown-900 { background-color: #2c1810; }
+      .bg-brown-50 { background-color: #f9f6f2; }
+      .bg-brown-500 { background-color: #8b5a2b; }
+      .border-brown-600 { border-color: #6b4423; }
+      .border-brown-400 { border-color: #a67c52; }
+      .border-brown-300 { border-color: #c4a484; }
+      .border-brown-200 { border-color: #e2d5c7; }
+      .font-serif { font-family: 'Crimson Text', 'Times New Roman', serif; }
+      .cookbook-page {
+        font-family: 'Source Serif Pro', Georgia, serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #52341f;
+      }
+    `}</style>
 
       <div className="max-w-7xl mx-auto pt-4 md:pt-8 px-4 md:px-8">
         {/* En-tête responsive */}
