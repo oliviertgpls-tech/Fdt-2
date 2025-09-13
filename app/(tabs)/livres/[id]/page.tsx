@@ -201,9 +201,9 @@ const generatePreviewPDF = async () => {
       cover,
       bookRecipes[0]?.imageUrl,
       margin,
-      A4.h / 2,
-      A4.w - margin * 2,
-      A4.h / 2 - margin
+      A4.h / 1.1,
+      A4.w - margin * 1.1,
+      A4.h / 1.1 - margin
     );
     cover.drawText(book.title, {
       x: margin,
