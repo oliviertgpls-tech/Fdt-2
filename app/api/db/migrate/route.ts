@@ -68,13 +68,13 @@ export async function POST() {
       )
     `
 
-    // Test que tout fonctionne
-    const recipeCount = await prisma.$queryRaw`SELECT COUNT(*) as count FROM "Recipe"`
+    // Test simple sans COUNT pour éviter le BigInt
+    await prisma.$queryRaw`SELECT 1 as test`
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Tables créées avec succès !',
-      recipeCount
+      message: 'Tables créées avec succès ! 🎉',
+      timestamp: new Date().toISOString()
     })
     
   } catch (error: any) {
