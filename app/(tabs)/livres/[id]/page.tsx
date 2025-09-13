@@ -15,93 +15,64 @@ import {
   Loader,
   GripVertical 
 } from 'lucide-react';
-
-// Importez vos fonctions d'API
-import { 
-  getBook, 
-  updateBook,
-  getBookRecipes, 
-  getRecipes,
-  addRecipeToBook as addRecipeToBookAction,
-  removeRecipeFromBook as removeRecipeFromBookAction
-} from '@/lib/api';
+import { useRecipes } from '@/contexts/RecipesProvider';
 
 export default function BookPage() {
   const router = useRouter();
   const { id } = useParams();
   
-  // États de base
-  const [book, setBook] = useState(null);
-  const [bookRecipes, setBookRecipes] = useState([]);
-  const [availableRecipes, setAvailableRecipes] = useState([]);
+  // ✅ Utilisez le context RecipesProvider
+  const { 
+    books, 
+    recipes, 
+    updateBook,
+    addRecipeToBook,
+    removeRecipeFromBook 
+  } = useRecipes();
+  
+  // États locaux
   const [bookDescription, setBookDescription] = useState('');
   const [editingDescription, setEditingDescription] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
   // États pour la modale PDF
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
-  // Chargement des données
+  // ✅ Trouvez les données directement depuis le context
+  const book = books.find(b => b.id === id);
+  const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
+  const availableRecipes = recipes.filter(recipe => 
+    !book?.recipeIds.includes(recipe.id)
+  );
+
+  // Initialiser la description
   useEffect(() => {
-    if (id) {
-      loadBookData();
+    if (book) {
+      setBookDescription(book.description || '');
     }
-  }, [id]);
+  }, [book]);
 
-  const loadBookData = async () => {
-    try {
-      // Charger le livre
-      const bookData = await getBook(id);
-      setBook(bookData);
-      setBookDescription(bookData.description || '');
-
-      // Charger les recettes du livre
-      const recipes = await getBookRecipes(id);
-      setBookRecipes(recipes);
-
-      // Charger les recettes disponibles
-      const allRecipes = await getRecipes();
-      const available = allRecipes.filter(recipe => 
-        !recipes.some(bookRecipe => bookRecipe.id === recipe.id)
-      );
-      setAvailableRecipes(available);
-    } catch (error) {
-      console.error('Erreur chargement livre:', error);
-    }
+  // Actions simplifiées (pas d'async)
+  const handleAddRecipeToBook = (bookId, recipeId) => {
+    addRecipeToBook(bookId, recipeId);
   };
 
-  // Actions
-  const addRecipeToBook = async (bookId, recipeId) => {
-    try {
-      await addRecipeToBookAction(bookId, recipeId);
-      await loadBookData(); // Recharger
-    } catch (error) {
-      console.error('Erreur ajout recette:', error);
-    }
+  const handleRemoveRecipeFromBook = (bookId, recipeId) => {
+    removeRecipeFromBook(bookId, recipeId);
   };
 
-  const removeRecipeFromBook = async (bookId, recipeId) => {
-    try {
-      await removeRecipeFromBookAction(bookId, recipeId);
-      await loadBookData(); // Recharger
-    } catch (error) {
-      console.error('Erreur suppression recette:', error);
-    }
-  };
-
-  const saveDescription = async () => {
-    try {
-      await updateBook(id, { description: bookDescription });
+  const saveDescription = () => {
+    if (book) {
+      updateBook(book.id, { description: bookDescription });
       setEditingDescription(false);
-    } catch (error) {
-      console.error('Erreur sauvegarde description:', error);
     }
   };
 
   // Génération PDF aperçu
   const generatePreviewPDF = async () => {
+    if (!book) return;
+    
     setIsGeneratingPreview(true);
     try {
       const pdfDoc = await PDFDocument.create();
@@ -135,9 +106,9 @@ export default function BookPage() {
 
       // Description si elle existe
       if (bookDescription) {
-        const lines = bookDescription.match(/.{1,70}/g) || []; // Découper en lignes
+        const lines = bookDescription.match(/.{1,70}/g) || [];
         let yPos = 600;
-        lines.slice(0, 8).forEach((line) => { // Max 8 lignes
+        lines.slice(0, 8).forEach((line) => {
           coverPage.drawText(line, {
             x: 50,
             y: yPos,
@@ -160,7 +131,6 @@ export default function BookPage() {
       let yPosition = 700;
       bookRecipes.forEach((recipe, index) => {
         if (yPosition < 100) {
-          // Nouvelle page si nécessaire
           yPosition = 750;
         }
         
@@ -212,7 +182,7 @@ export default function BookPage() {
         let yPos = 640;
         if (recipe.ingredients && recipe.ingredients.length > 0) {
           recipe.ingredients.forEach((ingredient) => {
-            recipePage.drawText(`• ${ingredient.name} - ${ingredient.quantity}`, {
+            recipePage.drawText(`• ${ingredient}`, {
               x: 70,
               y: yPos,
               size: 11,
@@ -230,7 +200,7 @@ export default function BookPage() {
           yPos -= 20;
         }
 
-        // Instructions
+        // Instructions (adaptées à votre structure de steps en string)
         recipePage.drawText('👨‍🍳 Instructions :', {
           x: 50,
           y: yPos - 20,
@@ -239,10 +209,13 @@ export default function BookPage() {
         });
 
         yPos -= 50;
-        if (recipe.instructions && recipe.instructions.length > 0) {
-          recipe.instructions.forEach((instruction, index) => {
+        if (recipe.steps) {
+          // Découper les étapes par double saut de ligne ou numérotation
+          const steps = recipe.steps.split('\n\n').filter(step => step.trim());
+          
+          steps.forEach((step, index) => {
             const maxLength = 65;
-            const lines = instruction.match(new RegExp(`.{1,${maxLength}}`, 'g')) || [instruction];
+            const lines = step.match(new RegExp(`.{1,${maxLength}}`, 'g')) || [step];
             
             lines.forEach((line, lineIndex) => {
               const prefix = lineIndex === 0 ? `${index + 1}. ` : '   ';
@@ -254,7 +227,7 @@ export default function BookPage() {
               });
               yPos -= 18;
             });
-            yPos -= 10; // Espace entre instructions
+            yPos -= 10;
           });
         } else {
           recipePage.drawText('1. Instructions à ajouter...', {
@@ -281,19 +254,6 @@ export default function BookPage() {
     }
   };
 
-  // Génération PDF complet (Puppeteer)
-  const handleGeneratePDF = async () => {
-    setIsGeneratingPDF(true);
-    try {
-      // Votre logique Puppeteer ici si vous la gardez
-      console.log('Génération PDF complet...');
-    } catch (error) {
-      console.error('Erreur génération PDF:', error);
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
   // Fermer la modale PDF
   const closePDFModal = () => {
     setShowPDFModal(false);
@@ -305,7 +265,7 @@ export default function BookPage() {
 
   // Télécharger le PDF
   const downloadPDF = () => {
-    if (pdfUrl) {
+    if (pdfUrl && book) {
       const link = document.createElement('a');
       link.href = pdfUrl;
       link.download = `${book.title}.pdf`;
@@ -317,12 +277,20 @@ export default function BookPage() {
   const pageCount = 6 + (bookRecipes.length * 2);
   const estimatedPrice = pageCount * 0.15 + 3;
 
+  // Si le livre n'existe pas
   if (!book) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement du livre...</p>
+          <div className="text-6xl mb-4">😕</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Livre introuvable</h2>
+          <p className="text-gray-600 mb-6">Ce livre n'existe pas ou a été supprimé.</p>
+          <button
+            onClick={() => router.push('/livres')}
+            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            ← Retour aux livres
+          </button>
         </div>
       </div>
     );
@@ -369,16 +337,6 @@ export default function BookPage() {
                   Aperçu PDF
                 </>
               )}
-            </button>
-
-            {/* Bouton génération complète */}
-            <button 
-              onClick={handleGeneratePDF}
-              disabled={isGeneratingPDF}
-              className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors font-medium flex items-center gap-2"
-            >
-              <Upload className="w-4 h-4" />
-              {isGeneratingPDF ? 'Génération...' : `PDF Complet (${estimatedPrice.toFixed(2)}€)`}
             </button>
           </div>
         </div>
@@ -498,7 +456,7 @@ export default function BookPage() {
                       </div>
                       
                       <button
-                        onClick={() => removeRecipeFromBook(book.id, recipe.id)}
+                        onClick={() => handleRemoveRecipeFromBook(book.id, recipe.id)}
                         className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -525,7 +483,7 @@ export default function BookPage() {
                   <div 
                     key={recipe.id} 
                     className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
-                    onClick={() => addRecipeToBook(book.id, recipe.id)}
+                    onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
                   >
                     <div className="flex gap-3">
                       <img 
