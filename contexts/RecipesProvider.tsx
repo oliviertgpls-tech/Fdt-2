@@ -140,45 +140,44 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
 
   const addRecipeToNotebook = async (notebookId: string, recipeId: string) => {
     try {
-      const response = await fetch(`/api/notebooks/${notebookId}/recipes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeId })
-      });
-      
-      if (!response.ok) throw new Error('Erreur lors de l\'ajout à la recette');
-      
-      // Recharger les carnets
-      const notebooksRes = await fetch('/api/notebooks');
-      const notebooksData = await notebooksRes.json();
-      setNotebooks(notebooksData);
+      // Pour l'instant, on garde la logique simple en attendant l'API complète
+      setNotebooks(prev =>
+        prev.map(notebook => {
+          if (notebook.id === notebookId && !notebook.recipeIds.includes(recipeId)) {
+            return {
+              ...notebook,
+              recipeIds: [...notebook.recipeIds, recipeId],
+              updatedAt: Date.now()
+            };
+          }
+          return notebook;
+        })
+      );
     } catch (err) {
       setError('Erreur lors de l\'ajout de la recette au carnet');
-      throw err;
     }
   };
 
   const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) => {
     try {
-      const response = await fetch(`/api/notebooks/${notebookId}/recipes/${recipeId}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) throw new Error('Erreur lors de la suppression');
-      
-      // Recharger les carnets
-      const notebooksRes = await fetch('/api/notebooks');
-      const notebooksData = await notebooksRes.json();
-      setNotebooks(notebooksData);
+      setNotebooks(prev =>
+        prev.map(notebook =>
+          notebook.id === notebookId
+            ? { 
+                ...notebook, 
+                recipeIds: notebook.recipeIds.filter((id: string) => id !== recipeId),
+                updatedAt: Date.now()
+              }
+            : notebook
+        )
+      );
     } catch (err) {
       setError('Erreur lors de la suppression de la recette du carnet');
-      throw err;
     }
   };
 
   // 📖 GESTION DES LIVRES (version simplifiée pour l'instant)
   const createBook = async (title: string, selectedRecipeIds: string[]) => {
-    // Pour l'instant, on garde la logique en mémoire
     const newBook = {
       id: `book-${Date.now()}`,
       title,
