@@ -120,7 +120,7 @@ export default function CarnetsPage() {
 
   const CarnetsLibrary = () => (
     <div className="space-y-8">
-      {/* 🚀 EN-TÊTE AVEC BOUTON NOUVEAU CARNET */}
+      {/* 🚀 EN-TÊTE */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">📚 Mes Carnets</h1>
@@ -128,15 +128,6 @@ export default function CarnetsPage() {
             Organisez vos recettes par thème et créez vos livres
           </p>
         </div>
-        
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-sm md:text-base self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4 md:w-5 md:h-5" />
-          <span className="sm:hidden">Nouveau</span>
-          <span className="hidden sm:inline">Nouveau carnet</span>
-        </button>
       </div>
 
       {notebooks.length === 0 ? (
