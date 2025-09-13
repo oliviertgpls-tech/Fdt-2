@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  ingredients String[] // Array of strings
+  steps       String   // Text with line breaks
+  author      String?
+  prepMinutes Int?
+  servings    String?
+  tags        String[] // Array of strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  notebookRecipes NotebookRecipe[]
+  bookRecipes     BookRecipe[]
+}
+
+model Notebook {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  recipes NotebookRecipe[]
+}
+
+model NotebookRecipe {
+  id         String   @id @default(cuid())
+  notebookId String
+  recipeId   String
+  position   Int      // For ordering
+  
+  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@unique([notebookId, recipeId])
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("draft") // draft, ready, ordered, printed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  recipes BookRecipe[]
+}
+
+model BookRecipe {
+  id       String @id @default(cuid())
+  bookId   String
+  recipeId String
+  position Int    // For ordering
+  
+  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  
+  @@unique([bookId, recipeId])
+}
