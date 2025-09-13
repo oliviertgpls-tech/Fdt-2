@@ -368,7 +368,7 @@ export default function RecipeDetailPage() {
           <div className="flex gap-3">
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="flex-1 bg-primary-100 text-white px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors font-medium text-center"
+              className="flex-1 bg-primary-100 text-orange-500 px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors font-medium text-center"
             >
               ✏️ Modifier cette recette
             </Link>
