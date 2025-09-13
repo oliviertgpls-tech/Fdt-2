@@ -68,117 +68,334 @@ export default function BookPage() {
   };
 
   // Génération PDF aperçu avec import dynamique et débogage complet
-  const generatePreviewPDF = async () => {
-    if (!book) return;
-    
-    setIsGeneratingPreview(true);
-    try {
-      console.log('=== DÉBUT GÉNÉRATION PDF ===');
-      console.log('Livre:', book.title);
-      console.log('Nombre de recettes:', bookRecipes.length);
-      
-      console.log('Tentative d\'import de pdf-lib...');
-      const pdfLib = await import('pdf-lib');
-      console.log('pdf-lib importé:', Object.keys(pdfLib));
-      
-      const { PDFDocument, rgb } = pdfLib;
-      console.log('PDFDocument:', typeof PDFDocument);
-      console.log('rgb:', typeof rgb);
-      
-      console.log('Création du document PDF...');
-      const pdfDoc = await PDFDocument.create();
-      console.log('Document PDF créé');
-      
-      console.log('Ajout d\'une page...');
-      const page = pdfDoc.addPage([595, 842]);
-      console.log('Page ajoutée');
-      
-      console.log('Ajout de texte...');
-      page.drawText(book.title, {
-        x: 50,
-        y: 750,
-        size: 24,
-        color: rgb(0.2, 0.1, 0.05)
+ // Remplace TOUT le corps de generatePreviewPDF par ceci
+const generatePreviewPDF = async () => {
+  if (!book) return;
+
+  setIsGeneratingPreview(true);
+  try {
+    const pdfLib = await import('pdf-lib');
+    const { PDFDocument, rgb, StandardFonts } = pdfLib;
+
+    // --- Helpers locaux ---
+    const A4 = { w: 595.28, h: 841.89 }; // points
+    const margin = 36; // 0.5 inch
+
+    const mm = (x: number) => x * 2.83465;
+
+    const wrapText = (
+      text: string,
+      font: any,
+      size: number,
+      maxWidth: number
+    ): string[] => {
+      if (!text) return [];
+      const words = text.split(/\s+/);
+      const lines: string[] = [];
+      let line = '';
+      for (const w of words) {
+        const test = line ? line + ' ' + w : w;
+        const width = font.widthOfTextAtSize(test, size);
+        if (width > maxWidth && line) {
+          lines.push(line);
+          line = w;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    };
+
+    const drawParagraph = (
+      page: any,
+      text: string,
+      x: number,
+      y: number,
+      font: any,
+      size: number,
+      color: any,
+      maxWidth: number,
+      lineGap = 4
+    ) => {
+      const lines = wrapText(text, font, size, maxWidth);
+      let cursorY = y;
+      for (const line of lines) {
+        page.drawText(line, { x, y: cursorY, size, font, color });
+        cursorY -= size + lineGap;
+        if (cursorY < margin) break; // pas de pagination automatique ici
+      }
+      return cursorY;
+    };
+
+    const fetchImageBytes = async (url?: string | null): Promise<Uint8Array | null> => {
+      if (!url) return null;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const buf = await res.arrayBuffer();
+        return new Uint8Array(buf);
+      } catch {
+        return null;
+      }
+    };
+
+    const drawImageFitted = async (
+      pdfDoc: any,
+      page: any,
+      url: string | undefined,
+      x: number,
+      y: number,
+      boxW: number,
+      boxH: number
+    ) => {
+      const bytes = await fetchImageBytes(url);
+      if (!bytes) {
+        // placeholder si pas d'image
+        page.drawRectangle({
+          x, y,
+          width: boxW,
+          height: boxH,
+          color: rgb(0.95, 0.94, 0.92),
+          borderColor: rgb(0.8, 0.8, 0.8),
+          borderWidth: 1
+        });
+        page.drawText('Image indisponible', {
+          x: x + 12,
+          y: y + boxH / 2 - 6,
+          size: 12,
+          color: rgb(0.4, 0.35, 0.3)
+        });
+        return;
+      }
+
+      // deviner PNG ou JPG très simplement (content-type inaccessible proprement via fetch sur certains domaines)
+      const isPng = url?.toLowerCase().endsWith('.png');
+      const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+      const { width, height } = img.size();
+
+      const scale = Math.min(boxW / width, boxH / height);
+      const w = width * scale;
+      const h = height * scale;
+      const cx = x + (boxW - w) / 2;
+      const cy = y + (boxH - h) / 2;
+
+      page.drawImage(img, { x: cx, y: cy, width: w, height: h });
+    };
+
+    // --- Création du doc + polices ---
+    const pdfDoc = await PDFDocument.create();
+    const fontTitle = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+    const fontBody = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    const colorTitle = rgb(0.2, 0.1, 0.05);
+    const colorBody = rgb(0.25, 0.2, 0.17);
+
+    // --- 1) Couverture ---
+    const cover = pdfDoc.addPage([A4.w, A4.h]);
+    cover.drawRectangle({
+      x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972) // bg-cream
+    });
+    // image héro si dispo
+    await drawImageFitted(
+      pdfDoc,
+      cover,
+      bookRecipes[0]?.imageUrl,
+      margin,
+      A4.h / 2,
+      A4.w - margin * 2,
+      A4.h / 2 - margin
+    );
+    cover.drawText(book.title, {
+      x: margin,
+      y: A4.h - margin - 40,
+      size: 28,
+      font: fontTitle,
+      color: colorTitle
+    });
+    cover.drawText('Carnet de transmission culinaire', {
+      x: margin,
+      y: A4.h - margin - 70,
+      size: 16,
+      font: fontBody,
+      color: colorBody
+    });
+    cover.drawText(`${bookRecipes.length} recettes de famille`, {
+      x: margin,
+      y: A4.h - margin - 95,
+      size: 12,
+      font: fontBody,
+      color: colorBody
+    });
+
+    // --- 2) Sommaire ---
+    const toc = pdfDoc.addPage([A4.w, A4.h]);
+    toc.drawText('Sommaire', {
+      x: margin,
+      y: A4.h - margin - 20,
+      size: 22,
+      font: fontTitle,
+      color: colorTitle
+    });
+    let yToc = A4.h - margin - 60;
+    bookRecipes.forEach((r, i) => {
+      const line = `${(i + 1).toString().padStart(2, '0')}  ${r.title}`;
+      toc.drawText(line, {
+        x: margin,
+        y: yToc,
+        size: 12,
+        font: fontBody,
+        color: colorBody
       });
-      
-      page.drawText('Livre de recettes familiales', {
-        x: 50,
-        y: 700,
-        size: 16,
-        color: rgb(0.4, 0.3, 0.2)
+      yToc -= 18;
+      if (yToc < margin + 40) {
+        // nouvelle page de sommaire si nécessaire (au cas où tu as vraiment beaucoup de recettes)
+        yToc = A4.h - margin - 20;
+      }
+    });
+
+    // --- 3) Pages par recette : 2 pages (photo + contenu) ---
+    for (const recipe of bookRecipes) {
+      // 3.1) Page Photo
+      const pPhoto = pdfDoc.addPage([A4.w, A4.h]);
+      pPhoto.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
       });
-      
-      page.drawText(`${bookRecipes.length} recettes`, {
-        x: 50,
-        y: 650,
+      await drawImageFitted(
+        pdfDoc,
+        pPhoto,
+        recipe.imageUrl,
+        margin,
+        margin + mm(20),
+        A4.w - margin * 2,
+        A4.h - margin * 2 - mm(40)
+      );
+      // bandeau titre bas
+      pPhoto.drawRectangle({
+        x: 0, y: margin, width: A4.w, height: mm(18),
+        color: rgb(0.18, 0.10, 0.06)
+      });
+      pPhoto.drawText(recipe.title, {
+        x: margin,
+        y: margin + 6,
         size: 14,
-        color: rgb(0.5, 0.4, 0.3)
+        font: fontTitle,
+        color: rgb(1, 1, 1)
       });
-      
-      console.log('Texte ajouté');
-
-      // Ajouter les recettes si il y en a
-      if (bookRecipes.length > 0) {
-        console.log('Ajout du sommaire...');
-        const summaryPage = pdfDoc.addPage();
-        summaryPage.drawText('Sommaire', {
-          x: 50,
-          y: 750,
-          size: 24,
-          color: rgb(0.2, 0.1, 0.05)
+      if (recipe.author) {
+        pPhoto.drawText(`par ${recipe.author}`, {
+          x: margin + 240,
+          y: margin + 6,
+          size: 12,
+          font: fontBody,
+          color: rgb(1, 1, 1)
         });
-
-        let yPosition = 700;
-        bookRecipes.forEach((recipe, index) => {
-          if (yPosition < 100) {
-            yPosition = 750;
-          }
-          
-          summaryPage.drawText(`${index + 1}. ${recipe.title}`, {
-            x: 70,
-            y: yPosition,
-            size: 14,
-            color: rgb(0.3, 0.2, 0.1)
-          });
-          
-          yPosition -= 30;
-        });
-        console.log('Sommaire ajouté');
       }
 
-      console.log('Sauvegarde du PDF...');
-      const pdfBytes = await pdfDoc.save();
-      console.log('PDF sauvegardé, taille:', pdfBytes.length, 'bytes');
-      
-      console.log('Création du blob...');
-      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
-      console.log('Blob créé, taille:', blob.size);
-      
-      console.log('Création de l\'URL...');
-      const url = URL.createObjectURL(blob);
-      console.log('URL créée:', url);
-      
-      setPdfUrl(url);
-      setShowPDFModal(true);
-      
-      console.log('=== PDF GÉNÉRÉ AVEC SUCCÈS ===');
+      // 3.2) Page Contenu
+      const pCont = pdfDoc.addPage([A4.w, A4.h]);
+      pCont.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
+      });
 
-    } catch (error) {
-      console.error('=== ERREUR GÉNÉRATION PDF ===');
-      
-      if (error instanceof Error) {
-        console.error('Type d\'erreur:', error.constructor.name);
-        console.error('Message:', error.message);
-        console.error('Stack:', error.stack);
-        alert(`Erreur: ${error.message}`);
-      } else {
-        console.error('Erreur inconnue:', error);
-        alert('Une erreur inconnue s\'est produite lors de la génération du PDF');
+      // Header
+      pCont.drawText(recipe.title, {
+        x: margin,
+        y: A4.h - margin - 24,
+        size: 18,
+        font: fontTitle,
+        color: colorTitle
+      });
+      const meta = `${recipe.prepMinutes || 30} min • ${recipe.servings || '4'} pers.`;
+      pCont.drawText(meta, {
+        x: margin,
+        y: A4.h - margin - 42,
+        size: 12,
+        font: fontBody,
+        color: colorBody
+      });
+
+      // Colonnes
+      const colGap = 18;
+      const colW = (A4.w - margin * 2 - colGap) / 2;
+      let yLeft = A4.h - margin - 70;
+      let yRight = A4.h - margin - 70;
+
+      // Ingrédients (gauche)
+      pCont.drawText('Ingrédients', {
+        x: margin,
+        y: yLeft,
+        size: 14,
+        font: fontTitle,
+        color: colorTitle
+      });
+      yLeft -= 18;
+
+      const ingredients: string[] = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+      for (const ing of ingredients) {
+        // puce
+        pCont.drawCircle({ x: margin + 3, y: yLeft + 4, size: 1.5, color: colorBody });
+        yLeft = drawParagraph(pCont, ing, margin + 10, yLeft, fontBody, 11, colorBody, colW - 12, 3) - 6;
+        if (yLeft < margin + 40) break; // pas de pagination supplémentaire dans Option A
       }
-    } finally {
-      setIsGeneratingPreview(false);
+
+      // Préparation (droite)
+      pCont.drawText('Préparation', {
+        x: margin + colW + colGap,
+        y: yRight,
+        size: 14,
+        font: fontTitle,
+        color: colorTitle
+      });
+      yRight -= 18;
+
+      const steps: string[] =
+        typeof recipe.steps === 'string'
+          ? recipe.steps.split('\n\n').filter(s => s.trim())
+          : Array.isArray(recipe.steps)
+          ? recipe.steps
+          : [];
+
+      steps.forEach((step, idx) => {
+        const prefix = `${idx + 1}. `;
+        const prefixWidth = fontBody.widthOfTextAtSize(prefix, 11);
+        // numéro
+        pCont.drawText(prefix, {
+          x: margin + colW + colGap,
+          y: yRight,
+          size: 11,
+          font: fontBody,
+          color: colorBody
+        });
+        // texte wrap
+        yRight = drawParagraph(
+          pCont,
+          step,
+          margin + colW + colGap + prefixWidth,
+          yRight,
+          fontBody,
+          11,
+          colorBody,
+          colW - prefixWidth - 6,
+          3
+        ) - 4;
+        if (yRight < margin + 40) return; // pas de pagination supplémentaire dans Option A
+      });
     }
-  }; // ← FERMETURE manquante auparavant
+
+    // --- Export ---
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+    setShowPDFModal(true);
+  } catch (error) {
+    console.error('PDF error', error);
+    alert('Erreur lors de la génération du PDF');
+  } finally {
+    setIsGeneratingPreview(false);
+  }
+};
+
 
   // Fermer la modale PDF
   const closePDFModal = () => {
