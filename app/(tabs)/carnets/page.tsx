@@ -174,13 +174,19 @@ export default function CarnetsPage() {
                       href={`/carnets/${carnet.id}`}
                       className="flex-1 bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition-colors font-medium text-sm text-center"
                     >
-                      Voir
+                      Voir ce carnet
                     </Link>
                     <Link
                       href={`/carnets/${carnet.id}/edit`}
                       className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
+                    </Link>
+                     <Link
+                      href={`/carnets/`}
+                      className="flex-1 bg-red-100 text-red-700 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium text-sm text-center"
+                    >
+                      Supprimer
                     </Link>
                   </div>
                 </div>
