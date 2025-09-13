@@ -54,11 +54,11 @@ export default function BookPage() {
   }, [book]);
 
   // Actions simplifiées (pas d'async)
-  const handleAddRecipeToBook = (bookId, recipeId) => {
+  const handleAddRecipeToBook = (bookId: string, recipeId: string) => {
     addRecipeToBook(bookId, recipeId);
   };
 
-  const handleRemoveRecipeFromBook = (bookId, recipeId) => {
+  const handleRemoveRecipeFromBook = (bookId: string, recipeId: string) => {
     removeRecipeFromBook(bookId, recipeId);
   };
 
