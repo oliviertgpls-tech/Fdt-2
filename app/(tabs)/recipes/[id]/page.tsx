@@ -37,7 +37,7 @@ export default function RecipeDetailPage() {
   const handleAddToBook = () => {
     if (books.length === 0) {
       alert("Créez d'abord un livre pour ajouter cette recette !");
-      router.push("/library");
+      router.push("/livres");
       return;
     }
     
