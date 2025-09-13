@@ -2,13 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { PDFDocument, rgb } from 'pdf-lib';
 import { 
   ArrowLeft, 
   Edit3, 
   Trash2, 
   Plus, 
-  Upload, 
   Eye, 
   Download, 
   X, 
@@ -21,7 +19,7 @@ export default function BookPage() {
   const router = useRouter();
   const { id } = useParams();
   
-  // ✅ Utilisez le context RecipesProvider
+  // Utilisez le context RecipesProvider
   const { 
     books, 
     recipes, 
@@ -39,7 +37,7 @@ export default function BookPage() {
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
-  // ✅ Trouvez les données directement depuis le context
+  // Trouvez les données directement depuis le context
   const book = books.find(b => b.id === id);
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
@@ -69,186 +67,108 @@ export default function BookPage() {
     }
   };
 
-  // Génération PDF aperçu
+  // Génération PDF aperçu avec import dynamique et débogage complet
   const generatePreviewPDF = async () => {
     if (!book) return;
     
     setIsGeneratingPreview(true);
     try {
+      console.log('=== DÉBUT GÉNÉRATION PDF ===');
+      console.log('Livre:', book.title);
+      console.log('Nombre de recettes:', bookRecipes.length);
+      
+      console.log('Tentative d\'import de pdf-lib...');
+      const pdfLib = await import('pdf-lib');
+      console.log('pdf-lib importé:', Object.keys(pdfLib));
+      
+      const { PDFDocument, rgb } = pdfLib;
+      console.log('PDFDocument:', typeof PDFDocument);
+      console.log('rgb:', typeof rgb);
+      
+      console.log('Création du document PDF...');
       const pdfDoc = await PDFDocument.create();
+      console.log('Document PDF créé');
       
-      // Page 1 : Couverture
-      const coverPage = pdfDoc.addPage([595, 842]); // A4
+      console.log('Ajout d\'une page...');
+      const page = pdfDoc.addPage([595, 842]);
+      console.log('Page ajoutée');
       
-      // Titre principal
-      coverPage.drawText(book.title, {
+      console.log('Ajout de texte...');
+      page.drawText(book.title, {
         x: 50,
         y: 750,
-        size: 32,
+        size: 24,
         color: rgb(0.2, 0.1, 0.05)
       });
       
-      // Sous-titre
-      coverPage.drawText('Livre de recettes familiales', {
+      page.drawText('Livre de recettes familiales', {
         x: 50,
         y: 700,
         size: 16,
         color: rgb(0.4, 0.3, 0.2)
       });
       
-      // Nombre de recettes
-      coverPage.drawText(`${bookRecipes.length} recettes délicieuses`, {
+      page.drawText(`${bookRecipes.length} recettes`, {
         x: 50,
         y: 650,
         size: 14,
         color: rgb(0.5, 0.4, 0.3)
       });
+      
+      console.log('Texte ajouté');
 
-      // Description si elle existe
-      if (bookDescription) {
-        const lines = bookDescription.match(/.{1,70}/g) || [];
-        let yPos = 600;
-        lines.slice(0, 8).forEach((line) => {
-          coverPage.drawText(line, {
-            x: 50,
-            y: yPos,
-            size: 11,
-            color: rgb(0.5, 0.4, 0.3)
-          });
-          yPos -= 20;
-        });
-      }
-
-      // Page 2 : Sommaire
-      const summaryPage = pdfDoc.addPage();
-      summaryPage.drawText('Sommaire', {
-        x: 50,
-        y: 750,
-        size: 24,
-        color: rgb(0.2, 0.1, 0.05)
-      });
-
-      let yPosition = 700;
-      bookRecipes.forEach((recipe, index) => {
-        if (yPosition < 100) {
-          yPosition = 750;
-        }
-        
-        summaryPage.drawText(`${index + 1}. ${recipe.title}`, {
-          x: 70,
-          y: yPosition,
-          size: 14,
-          color: rgb(0.3, 0.2, 0.1)
-        });
-        
-        summaryPage.drawText(`${recipe.prepMinutes || 30} min`, {
-          x: 450,
-          y: yPosition,
-          size: 10,
-          color: rgb(0.6, 0.5, 0.4)
-        });
-        
-        yPosition -= 30;
-      });
-
-      // Pages recettes
-      bookRecipes.forEach((recipe) => {
-        const recipePage = pdfDoc.addPage();
-        
-        // Titre de la recette
-        recipePage.drawText(recipe.title, {
+      // Ajouter les recettes si il y en a
+      if (bookRecipes.length > 0) {
+        console.log('Ajout du sommaire...');
+        const summaryPage = pdfDoc.addPage();
+        summaryPage.drawText('Sommaire', {
           x: 50,
           y: 750,
-          size: 22,
+          size: 24,
           color: rgb(0.2, 0.1, 0.05)
         });
-        
-        // Informations générales
-        recipePage.drawText(`⏱️ Temps: ${recipe.prepMinutes || 30} min  |  👥 ${recipe.servings || 4} personnes`, {
-          x: 50,
-          y: 710,
-          size: 12,
-          color: rgb(0.4, 0.3, 0.2)
-        });
 
-        // Ingrédients
-        recipePage.drawText('🥘 Ingrédients :', {
-          x: 50,
-          y: 670,
-          size: 16,
-          color: rgb(0.3, 0.2, 0.1)
-        });
-
-        let yPos = 640;
-        if (recipe.ingredients && recipe.ingredients.length > 0) {
-          recipe.ingredients.forEach((ingredient) => {
-            recipePage.drawText(`• ${ingredient}`, {
-              x: 70,
-              y: yPos,
-              size: 11,
-              color: rgb(0.4, 0.3, 0.2)
-            });
-            yPos -= 20;
-          });
-        } else {
-          recipePage.drawText('• Ingrédients à ajouter...', {
-            x: 70,
-            y: yPos,
-            size: 11,
-            color: rgb(0.6, 0.5, 0.4)
-          });
-          yPos -= 20;
-        }
-
-        // Instructions (adaptées à votre structure de steps en string)
-        recipePage.drawText('👨‍🍳 Instructions :', {
-          x: 50,
-          y: yPos - 20,
-          size: 16,
-          color: rgb(0.3, 0.2, 0.1)
-        });
-
-        yPos -= 50;
-        if (recipe.steps) {
-          // Découper les étapes par double saut de ligne ou numérotation
-          const steps = recipe.steps.split('\n\n').filter(step => step.trim());
+        let yPosition = 700;
+        bookRecipes.forEach((recipe, index) => {
+          if (yPosition < 100) {
+            yPosition = 750;
+          }
           
-          steps.forEach((step, index) => {
-            const maxLength = 65;
-            const lines = step.match(new RegExp(`.{1,${maxLength}}`, 'g')) || [step];
-            
-            lines.forEach((line, lineIndex) => {
-              const prefix = lineIndex === 0 ? `${index + 1}. ` : '   ';
-              recipePage.drawText(`${prefix}${line}`, {
-                x: 70,
-                y: yPos,
-                size: 11,
-                color: rgb(0.4, 0.3, 0.2)
-              });
-              yPos -= 18;
-            });
-            yPos -= 10;
-          });
-        } else {
-          recipePage.drawText('1. Instructions à ajouter...', {
+          summaryPage.drawText(`${index + 1}. ${recipe.title}`, {
             x: 70,
-            y: yPos,
-            size: 11,
-            color: rgb(0.6, 0.5, 0.4)
+            y: yPosition,
+            size: 14,
+            color: rgb(0.3, 0.2, 0.1)
           });
-        }
-      });
+          
+          yPosition -= 30;
+        });
+        console.log('Sommaire ajouté');
+      }
 
-      // Générer le PDF
+      console.log('Sauvegarde du PDF...');
       const pdfBytes = await pdfDoc.save();
+      console.log('PDF sauvegardé, taille:', pdfBytes.length, 'bytes');
+      
+      console.log('Création du blob...');
       const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+      console.log('Blob créé, taille:', blob.size);
+      
+      console.log('Création de l\'URL...');
       const url = URL.createObjectURL(blob);
+      console.log('URL créée:', url);
+      
       setPdfUrl(url);
       setShowPDFModal(true);
+      
+      console.log('=== PDF GÉNÉRÉ AVEC SUCCÈS ===');
 
     } catch (error) {
-      console.error('Erreur génération PDF:', error);
-      alert('Erreur lors de la génération du PDF');
+      console.error('=== ERREUR GÉNÉRATION PDF ===');
+      console.error('Type d\'erreur:', error.constructor.name);
+      console.error('Message:', error.message);
+      console.error('Stack:', error.stack);
+      alert(`Erreur: ${error.message}`);
     } finally {
       setIsGeneratingPreview(false);
     }
