@@ -41,7 +41,7 @@ export default function BookPage() {
   const book = books.find(b => b.id === id);
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
-    !book?.recipeIds.includes(recipe.id)
+    !book?.recipeIds?.includes(recipe.id)
   );
 
   // Initialiser la description
@@ -178,7 +178,7 @@ export default function BookPage() {
       }
     } finally {
       setIsGeneratingPreview(false);
-    }
+    };
 
   // Fermer la modale PDF
   const closePDFModal = () => {
