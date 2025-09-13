@@ -35,7 +35,7 @@ export default function BookPage() {
   const [editingDescription, setEditingDescription] = useState(false);
   
   // États pour la modale PDF
-  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
