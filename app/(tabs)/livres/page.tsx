@@ -126,18 +126,9 @@ export default function LivresPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
           <p className="text-gray-600 mt-1 text-sm md:text-base">
-            Créez de beaux livres à imprimer avec vos recettes sélectionnées
+            Créez de beaux livres à imprimer et transmettez votre patrimoine
           </p>
         </div>
-        
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-sm md:text-base self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4 md:w-5 md:h-5" />
-          <span className="sm:hidden">Nouveau</span>
-          <span className="hidden sm:inline">Nouveau livre</span>
-        </button>
       </div>
 
       {/* Livres existants */}
@@ -192,7 +183,7 @@ export default function LivresPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-lg md:text-xl font-semibold text-gray-800">
-            Sélectionner des recettes pour un nouveau livre
+            Sélectionner au moins une recette pour créer un nouveau livre
           </h2>
           {selectedRecipes.length > 0 && (
             <div className="flex items-center gap-3">
