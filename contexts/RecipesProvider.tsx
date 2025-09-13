@@ -211,7 +211,7 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     setBooks(prev =>
       prev.map(book =>
         book.id === bookId
-          ? { ...book, recipeIds: book.recipeIds.filter(id => id !== recipeId) }
+          ? { ...book, recipeIds: book.recipeIds.filter((id: string) => id !== recipeId) }
           : book
       )
     );
