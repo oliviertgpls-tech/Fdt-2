@@ -203,6 +203,7 @@ export default function RecipeDetailPage() {
             <div className="flex-1">
               <h1 className="text-3xl font-semibold">{recipe.title}</h1>
             </div>
+          </div>
           
           <div className="flex flex-wrap items-center gap-4 text-gray-600">
             {recipe.author && <span>par {recipe.author}</span>}
