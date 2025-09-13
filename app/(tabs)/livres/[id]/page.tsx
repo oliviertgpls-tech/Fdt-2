@@ -165,14 +165,20 @@ export default function BookPage() {
 
     } catch (error) {
       console.error('=== ERREUR GÉNÉRATION PDF ===');
-      console.error('Type d\'erreur:', error.constructor.name);
-      console.error('Message:', error.message);
-      console.error('Stack:', error.stack);
-      alert(`Erreur: ${error.message}`);
+      
+      // Type guard pour vérifier si error est une instance d'Error
+      if (error instanceof Error) {
+        console.error('Type d\'erreur:', error.constructor.name);
+        console.error('Message:', error.message);
+        console.error('Stack:', error.stack);
+        alert(`Erreur: ${error.message}`);
+      } else {
+        console.error('Erreur inconnue:', error);
+        alert('Une erreur inconnue s\'est produite lors de la génération du PDF');
+      }
     } finally {
       setIsGeneratingPreview(false);
     }
-  };
 
   // Fermer la modale PDF
   const closePDFModal = () => {
