@@ -144,7 +144,7 @@ export default function RecipeDetailPage() {
               <div className="text-center py-6">
                 <p className="text-gray-600 mb-4">Cette recette est déjà dans tous vos livres !</p>
                 <Link
-                  href="/library"
+                  href="/livres"
                   className="text-orange-600 hover:text-orange-700 font-medium"
                   onClick={() => setShowBookModal(false)}
                 >
