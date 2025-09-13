@@ -183,7 +183,7 @@ export default function LivresPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-lg md:text-xl font-semibold text-gray-800">
-            Sélectionner au moins une recette pour créer un nouveau livre
+            Sélectionnez au moins une recette pour créer un livre
           </h2>
           {selectedRecipes.length > 0 && (
             <div className="flex items-center gap-3">
