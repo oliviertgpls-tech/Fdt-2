@@ -21,7 +21,7 @@ export default function HomePage() {
       {/* Actions principales */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <Link 
-          href="/carnets" 
+          href="/carnets/[id]" 
           className="card group p-8 hover:-translate-y-1 transition-all duration-200"
         >
           <div className="text-center space-y-4">
