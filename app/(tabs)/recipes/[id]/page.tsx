@@ -203,15 +203,6 @@ export default function RecipeDetailPage() {
             <div className="flex-1">
               <h1 className="text-3xl font-semibold">{recipe.title}</h1>
             </div>
-            
-            {/* CTA Ajouter au livre */}
-            <button
-              onClick={handleAddToBook}
-              className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium flex items-center gap-2 ml-6 flex-shrink-0"
-            >
-              📚 Ajouter à mon livre
-            </button>
-          </div>
           
           <div className="flex flex-wrap items-center gap-4 text-gray-600">
             {recipe.author && <span>par {recipe.author}</span>}
