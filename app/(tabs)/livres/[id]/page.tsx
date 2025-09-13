@@ -17,7 +17,7 @@ import { useRecipes } from '@/contexts/RecipesProvider';
 
 export default function BookPage() {
   const router = useRouter();
-  const { id } = useParams();
+  const { id } = useParams() as { id: string };
   
   // Utilisez le context RecipesProvider
   const { 
@@ -41,7 +41,7 @@ export default function BookPage() {
   const book = books.find(b => b.id === id);
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
-    !book?.recipeIds?.includes(recipe.id)
+    !book?.recipeIds?.includes(recipe.id) // sécurisé
   );
 
   // Initialiser la description
@@ -166,7 +166,6 @@ export default function BookPage() {
     } catch (error) {
       console.error('=== ERREUR GÉNÉRATION PDF ===');
       
-      // Type guard pour vérifier si error est une instance d'Error
       if (error instanceof Error) {
         console.error('Type d\'erreur:', error.constructor.name);
         console.error('Message:', error.message);
@@ -178,7 +177,8 @@ export default function BookPage() {
       }
     } finally {
       setIsGeneratingPreview(false);
-    };
+    }
+  }; // ← FERMETURE manquante auparavant
 
   // Fermer la modale PDF
   const closePDFModal = () => {
