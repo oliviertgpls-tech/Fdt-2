@@ -9,7 +9,7 @@ import { ArrowLeft, Edit3, Plus, Search } from "lucide-react";
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes } = useRecipes();
+  const { notebooks, recipes, createBook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Trouver le carnet
@@ -40,6 +40,23 @@ export default function CarnetPage() {
       return searchText.includes(query);
     });
   }, [carnetRecipes, searchQuery]);
+
+  const handleCreateBookFromCarnet = async () => {
+    if (!carnet || !carnetRecipes.length) return;
+    
+    try {
+      const bookTitle = `Livre - ${carnet.title}`;
+      const recipeIds = carnetRecipes.map(r => r.id);
+      
+      const newBook = await createBook(bookTitle, recipeIds);
+      
+      // Rediriger vers la page du livre créé
+      router.push(`/livres/${newBook.id}`);
+    } catch (error) {
+      console.error('Erreur lors de la création du livre:', error);
+      alert('Erreur lors de la création du livre');
+    }
+  };
 
   if (!carnet) {
     return (
