@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
+import { ImageSearch } from "@/components/ImageSearch";
 import type { Recipe } from "@/lib/types";
 
 export default function EditRecipePage() {
@@ -24,7 +25,8 @@ export default function EditRecipePage() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showHelpModal, setShowHelpModal] = useState(true); // Modale d'explication
+  const [showHelpModal, setShowHelpModal] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Pré-remplir le formulaire avec les données existantes
   useEffect(() => {
@@ -38,10 +40,39 @@ export default function EditRecipePage() {
       setImageUrl(recipe.imageUrl || "");
       setIsLoading(false);
     } else if (recipes.length > 0) {
-      // Si les recettes sont chargées mais la recette n'existe pas
       router.push("/recipes");
     }
   }, [recipe, recipes, router]);
+
+  // Upload d'image personnelle
+  const handleImageUpload = async (file: File) => {
+    setIsUploading(true);
+    
+    try {
+      // Créer un FormData pour l'upload
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Simuler un upload (à remplacer par votre service d'upload)
+      // Pour l'instant, on crée une URL temporaire
+      const tempUrl = URL.createObjectURL(file);
+      setImageUrl(tempUrl);
+      
+      // Dans un vrai projet, vous feriez quelque chose comme :
+      // const response = await fetch('/api/upload', {
+      //   method: 'POST',
+      //   body: formData
+      // });
+      // const { url } = await response.json();
+      // setImageUrl(url);
+      
+    } catch (error) {
+      alert("Erreur lors de l'upload de l'image");
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -60,7 +91,6 @@ export default function EditRecipePage() {
         prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
         servings: servings.trim() || undefined,
         imageUrl: imageUrl.trim() || undefined,
-        // Transformer le textarea en array (1 ligne = 1 ingrédient)
         ingredients: ingredients
           .split('\n')
           .map(line => line.trim())
@@ -207,20 +237,70 @@ export default function EditRecipePage() {
             </div>
           </div>
 
-          {/* Photo (optionnel) */}
+          {/* Photo - AMÉLIORÉE avec Upload + Unsplash */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Photo (optionnel)
             </label>
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-              placeholder="Collez un lien d'image..."
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              💡 Bientôt : photo depuis votre téléphone !
+            
+            <div className="space-y-3">
+              {/* URL manuelle */}
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+                placeholder="Collez un lien d'image..."
+              />
+              
+              {/* Boutons d'actions */}
+              <div className="flex flex-wrap gap-3">
+                {/* Upload photo personnelle */}
+                <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment" // Ouvre la caméra sur mobile
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                    }}
+                    className="hidden"
+                    disabled={isUploading}
+                  />
+                  📷 {isUploading ? "Upload..." : "Ma photo"}
+                </label>
+
+                {/* Recherche Unsplash */}
+                <ImageSearch 
+                  onImageSelect={(url) => setImageUrl(url)}
+                  initialQuery={title}
+                />
+              </div>
+              
+              {/* Aperçu */}
+              {imageUrl && (
+                <div className="mt-3 relative">
+                  <img 
+                    src={imageUrl} 
+                    alt="Aperçu" 
+                    className="w-full max-w-xs h-32 object-cover rounded-lg border"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <button
+                    onClick={() => setImageUrl("")}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-xs text-gray-500 mt-2">
+              💡 Prenez une photo, cherchez sur Unsplash ou collez un lien !
             </p>
           </div>
 
@@ -285,10 +365,10 @@ Simple et naturel !"
             <button
               type="button"
               onClick={handleSave}
-              disabled={isSaving || !title.trim()}
+              disabled={isSaving || !title.trim() || isUploading}
               className="flex-1 bg-primary-500 text-white py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
             >
-              {isSaving ? "⏳ Sauvegarde..." : "💾 Sauvegarder"}
+              {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "💾 Sauvegarder"}
             </button>
           </div>
         </div>
