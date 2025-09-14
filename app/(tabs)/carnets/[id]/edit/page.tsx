@@ -180,13 +180,13 @@ export default function CarnetEditPage() {
             <p className="text-sm text-orange-700 mb-4">
               Transformez ce carnet en un beau livre à imprimer avec toutes ses recettes
             </p>
-            <Link
-              href={`/livres/nouveau?carnet=${actualCarnet.id}`}
+            <button
+              onClick={handleCreateBookFromCarnet}
               className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
             >
               Créer un livre avec {carnetRecipes.length} recettes
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       )}
