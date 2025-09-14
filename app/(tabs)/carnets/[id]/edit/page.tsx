@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Eye, Move, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
@@ -9,10 +9,18 @@ import Link from 'next/link';
 export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
   
   // Trouver le carnet actuel
   const currentCarnet = notebooks.find(n => n.id === id);
+
+  const handleAddRecipe = (carnetId: string, recipeId: string) => {
+    addRecipeToNotebook(carnetId, recipeId);
+  };
+
+  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
+    removeRecipeFromNotebook(carnetId, recipeId);
+  };
 
   if (!currentCarnet) {
     return (
@@ -41,31 +49,6 @@ export default function CarnetEditPage() {
   const availableRecipes = recipes.filter(recipe => 
     !actualCarnet.recipeIds || !actualCarnet.recipeIds.includes(recipe.id)
   );
-
-  const handleAddRecipe = (carnetId: string, recipeId: string) => {
-    addRecipeToNotebook(carnetId, recipeId);
-  };
-
-  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-    removeRecipeFromNotebook(carnetId, recipeId);
-  };
-
-  const handleCreateBookFromCarnet = async () => {
-    if (!actualCarnet || !carnetRecipes.length) return;
-    
-    try {
-      const bookTitle = `Livre - ${actualCarnet.title}`;
-      const recipeIds = carnetRecipes.map(r => r.id);
-      
-      const newBook = await createBook(bookTitle, recipeIds);
-      
-      // Rediriger vers la page du livre créé
-      router.push(`/livres/${newBook.id}`);
-    } catch (error) {
-      console.error('Erreur lors de la création du livre:', error);
-      alert('Erreur lors de la création du livre');
-    }
-  };
 
   return (
     <div className="space-y-8">
@@ -186,27 +169,6 @@ export default function CarnetEditPage() {
           )}
         </div>
       </div>
-
-      {/* BOUTON CRÉER UN LIVRE */}
-      {carnetRecipes.length > 0 && (
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 text-center">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-orange-800 mb-2">
-              📖 Créer un livre avec ces recettes
-            </h3>
-            <p className="text-sm text-orange-700 mb-4">
-              Transformez ce carnet en un beau livre à imprimer avec toutes ses recettes
-            </p>
-            <button
-              onClick={handleCreateBookFromCarnet}
-              className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
-            >
-              Créer un livre avec {carnetRecipes.length} recettes
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
