@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Eye, Edit3, X } from 'lucide-react';
+import { Plus, Eye, Edit3, X, Trash2 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
@@ -83,7 +83,7 @@ export default function CarnetsPage() {
                 <div>
                   <h4 className="font-medium text-blue-800 mb-1">Astuce</h4>
                   <p className="text-sm text-blue-700">
-                    Les carnets vous aident à organiser vos recettes. Vous pourrez créer des livres à imprimer à partir de vos carnets !
+                    Les carnets vous aident à organiser vos recettes. Plus tard, vous pourrez créer des livres à imprimer à partir de vos carnets !
                   </p>
                 </div>
               </div>
@@ -124,6 +124,15 @@ export default function CarnetsPage() {
             Organisez vos recettes par thème et créez vos livres
           </p>
         </div>
+        
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2 text-sm md:text-base self-start sm:self-auto"
+        >
+          <Plus className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="sm:hidden">Nouveau</span>
+          <span className="hidden sm:inline">Nouveau carnet</span>
+        </button>
       </div>
 
       {notebooks.length === 0 ? (
@@ -174,19 +183,13 @@ export default function CarnetsPage() {
                       href={`/carnets/${carnet.id}`}
                       className="flex-1 bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition-colors font-medium text-sm text-center"
                     >
-                      Voir ce carnet
+                      Voir
                     </Link>
                     <Link
                       href={`/carnets/${carnet.id}/edit`}
                       className="px-3 py-2 text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
-                    </Link>
-                     <Link
-                      href={`/carnets/`}
-                      className="flex-1 bg-red-100 text-red-700 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium text-sm text-center"
-                    >
-                      Supprimer
                     </Link>
                   </div>
                 </div>
