@@ -23,6 +23,37 @@ export default function AddRecipePage() {
   const [steps, setSteps] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Upload d'image personnelle
+  const handleImageUpload = async (file: File) => {
+    setIsUploading(true);
+    
+    try {
+      // Créer un FormData pour l'upload
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Simuler un upload (à remplacer par votre service d'upload)
+      // Pour l'instant, on crée une URL temporaire
+      const tempUrl = URL.createObjectURL(file);
+      setImageUrl(tempUrl);
+      
+      // Dans un vrai projet, vous feriez quelque chose comme :
+      // const response = await fetch('/api/upload', {
+      //   method: 'POST',
+      //   body: formData
+      // });
+      // const { url } = await response.json();
+      // setImageUrl(url);
+      
+    } catch (error) {
+      alert("Erreur lors de l'upload de l'image");
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSaveManual = async () => {
     if (!title.trim()) {
@@ -431,13 +462,14 @@ export default function AddRecipePage() {
           </div>
         </div>
 
-        {/* Photo (optionnel) */}
+        {/* Photo - AMÉLIORÉE avec Upload + Unsplash */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Photo (optionnel)
           </label>
           
           <div className="space-y-3">
+            {/* URL manuelle */}
             <input
               type="url"
               value={imageUrl}
@@ -446,32 +478,54 @@ export default function AddRecipePage() {
               placeholder="Collez un lien d'image..."
             />
             
-            <div className="flex flex-wrap gap-2">
+            {/* Boutons d'actions */}
+            <div className="flex flex-wrap gap-3">
+              {/* Upload photo personnelle */}
+              <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment" // Ouvre la caméra sur mobile
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+                📷 {isUploading ? "Upload..." : "Ma photo"}
+              </label>
+
+              {/* Recherche Unsplash */}
               <ImageSearch 
                 onImageSelect={(url) => setImageUrl(url)}
-                initialQuery={title} // Suggestion basée sur le titre
+                initialQuery={title}
               />
-              <span className="text-xs text-gray-500 self-center">
-                ou collez un lien ci-dessus
-              </span>
             </div>
             
+            {/* Aperçu */}
             {imageUrl && (
-              <div className="mt-3">
+              <div className="mt-3 relative">
                 <img 
                   src={imageUrl} 
                   alt="Aperçu" 
-                  className="w-32 h-24 object-cover rounded-lg border"
+                  className="w-full max-w-xs h-32 object-cover rounded-lg border"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
+                <button
+                  onClick={() => setImageUrl("")}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                >
+                  ×
+                </button>
               </div>
             )}
           </div>
           
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Cliquez sur "Chercher une image" pour des photos libres de droits !
+          <p className="text-xs text-gray-500 mt-2">
+            💡 Prenez une photo, cherchez sur Unsplash ou collez un lien !
           </p>
         </div>
 
@@ -536,10 +590,10 @@ Simple et naturel !"
           <button
             type="button"
             onClick={handleSaveManual}
-            disabled={isSaving || !title.trim()}
+            disabled={isSaving || !title.trim() || isUploading}
             className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {isSaving ? "⏳ Sauvegarde..." : "✨ Créer"}
+            {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "✨ Créer"}
           </button>
         </div>
       </div>
