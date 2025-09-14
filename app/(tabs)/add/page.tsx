@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText } from "lucide-react";
 import type { Recipe } from "@/lib/types";
+import { ImageSearch } from "@/components/ImageSearch";
 
 export default function AddRecipePage() {
   const router = useRouter();
@@ -435,15 +436,42 @@ export default function AddRecipePage() {
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Photo (optionnel)
           </label>
-          <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-            placeholder="Collez un lien d'image..."
-          />
+          
+          <div className="space-y-3">
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              placeholder="Collez un lien d'image..."
+            />
+            
+            <div className="flex flex-wrap gap-2">
+              <ImageSearch 
+                onImageSelect={(url) => setImageUrl(url)}
+                initialQuery={title} // Suggestion basée sur le titre
+              />
+              <span className="text-xs text-gray-500 self-center">
+                ou collez un lien ci-dessus
+              </span>
+            </div>
+            
+            {imageUrl && (
+              <div className="mt-3">
+                <img 
+                  src={imageUrl} 
+                  alt="Aperçu" 
+                  className="w-32 h-24 object-cover rounded-lg border"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+          
           <p className="text-xs text-gray-500 mt-1">
-            💡 Ou utilisez notre mode "Photo d'un plat" pour une photo optimisée !
+            💡 Cliquez sur "Chercher une image" pour des photos libres de droits !
           </p>
         </div>
 
