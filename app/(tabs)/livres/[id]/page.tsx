@@ -14,6 +14,7 @@ import {
   GripVertical 
 } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
+import { ImageSearch } from '@/components/ImageSearch';
 
 export default function BookPage() {
   const router = useRouter();
@@ -32,6 +33,11 @@ export default function BookPage() {
   const [bookDescription, setBookDescription] = useState('');
   const [editingDescription, setEditingDescription] = useState(false);
   
+  // 🆕 NOUVEAUX ÉTATS pour la photo de couverture
+  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [editingCover, setEditingCover] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  
   // États pour la modale PDF
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
@@ -41,15 +47,35 @@ export default function BookPage() {
   const book = books.find(b => b.id === id);
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
-    !book?.recipeIds?.includes(recipe.id) // sécurisé
+    !book?.recipeIds?.includes(recipe.id)
   );
 
-  // Initialiser la description
+  // Initialiser les états
   useEffect(() => {
     if (book) {
       setBookDescription(book.description || '');
+      setCoverImageUrl(book.coverImageUrl || '');
     }
   }, [book]);
+
+  // 🆕 FONCTION upload photo couverture
+  const handleCoverImageUpload = async (file: File) => {
+    setIsUploadingCover(true);
+    
+    try {
+      const tempUrl = URL.createObjectURL(file);
+      setCoverImageUrl(tempUrl);
+      // Sauvegarder immédiatement
+      if (book) {
+        updateBook(book.id, { coverImageUrl: tempUrl });
+      }
+    } catch (error) {
+      alert("Erreur lors de l'upload de l'image");
+      console.error(error);
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
 
   // Actions simplifiées (pas d'async)
   const handleAddRecipeToBook = (bookId: string, recipeId: string) => {
@@ -68,334 +94,352 @@ export default function BookPage() {
   };
 
   // Génération PDF aperçu avec import dynamique et débogage complet
- // Remplace TOUT le corps de generatePreviewPDF par ceci
-const generatePreviewPDF = async () => {
-  if (!book) return;
+  const generatePreviewPDF = async () => {
+    if (!book) return;
 
-  setIsGeneratingPreview(true);
-  try {
-    const pdfLib = await import('pdf-lib');
-    const { PDFDocument, rgb, StandardFonts } = pdfLib;
+    setIsGeneratingPreview(true);
+    try {
+      const pdfLib = await import('pdf-lib');
+      const { PDFDocument, rgb, StandardFonts } = pdfLib;
 
-    // --- Helpers locaux ---
-    const A4 = { w: 595.28, h: 841.89 }; // points
-    const margin = 36; // 0.5 inch
+      // --- Helpers locaux ---
+      const A4 = { w: 595.28, h: 841.89 }; // points
+      const margin = 36; // 0.5 inch
 
-    const mm = (x: number) => x * 2.83465;
+      const mm = (x: number) => x * 2.83465;
 
-    const wrapText = (
-      text: string,
-      font: any,
-      size: number,
-      maxWidth: number
-    ): string[] => {
-      if (!text) return [];
-      const words = text.split(/\s+/);
-      const lines: string[] = [];
-      let line = '';
-      for (const w of words) {
-        const test = line ? line + ' ' + w : w;
-        const width = font.widthOfTextAtSize(test, size);
-        if (width > maxWidth && line) {
-          lines.push(line);
-          line = w;
-        } else {
-          line = test;
+      const wrapText = (
+        text: string,
+        font: any,
+        size: number,
+        maxWidth: number
+      ): string[] => {
+        if (!text) return [];
+        const words = text.split(/\s+/);
+        const lines: string[] = [];
+        let line = '';
+        for (const w of words) {
+          const test = line ? line + ' ' + w : w;
+          const width = font.widthOfTextAtSize(test, size);
+          if (width > maxWidth && line) {
+            lines.push(line);
+            line = w;
+          } else {
+            line = test;
+          }
         }
-      }
-      if (line) lines.push(line);
-      return lines;
-    };
+        if (line) lines.push(line);
+        return lines;
+      };
 
-    const drawParagraph = (
-      page: any,
-      text: string,
-      x: number,
-      y: number,
-      font: any,
-      size: number,
-      color: any,
-      maxWidth: number,
-      lineGap = 4
-    ) => {
-      const lines = wrapText(text, font, size, maxWidth);
-      let cursorY = y;
-      for (const line of lines) {
-        page.drawText(line, { x, y: cursorY, size, font, color });
-        cursorY -= size + lineGap;
-        if (cursorY < margin) break; // pas de pagination automatique ici
-      }
-      return cursorY;
-    };
+      const drawParagraph = (
+        page: any,
+        text: string,
+        x: number,
+        y: number,
+        font: any,
+        size: number,
+        color: any,
+        maxWidth: number,
+        lineGap = 4
+      ) => {
+        const lines = wrapText(text, font, size, maxWidth);
+        let cursorY = y;
+        for (const line of lines) {
+          page.drawText(line, { x, y: cursorY, size, font, color });
+          cursorY -= size + lineGap;
+          if (cursorY < margin) break;
+        }
+        return cursorY;
+      };
 
-    const fetchImageBytes = async (url?: string | null): Promise<Uint8Array | null> => {
-      if (!url) return null;
-      try {
-        const res = await fetch(url);
-        if (!res.ok) return null;
-        const buf = await res.arrayBuffer();
-        return new Uint8Array(buf);
-      } catch {
-        return null;
-      }
-    };
+      const fetchImageBytes = async (url?: string | null): Promise<Uint8Array | null> => {
+        if (!url) return null;
+        try {
+          const res = await fetch(url);
+          if (!res.ok) return null;
+          const buf = await res.arrayBuffer();
+          return new Uint8Array(buf);
+        } catch {
+          return null;
+        }
+      };
 
-    const drawImageFitted = async (
-      pdfDoc: any,
-      page: any,
-      url: string | undefined,
-      x: number,
-      y: number,
-      boxW: number,
-      boxH: number
-    ) => {
-      const bytes = await fetchImageBytes(url);
-      if (!bytes) {
-        // placeholder si pas d'image
-        page.drawRectangle({
-          x, y,
-          width: boxW,
-          height: boxH,
-          color: rgb(0.95, 0.94, 0.92),
-          borderColor: rgb(0.8, 0.8, 0.8),
-          borderWidth: 1
-        });
-        page.drawText('Image indisponible', {
-          x: x + 12,
-          y: y + boxH / 2 - 6,
-          size: 12,
-          color: rgb(0.4, 0.35, 0.3)
-        });
-        return;
-      }
+      const drawImageFitted = async (
+        pdfDoc: any,
+        page: any,
+        url: string | undefined,
+        x: number,
+        y: number,
+        boxW: number,
+        boxH: number
+      ) => {
+        const bytes = await fetchImageBytes(url);
+        if (!bytes) {
+          // placeholder si pas d'image
+          page.drawRectangle({
+            x, y,
+            width: boxW,
+            height: boxH,
+            color: rgb(0.95, 0.94, 0.92),
+            borderColor: rgb(0.8, 0.8, 0.8),
+            borderWidth: 1
+          });
+          page.drawText('Image indisponible', {
+            x: x + 12,
+            y: y + boxH / 2 - 6,
+            size: 12,
+            color: rgb(0.4, 0.35, 0.3)
+          });
+          return;
+        }
 
-      // deviner PNG ou JPG très simplement (content-type inaccessible proprement via fetch sur certains domaines)
-      const isPng = url?.toLowerCase().endsWith('.png');
-      const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-      const { width, height } = img.size();
+        const isPng = url?.toLowerCase().endsWith('.png');
+        const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+        const { width, height } = img.size();
 
-      const scale = Math.min(boxW / width, boxH / height);
-      const w = width * scale;
-      const h = height * scale;
-      const cx = x + (boxW - w) / 2;
-      const cy = y + (boxH - h) / 2;
+        const scale = Math.min(boxW / width, boxH / height);
+        const w = width * scale;
+        const h = height * scale;
+        const cx = x + (boxW - w) / 2;
+        const cy = y + (boxH - h) / 2;
 
-      page.drawImage(img, { x: cx, y: cy, width: w, height: h });
-    };
+        page.drawImage(img, { x: cx, y: cy, width: w, height: h });
+      };
 
-    // --- Création du doc + polices ---
-    const pdfDoc = await PDFDocument.create();
-    const fontTitle = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
-    const fontBody = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-    const colorTitle = rgb(0.2, 0.1, 0.05);
-    const colorBody = rgb(0.25, 0.2, 0.17);
+      // --- Création du doc + polices ---
+      const pdfDoc = await PDFDocument.create();
+      const fontTitle = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+      const fontBody = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+      const colorTitle = rgb(0.2, 0.1, 0.05);
+      const colorBody = rgb(0.25, 0.2, 0.17);
 
-    // --- 1) Couverture ---
-    const cover = pdfDoc.addPage([A4.w, A4.h]);
-    cover.drawRectangle({
-      x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972) // bg-cream
-    });
-    // image héro si dispo
-    await drawImageFitted(
-      pdfDoc,
-      cover,
-      bookRecipes[0]?.imageUrl,
-      margin,
-      A4.h / 2,
-      A4.w - margin * 2,
-      A4.h / 2 - margin
-    );
-    cover.drawText(book.title, {
-      x: margin,
-      y: A4.h - margin - 40,
-      size: 28,
-      font: fontTitle,
-      color: colorTitle
-    });
-    cover.drawText('Carnet de transmission culinaire', {
-      x: margin,
-      y: A4.h - margin - 70,
-      size: 16,
-      font: fontBody,
-      color: colorBody
-    });
-    cover.drawText(`${bookRecipes.length} recettes de famille`, {
-      x: margin,
-      y: A4.h - margin - 95,
-      size: 12,
-      font: fontBody,
-      color: colorBody
-    });
+      // --- 1) Couverture améliorée ---
+      const cover = pdfDoc.addPage([A4.w, A4.h]);
 
-    // --- 2) Sommaire ---
-    const toc = pdfDoc.addPage([A4.w, A4.h]);
-    toc.drawText('Sommaire', {
-      x: margin,
-      y: A4.h - margin - 20,
-      size: 22,
-      font: fontTitle,
-      color: colorTitle
-    });
-    let yToc = A4.h - margin - 60;
-    bookRecipes.forEach((r, i) => {
-      const line = `${(i + 1).toString().padStart(2, '0')}  ${r.title}`;
-      toc.drawText(line, {
-        x: margin,
-        y: yToc,
-        size: 12,
-        font: fontBody,
-        color: colorBody
+      // 📝 ZONE TITRE (1/3 supérieur) - Élégante
+      const titleZoneHeight = A4.h / 3;
+
+      // Fond titre élégant
+      cover.drawRectangle({
+        x: 0, y: A4.h - titleZoneHeight,
+        width: A4.w, height: titleZoneHeight,
+        color: rgb(0.95, 0.94, 0.90) // Beige doux
       });
-      yToc -= 18;
-      if (yToc < margin + 40) {
-        // nouvelle page de sommaire si nécessaire (au cas où tu as vraiment beaucoup de recettes)
-        yToc = A4.h - margin - 20;
-      }
-    });
 
-    // --- 3) Pages par recette : 2 pages (photo + contenu) ---
-    for (const recipe of bookRecipes) {
-      // 3.1) Page Photo
-      const pPhoto = pdfDoc.addPage([A4.w, A4.h]);
-      pPhoto.drawRectangle({
-        x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
+      // Ligne séparatrice subtile
+      cover.drawRectangle({
+        x: 0, y: A4.h - titleZoneHeight,
+        width: A4.w, height: 2,
+        color: rgb(0.85, 0.82, 0.76) // Ligne dorée
       });
+
+      // TITRE PRINCIPAL - Centré et lisible
+      const titleLines = wrapText(book.title, fontTitle, 32, A4.w - 80);
+      let titleY = A4.h - 60;
+
+      titleLines.forEach(line => {
+        const textWidth = fontTitle.widthOfTextAtSize(line, 32);
+        cover.drawText(line, {
+          x: (A4.w - textWidth) / 2, // Centré
+          y: titleY,
+          size: 32,
+          font: fontTitle,
+          color: rgb(0.15, 0.10, 0.05) // Brun élégant
+        });
+        titleY -= 40;
+      });
+
+      // SOUS-TITRE stylé
+      cover.drawText('Carnet de recettes familiales', {
+        x: 40, y: A4.h - titleZoneHeight + 80,
+        size: 16, font: fontBody,
+        color: rgb(0.4, 0.35, 0.30)
+      });
+
+      // NOMBRE DE RECETTES
+      cover.drawText(`${bookRecipes.length} recettes de famille`, {
+        x: 40, y: A4.h - titleZoneHeight + 50,
+        size: 14, font: fontBody,
+        color: rgb(0.5, 0.45, 0.40)
+      });
+
+      // 📸 ZONE PHOTO (2/3 inférieur) - PLEINE LARGEUR
+      const photoHeight = (A4.h * 2) / 3;
       await drawImageFitted(
-        pdfDoc,
-        pPhoto,
-        recipe.imageUrl,
-        margin,
-        margin + mm(20),
-        A4.w - margin * 2,
-        A4.h - margin * 2 - mm(40)
+        pdfDoc, cover, 
+        book.coverImageUrl || bookRecipes[0]?.imageUrl, // 🆕 Photo dédiée ou fallback
+        0, 0,  // Pas de marge = pleine largeur
+        A4.w, photoHeight       // Toute la largeur
       );
-      // bandeau titre bas
-      pPhoto.drawRectangle({
-        x: 0, y: margin, width: A4.w, height: mm(18),
-        color: rgb(0.18, 0.10, 0.06)
-      });
-      pPhoto.drawText(recipe.title, {
+
+      // --- 2) Sommaire ---
+      const toc = pdfDoc.addPage([A4.w, A4.h]);
+      toc.drawText('Sommaire', {
         x: margin,
-        y: margin + 6,
-        size: 14,
+        y: A4.h - margin - 20,
+        size: 22,
         font: fontTitle,
-        color: rgb(1, 1, 1)
+        color: colorTitle
       });
-      if (recipe.author) {
-        pPhoto.drawText(`par ${recipe.author}`, {
-          x: margin + 240,
-          y: margin + 6,
+      let yToc = A4.h - margin - 60;
+      bookRecipes.forEach((r, i) => {
+        const line = `${(i + 1).toString().padStart(2, '0')}  ${r.title}`;
+        toc.drawText(line, {
+          x: margin,
+          y: yToc,
           size: 12,
-          font: fontBody,
-          color: rgb(1, 1, 1)
-        });
-      }
-
-      // 3.2) Page Contenu
-      const pCont = pdfDoc.addPage([A4.w, A4.h]);
-      pCont.drawRectangle({
-        x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
-      });
-
-      // Header
-      pCont.drawText(recipe.title, {
-        x: margin,
-        y: A4.h - margin - 24,
-        size: 18,
-        font: fontTitle,
-        color: colorTitle
-      });
-      const meta = `${recipe.prepMinutes || 30} min • ${recipe.servings || '4'} pers.`;
-      pCont.drawText(meta, {
-        x: margin,
-        y: A4.h - margin - 42,
-        size: 12,
-        font: fontBody,
-        color: colorBody
-      });
-
-      // Colonnes
-      const colGap = 18;
-      const colW = (A4.w - margin * 2 - colGap) / 2;
-      let yLeft = A4.h - margin - 70;
-      let yRight = A4.h - margin - 70;
-
-      // Ingrédients (gauche)
-      pCont.drawText('Ingrédients', {
-        x: margin,
-        y: yLeft,
-        size: 14,
-        font: fontTitle,
-        color: colorTitle
-      });
-      yLeft -= 18;
-
-      const ingredients: string[] = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-      for (const ing of ingredients) {
-        // puce
-        pCont.drawCircle({ x: margin + 3, y: yLeft + 4, size: 1.5, color: colorBody });
-        yLeft = drawParagraph(pCont, ing, margin + 10, yLeft, fontBody, 11, colorBody, colW - 12, 3) - 6;
-        if (yLeft < margin + 40) break; // pas de pagination supplémentaire dans Option A
-      }
-
-      // Préparation (droite)
-      pCont.drawText('Préparation', {
-        x: margin + colW + colGap,
-        y: yRight,
-        size: 14,
-        font: fontTitle,
-        color: colorTitle
-      });
-      yRight -= 18;
-
-      const steps: string[] =
-        typeof recipe.steps === 'string'
-          ? recipe.steps.split('\n\n').filter(s => s.trim())
-          : Array.isArray(recipe.steps)
-          ? recipe.steps
-          : [];
-
-      steps.forEach((step, idx) => {
-        const prefix = `${idx + 1}. `;
-        const prefixWidth = fontBody.widthOfTextAtSize(prefix, 11);
-        // numéro
-        pCont.drawText(prefix, {
-          x: margin + colW + colGap,
-          y: yRight,
-          size: 11,
           font: fontBody,
           color: colorBody
         });
-        // texte wrap
-        yRight = drawParagraph(
-          pCont,
-          step,
-          margin + colW + colGap + prefixWidth,
-          yRight,
-          fontBody,
-          11,
-          colorBody,
-          colW - prefixWidth - 6,
-          3
-        ) - 4;
-        if (yRight < margin + 40) return; // pas de pagination supplémentaire dans Option A
+        yToc -= 18;
+        if (yToc < margin + 40) {
+          yToc = A4.h - margin - 20;
+        }
       });
+
+      // --- 3) Pages par recette : 2 pages (photo + contenu) ---
+      for (const recipe of bookRecipes) {
+        // 3.1) Page Photo
+        const pPhoto = pdfDoc.addPage([A4.w, A4.h]);
+        pPhoto.drawRectangle({
+          x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
+        });
+        await drawImageFitted(
+          pdfDoc,
+          pPhoto,
+          recipe.imageUrl,
+          margin,
+          margin + mm(20),
+          A4.w - margin * 2,
+          A4.h - margin * 2 - mm(40)
+        );
+        // bandeau titre bas
+        pPhoto.drawRectangle({
+          x: 0, y: margin, width: A4.w, height: mm(18),
+          color: rgb(0.18, 0.10, 0.06)
+        });
+        pPhoto.drawText(recipe.title, {
+          x: margin,
+          y: margin + 6,
+          size: 14,
+          font: fontTitle,
+          color: rgb(1, 1, 1)
+        });
+        if (recipe.author) {
+          pPhoto.drawText(`par ${recipe.author}`, {
+            x: margin + 240,
+            y: margin + 6,
+            size: 12,
+            font: fontBody,
+            color: rgb(1, 1, 1)
+          });
+        }
+
+        // 3.2) Page Contenu
+        const pCont = pdfDoc.addPage([A4.w, A4.h]);
+        pCont.drawRectangle({
+          x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
+        });
+
+        // Header
+        pCont.drawText(recipe.title, {
+          x: margin,
+          y: A4.h - margin - 24,
+          size: 18,
+          font: fontTitle,
+          color: colorTitle
+        });
+        const meta = `${recipe.prepMinutes || 30} min • ${recipe.servings || '4'} pers.`;
+        pCont.drawText(meta, {
+          x: margin,
+          y: A4.h - margin - 42,
+          size: 12,
+          font: fontBody,
+          color: colorBody
+        });
+
+        // Colonnes
+        const colGap = 18;
+        const colW = (A4.w - margin * 2 - colGap) / 2;
+        let yLeft = A4.h - margin - 70;
+        let yRight = A4.h - margin - 70;
+
+        // Ingrédients (gauche)
+        pCont.drawText('Ingrédients', {
+          x: margin,
+          y: yLeft,
+          size: 14,
+          font: fontTitle,
+          color: colorTitle
+        });
+        yLeft -= 18;
+
+        const ingredients: string[] = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+        for (const ing of ingredients) {
+          // puce
+          pCont.drawCircle({ x: margin + 3, y: yLeft + 4, size: 1.5, color: colorBody });
+          yLeft = drawParagraph(pCont, ing, margin + 10, yLeft, fontBody, 11, colorBody, colW - 12, 3) - 6;
+          if (yLeft < margin + 40) break;
+        }
+
+        // Préparation (droite)
+        pCont.drawText('Préparation', {
+          x: margin + colW + colGap,
+          y: yRight,
+          size: 14,
+          font: fontTitle,
+          color: colorTitle
+        });
+        yRight -= 18;
+
+        const steps: string[] =
+          typeof recipe.steps === 'string'
+            ? recipe.steps.split('\n\n').filter(s => s.trim())
+            : Array.isArray(recipe.steps)
+            ? recipe.steps
+            : [];
+
+        steps.forEach((step, idx) => {
+          const prefix = `${idx + 1}. `;
+          const prefixWidth = fontBody.widthOfTextAtSize(prefix, 11);
+          // numéro
+          pCont.drawText(prefix, {
+            x: margin + colW + colGap,
+            y: yRight,
+            size: 11,
+            font: fontBody,
+            color: colorBody
+          });
+          // texte wrap
+          yRight = drawParagraph(
+            pCont,
+            step,
+            margin + colW + colGap + prefixWidth,
+            yRight,
+            fontBody,
+            11,
+            colorBody,
+            colW - prefixWidth - 6,
+            3
+          ) - 4;
+          if (yRight < margin + 40) return;
+        });
+      }
+
+      // --- Export ---
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      setShowPDFModal(true);
+    } catch (error) {
+      console.error('PDF error', error);
+      alert('Erreur lors de la génération du PDF');
+    } finally {
+      setIsGeneratingPreview(false);
     }
-
-    // --- Export ---
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    setPdfUrl(url);
-    setShowPDFModal(true);
-  } catch (error) {
-    console.error('PDF error', error);
-    alert('Erreur lors de la génération du PDF');
-  } finally {
-    setIsGeneratingPreview(false);
-  }
-};
-
+  };
 
   // Fermer la modale PDF
   const closePDFModal = () => {
@@ -526,6 +570,114 @@ const generatePreviewPDF = async () => {
                 {bookDescription || "Aucune description pour le moment. Cliquez sur l'icône pour en ajouter une."}
               </p>
             )}
+          </div>
+
+          {/* 🆕 Photo de couverture */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">📸 Photo de couverture</h2>
+              <button
+                onClick={() => setEditingCover(!editingCover)}
+                className="text-gray-500 hover:text-gray-700 p-1"
+              >
+                <Edit3 className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {editingCover ? (
+              <div className="space-y-4">
+                {/* Upload + Unsplash */}
+                <div className="flex flex-wrap gap-3">
+                  {/* Upload photo personnelle */}
+                  <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleCoverImageUpload(file);
+                      }}
+                      className="hidden"
+                      disabled={isUploadingCover}
+                    />
+                    📷 {isUploadingCover ? "Upload..." : "Ma photo"}
+                  </label>
+
+                  {/* Recherche Unsplash */}
+                  <ImageSearch 
+                    onImageSelect={(url) => {
+                      setCoverImageUrl(url);
+                      updateBook(book.id, { coverImageUrl: url });
+                    }}
+                    initialQuery={`${book.title} family cooking`}
+                  />
+                  
+                  {/* URL manuelle */}
+                  <input
+                    type="url"
+                    value={coverImageUrl}
+                    onChange={(e) => setCoverImageUrl(e.target.value)}
+                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
+                    placeholder="Ou collez un lien d'image..."
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      updateBook(book.id, { coverImageUrl });
+                      setEditingCover(false);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Sauvegarder
+                  </button>
+                  <button
+                    onClick={() => setEditingCover(false)}
+                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                {coverImageUrl ? (
+                  <div className="relative">
+                    <img 
+                      src={coverImageUrl} 
+                      alt="Couverture" 
+                      className="w-full max-w-sm h-64 object-cover rounded-lg border"
+                    />
+                    <button
+                      onClick={() => {
+                        setCoverImageUrl("");
+                        updateBook(book.id, { coverImageUrl: "" });
+                      }}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <div className="text-4xl mb-2">📷</div>
+                    <p className="text-gray-600 mb-4">Aucune photo de couverture</p>
+                    <button
+                      onClick={() => setEditingCover(true)}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Ajouter une photo
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <p className="text-xs text-gray-500 mt-3">
+              💡 <strong>Idée :</strong> Photo de famille en cuisine, portrait de grand-mère, ou image symbolique
+            </p>
           </div>
 
           {/* Contenu du livre */}
