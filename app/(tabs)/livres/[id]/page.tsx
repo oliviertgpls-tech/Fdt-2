@@ -37,8 +37,6 @@ export default function BookPage() {
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [editingCover, setEditingCover] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
-  const [bookTitle, setBookTitle] = useState(book?.title || '');
-  const [editingTitle, setEditingTitle] = useState(false);
   
   // États pour la modale PDF
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -50,8 +48,10 @@ export default function BookPage() {
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
     !book?.recipeIds?.includes(recipe.id)
-  );
 
+  const [bookTitle, setBookTitle] = useState(book?.title || '');
+  const [editingTitle, setEditingTitle] = useState(false);
+  );
   // Initialiser les états
   useEffect(() => {
     if (book) {
