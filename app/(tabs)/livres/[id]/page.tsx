@@ -37,6 +37,8 @@ export default function BookPage() {
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [editingCover, setEditingCover] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [bookTitle, setBookTitle] = useState(book?.title || '');
+  const [editingTitle, setEditingTitle] = useState(false);
   
   // États pour la modale PDF
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -55,8 +57,17 @@ export default function BookPage() {
     if (book) {
       setBookDescription(book.description || '');
       setCoverImageUrl(book.coverImageUrl || '');
+      setBookTitle(book.title || '');
     }
   }, [book]);
+
+  // 🆕 FONCTION save titre
+const saveTitle = () => {
+  if (book && bookTitle.trim()) {
+    updateBook(book.id, { title: bookTitle.trim() });
+    setEditingTitle(false);
+    }
+  };
 
   // 🆕 FONCTION upload photo couverture
   const handleCoverImageUpload = async (file: File) => {
@@ -487,46 +498,83 @@ export default function BookPage() {
     <div className="min-h-screen bg-stone-100">
       <div className="max-w-6xl mx-auto pt-8 px-8">
         
-        {/* En-tête */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour
-            </button>
-            
-            <div>
-              <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
-              <p className="text-sm text-gray-600">
-                {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            {/* Bouton aperçu PDF */}
-            <button
-              onClick={generatePreviewPDF}
-              disabled={isGeneratingPreview}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-            >
-              {isGeneratingPreview ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Génération...
-                </>
-              ) : (
-                <>
-                  <Eye className="w-4 h-4" />
-                  Aperçu PDF
-                </>
-              )}
-            </button>
-          </div>
+        {/* En-tête avec titre éditable */}
+<div className="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between mb-8">
+  <div className="flex items-center gap-4">
+    <button
+      onClick={() => router.back()}
+      className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
+    >
+      <ArrowLeft className="w-4 h-4" />
+      Retour
+    </button>
+    
+    <div className="flex-1">
+      {editingTitle ? (
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            value={bookTitle}
+            onChange={(e) => setBookTitle(e.target.value)}
+            className="text-xl font-semibold text-gray-800 border border-gray-300 rounded px-3 py-1 focus:border-orange-500 focus:outline-none"
+            placeholder="Titre du livre"
+            autoFocus
+          />
+          <button
+            onClick={saveTitle}
+            disabled={!bookTitle.trim()}
+            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+          >
+            ✓
+          </button>
+          <button
+            onClick={() => {
+              setBookTitle(book.title);
+              setEditingTitle(false);
+            }}
+            className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200"
+          >
+            ✕
+          </button>
         </div>
+      ) : (
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
+          <button
+            onClick={() => setEditingTitle(true)}
+            className="text-gray-400 hover:text-gray-600 p-1"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      <p className="text-sm text-gray-600">
+        {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
+      </p>
+    </div>
+  </div>
+  
+  <div className="flex items-center gap-3">
+    {/* Bouton aperçu PDF */}
+    <button
+      onClick={generatePreviewPDF}
+      disabled={isGeneratingPreview}
+      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+    >
+      {isGeneratingPreview ? (
+        <>
+          <Loader className="w-4 h-4 animate-spin" />
+          Génération...
+        </>
+      ) : (
+        <>
+          <Eye className="w-4 h-4" />
+          Aperçu PDF
+        </>
+      )}
+    </button>
+  </div>
+</div>
 
         <div className="space-y-6">
           
