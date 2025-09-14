@@ -9,7 +9,7 @@ import Link from 'next/link';
 export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook } = useRecipes();
   
   // Trouver le carnet actuel
   const currentCarnet = notebooks.find(n => n.id === id);
