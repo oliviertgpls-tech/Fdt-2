@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Plus, Eye, Move, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
@@ -9,18 +9,10 @@ import Link from 'next/link';
 export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook } = useRecipes();
   
   // Trouver le carnet actuel
   const currentCarnet = notebooks.find(n => n.id === id);
-
-  const handleAddRecipe = (carnetId: string, recipeId: string) => {
-    addRecipeToNotebook(carnetId, recipeId);
-  };
-
-  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-    removeRecipeFromNotebook(carnetId, recipeId);
-  };
 
   if (!currentCarnet) {
     return (
@@ -49,6 +41,31 @@ export default function CarnetEditPage() {
   const availableRecipes = recipes.filter(recipe => 
     !actualCarnet.recipeIds || !actualCarnet.recipeIds.includes(recipe.id)
   );
+
+  const handleAddRecipe = (carnetId: string, recipeId: string) => {
+    addRecipeToNotebook(carnetId, recipeId);
+  };
+
+  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
+    removeRecipeFromNotebook(carnetId, recipeId);
+  };
+
+  const handleCreateBookFromCarnet = async () => {
+    if (!actualCarnet || !carnetRecipes.length) return;
+    
+    try {
+      const bookTitle = `Livre - ${actualCarnet.title}`;
+      const recipeIds = carnetRecipes.map(r => r.id);
+      
+      const newBook = await createBook(bookTitle, recipeIds);
+      
+      // Rediriger vers la page du livre créé
+      router.push(`/livres/${newBook.id}`);
+    } catch (error) {
+      console.error('Erreur lors de la création du livre:', error);
+      alert('Erreur lors de la création du livre');
+    }
+  };
 
   return (
     <div className="space-y-8">
