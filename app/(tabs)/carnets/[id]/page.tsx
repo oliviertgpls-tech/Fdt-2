@@ -91,13 +91,13 @@ export default function CarnetPage() {
           </Link>
           
           {carnetRecipes.length > 0 && (
-            <Link
-              href={`/livres/nouveau?carnet=${id}`}
+            <button
+              onClick={handleCreateBookFromCarnet}
               className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Créer un livre
-            </Link>
+            </button>
           )}
         </div>
       </div>
