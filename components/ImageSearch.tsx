@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Search, Image as ImageIcon, X, Loader } from 'lucide-react';
+import { Image as ImageIcon, X, Loader } from 'lucide-react';
 
 type UnsplashImage = {
   id: string;
@@ -121,20 +121,16 @@ export function ImageSearch({ onImageSelect, initialQuery = "" }: ImageSearchPro
                 </button>
               </div>
               
-              {/* 🆕 BARRE DE RECHERCHE CORRIGÉE */}
+              {/* 🆕 BARRE DE RECHERCHE CLEAN - SANS ICÔNE */}
               <form onSubmit={handleSearch} className="flex gap-3">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Ex: pizza, gâteau au chocolat, salade..."
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    autoFocus
-                  />
-                  {/* 🆕 ICÔNE CORRECTEMENT POSITIONNÉE */}
-                  <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-                </div>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Ex: pizza, gâteau au chocolat, salade..."
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  autoFocus
+                />
                 <button
                   type="submit"
                   disabled={loading || !query.trim()}
