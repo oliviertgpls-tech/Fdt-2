@@ -49,26 +49,34 @@ export default function EditRecipePage() {
     setIsUploading(true);
     
     try {
-      // Créer un FormData pour l'upload
+      console.log('🚀 Upload en cours...', file.name);
+      
       const formData = new FormData();
       formData.append('file', file);
       
-      // Simuler un upload (à remplacer par votre service d'upload)
-      // Pour l'instant, on crée une URL temporaire
-      const tempUrl = URL.createObjectURL(file);
-      setImageUrl(tempUrl);
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
       
-      // Dans un vrai projet, vous feriez quelque chose comme :
-      // const response = await fetch('/api/upload', {
-      //   method: 'POST',
-      //   body: formData
-      // });
-      // const { url } = await response.json();
-      // setImageUrl(url);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
       
-    } catch (error) {
-      alert("Erreur lors de l'upload de l'image");
-      console.error(error);
+      const result = await response.json();
+      console.log('✅ Upload réussi:', result);
+      
+      if (result.success) {
+        setImageUrl(result.imageUrl); // URL permanente : /uploads/filename.jpg
+        console.log('📸 Image URL mise à jour:', result.imageUrl);
+      } else {
+        throw new Error(result.error || 'Erreur upload');
+      }
+      
+    } catch (error: any) {
+      console.error('💥 Erreur upload:', error);
+      alert("Erreur lors de l'upload : " + error.message);
     } finally {
       setIsUploading(false);
     }
