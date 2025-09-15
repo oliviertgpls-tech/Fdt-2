@@ -121,18 +121,18 @@ export default function CarnetPage() {
 
       {/* Barre de recherche */}
       {carnetRecipes.length > 0 && (
-        <div className="relative">
-          <input
-            type="text"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-10 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            placeholder="Rechercher dans ce carnet..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="w-5 h-5 text-gray-400" />
-          </div>
+      <div className="relative">
+        <input
+          type="text"
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-12 pr-4 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder="Rechercher une recette (titre, ingrédients, auteur...)"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+          <span className="text-gray-400 text-lg">🔍</span>
         </div>
+      </div>
       )}
 
       {/* Liste des recettes */}
