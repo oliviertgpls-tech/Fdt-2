@@ -53,7 +53,6 @@ export default function BookPage() {
   // 🆕 AJOUTE les nouveaux états
   const [bookTitle, setBookTitle] = useState(book?.title || '');
   const [editingTitle, setEditingTitle] = useState(false);
-  const [editingTitle, setEditingTitle] = useState(false);
   
   // Initialiser les états
   useEffect(() => {
