@@ -2,7 +2,344 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
+
+// Service IA OpenAI simplifié
+class OpenAIService {
+  private apiKey: string;
+  private baseUrl = 'https://api.openai.com/v1';
+
+  constructor() {
+    this.apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || '';
+  }
+
+  async analyzePhotoToRecipe(imageFile: File): Promise<{
+    title: string;
+    author: string;
+    prepMinutes: number;
+    servings: string;
+    ingredients: string[];
+    steps: string;
+    confidence: number;
+  }> {
+    if (!this.apiKey) {
+      throw new Error('Clé OpenAI manquante');
+    }
+
+    try {
+      const base64Image = await this.fileToBase64(imageFile);
+      
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Analysez cette photo de plat et créez une recette complète au format JSON.
+
+INSTRUCTIONS :
+- Identifiez le plat principal visible
+- Estimez les ingrédients probables
+- Proposez une méthode de préparation réaliste
+- Donnez un niveau de confiance (0-100)
+
+FORMAT DE RÉPONSE (JSON uniquement) :
+{
+  "title": "Nom du plat",
+  "author": "Recette générée par IA",
+  "prepMinutes": 30,
+  "servings": "4 personnes",
+  "ingredients": ["ingrédient 1", "ingrédient 2", ...],
+  "steps": "Étape 1...\n\nÉtape 2...\n\nÉtape 3...",
+  "confidence": 85
+}`
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${base64Image}`,
+                    detail: "high"
+                  }
+                }
+              ]
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API OpenAI: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Pas de réponse de l\'IA');
+      }
+
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Format de réponse invalide');
+      }
+
+      return JSON.parse(jsonMatch[0]);
+      
+    } catch (error) {
+      console.error('Erreur analyse photo:', error);
+      throw new Error('Impossible d\'analyser cette image');
+    }
+  }
+
+  async analyzeManuscriptToRecipe(imageFile: File): Promise<{
+    title: string;
+    author: string;
+    prepMinutes: number;
+    servings: string;
+    ingredients: string[];
+    steps: string;
+    confidence: number;
+  }> {
+    if (!this.apiKey) {
+      throw new Error('Clé OpenAI manquante');
+    }
+
+    try {
+      const base64Image = await this.fileToBase64(imageFile);
+      
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Lisez cette recette manuscrite et structurez-la au format JSON.
+
+INSTRUCTIONS :
+- Lisez tout le texte visible (titre, ingrédients, étapes)
+- Extrayez et structurez les informations
+- Corrigez l'orthographe si nécessaire
+- Estimez temps et portions si non mentionnés
+
+FORMAT DE RÉPONSE (JSON uniquement) :
+{
+  "title": "Titre de la recette",
+  "author": "Nom trouvé ou 'Recette familiale'",
+  "prepMinutes": 30,
+  "servings": "4 personnes",
+  "ingredients": ["ingrédient 1", "ingrédient 2", ...],
+  "steps": "Étape 1...\n\nÉtape 2...\n\nÉtape 3...",
+  "confidence": 90
+}`
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${base64Image}`,
+                    detail: "high"
+                  }
+                }
+              ]
+            }
+          ],
+          max_tokens: 1200,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API OpenAI: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Pas de réponse de l\'IA');
+      }
+
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Format de réponse invalide');
+      }
+
+      return JSON.parse(jsonMatch[0]);
+      
+    } catch (error) {
+      console.error('Erreur analyse manuscrit:', error);
+      throw new Error('Impossible de lire cette recette manuscrite');
+    }
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        const base64Data = base64.split(',')[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+// Composant pour recherche d'images Unsplash
+function ImageSearch({ onImageSelect, initialQuery = "" }: {
+  onImageSelect: (imageUrl: string) => void;
+  initialQuery?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState(initialQuery);
+  const [images, setImages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const searchImages = async (searchQuery: string) => {
+    if (!searchQuery.trim()) return;
+    
+    setLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=12&orientation=landscape`,
+        {
+          headers: {
+            'Authorization': `Client-ID ${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la recherche d\'images');
+      }
+      
+      const data = await response.json();
+      setImages(data.results || []);
+      
+      if (data.results?.length === 0) {
+        setError("Aucune image trouvée. Essayez d'autres mots-clés.");
+      }
+    } catch (err) {
+      setError("Erreur lors de la recherche. Vérifiez votre connexion.");
+      console.error('Erreur Unsplash:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    searchImages(query);
+  };
+
+  const handleImageSelect = (image: any) => {
+    onImageSelect(image.urls.regular);
+    setIsOpen(false);
+    setQuery("");
+    setImages([]);
+  };
+
+  if (!isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+      >
+        <ImageIcon className="w-4 h-4" />
+        Chercher une image
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] shadow-2xl flex flex-col">
+        
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold text-gray-900">
+              🖼️ Choisir une image
+            </h3>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-400 hover:text-gray-600 p-2"
+            >
+              ×
+            </button>
+          </div>
+          
+          <form onSubmit={handleSearch} className="flex gap-3">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ex: pizza, gâteau au chocolat, salade..."
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? "..." : "Chercher"}
+            </button>
+          </form>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          {error && (
+            <div className="text-center py-8">
+              <p className="text-gray-600">{error}</p>
+            </div>
+          )}
+
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {images.map((image) => (
+                <div
+                  key={image.id}
+                  onClick={() => handleImageSelect(image)}
+                  className="aspect-[4/3] rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                >
+                  <img
+                    src={image.urls.small}
+                    alt={image.alt_description || "Photo de recette"}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const openAIService = new OpenAIService();
 
 export default function AddRecipePage() {
   const router = useRouter();
@@ -62,7 +399,6 @@ export default function AddRecipePage() {
         updatedAt: Date.now()
       };
 
-      // Appel API direct (sans useRecipes pour l'instant)
       const response = await fetch('/api/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,51 +416,20 @@ export default function AddRecipePage() {
     }
   };
 
-  // Simulation IA pour l'instant (remplacera openAIService plus tard)
+  // VRAIE analyse photo avec OpenAI
   const handlePhotoUpload = async (file: File) => {
     setIsProcessing(true);
     
     try {
-      // Simulation de l'analyse IA
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const aiResult = await openAIService.analyzePhotoToRecipe(file);
       
-      // Résultats simulés
-      setTitle("Recette analysée par IA");
-      setAuthor("IA Assistant");
-      setPrepMinutes("30");
-      setServings("4 personnes");
-      setIngredients("Ingrédients détectés par IA\nIngrédient 2\nIngrédient 3");
-      setSteps("Étape 1 : Préparer les ingrédients\n\nÉtape 2 : Mélanger\n\nÉtape 3 : Cuire");
-      setAiConfidence(85);
-      
-      // Image uploadée
-      const tempUrl = URL.createObjectURL(file);
-      setImageUrl(tempUrl);
-      
-      setMode('manual'); // Passer en mode édition
-      
-    } catch (error) {
-      console.error('Erreur analyse IA:', error);
-      alert('Simulation IA - En cours de développement');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleScanUpload = async (file: File) => {
-    setIsProcessing(true);
-    
-    try {
-      // Simulation OCR
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      setTitle("Recette numérisée");
-      setAuthor("Recette familiale");
-      setPrepMinutes("45");
-      setServings("6 personnes");
-      setIngredients("Texte OCR : Ingrédient 1\nIngrédient 2 lu par OCR\nIngrédient 3");
-      setSteps("Étape OCR 1\n\nÉtape OCR 2\n\nÉtape OCR 3");
-      setAiConfidence(78);
+      setTitle(aiResult.title);
+      setAuthor(aiResult.author);
+      setPrepMinutes(aiResult.prepMinutes.toString());
+      setServings(aiResult.servings);
+      setIngredients(aiResult.ingredients.join('\n'));
+      setSteps(aiResult.steps);
+      setAiConfidence(aiResult.confidence);
       
       const tempUrl = URL.createObjectURL(file);
       setImageUrl(tempUrl);
@@ -132,8 +437,36 @@ export default function AddRecipePage() {
       setMode('manual');
       
     } catch (error) {
-      console.error('Erreur OCR:', error);
-      alert('Simulation OCR - En cours de développement');
+      console.error('Erreur analyse IA:', error);
+      alert('Erreur lors de l\'analyse IA. Essayez avec une autre image ou saisissez manuellement.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // VRAIE analyse manuscrit avec OpenAI
+  const handleScanUpload = async (file: File) => {
+    setIsProcessing(true);
+    
+    try {
+      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
+      
+      setTitle(aiResult.title);
+      setAuthor(aiResult.author);
+      setPrepMinutes(aiResult.prepMinutes.toString());
+      setServings(aiResult.servings);
+      setIngredients(aiResult.ingredients.join('\n'));
+      setSteps(aiResult.steps);
+      setAiConfidence(aiResult.confidence);
+      
+      const tempUrl = URL.createObjectURL(file);
+      setImageUrl(tempUrl);
+      
+      setMode('manual');
+      
+    } catch (error) {
+      console.error('Erreur analyse manuscrit:', error);
+      alert('Erreur lors de l\'analyse du manuscrit. Vérifiez que le texte est bien lisible.');
     } finally {
       setIsProcessing(false);
     }
@@ -150,13 +483,13 @@ export default function AddRecipePage() {
             🤖 IA en cours d'analyse...
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
+            Notre IA OpenAI analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Simulation IA - Cela prend 3 secondes...
+            Cela prend généralement 5-10 secondes...
           </p>
         </div>
       </div>
@@ -166,7 +499,6 @@ export default function AddRecipePage() {
   if (mode === 'choose') {
     return (
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* En-tête */}
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold text-gray-900">
             ✨ Nouvelle recette
@@ -176,7 +508,6 @@ export default function AddRecipePage() {
           </p>
         </div>
 
-        {/* 3 modes de création */}
         <div className="grid md:grid-cols-3 gap-8">
           
           {/* Mode 1 : Saisie manuelle */}
@@ -221,16 +552,16 @@ export default function AddRecipePage() {
                   Photo d'un plat
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Prenez en photo votre plat terminé. Notre IA devine la recette et génère automatiquement les instructions.
+                  Prenez en photo votre plat terminé. Notre IA OpenAI devine la recette et génère automatiquement les instructions.
                 </p>
               </div>
               
               <div className="pt-4 space-y-2">
                 <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
-                  🤖 IA Simulation
+                  🤖 IA OpenAI - ~0,01€
                 </div>
                 <p className="text-xs text-gray-500">
-                  Version de démonstration
+                  Analyse intelligente du plat
                 </p>
               </div>
             </div>
@@ -251,35 +582,34 @@ export default function AddRecipePage() {
                   Recette manuscrite
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Photographiez une recette écrite à la main ou imprimée. Notre IA lit et structure automatiquement le texte.
+                  Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI lit et structure automatiquement le texte.
                 </p>
               </div>
               
               <div className="pt-4">
                 <div className="bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
-                  🤖 OCR Simulation
+                  🤖 IA OpenAI - ~0,01€
                 </div>
                 <p className="text-xs text-gray-500">
-                  Version de démonstration
+                  OCR + structuration intelligente
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Infos IA */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
           <div className="flex items-start gap-4">
             <div className="text-3xl">🤖</div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">
-                IA en cours de développement
+                Powered by OpenAI GPT-4 Vision
               </h4>
               <ul className="text-sm text-gray-700 space-y-1">
-                <li>• <strong>Mode manuel</strong> : Entièrement fonctionnel</li>
-                <li>• <strong>IA Photo</strong> : Version simulation (sera OpenAI)</li>
-                <li>• <strong>OCR</strong> : Version simulation (sera OpenAI)</li>
-                <li>• <strong>Éditable</strong> : Vous pouvez corriger tous les résultats</li>
+                <li>• <strong>Analyse intelligente</strong> : Reconnaît les plats et ingrédients</li>
+                <li>• <strong>OCR avancé</strong> : Lit même l'écriture manuscrite</li>
+                <li>• <strong>Coût transparent</strong> : ~0,01€ par analyse</li>
+                <li>• <strong>Éditable</strong> : Vous pouvez corriger le résultat</li>
               </ul>
             </div>
           </div>
@@ -299,7 +629,7 @@ export default function AddRecipePage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            📸 Photo d'un plat (Simulation)
+            📸 Photo d'un plat
           </h1>
         </div>
 
@@ -312,7 +642,7 @@ export default function AddRecipePage() {
             Photographiez votre plat
           </h2>
           <p className="text-gray-600 mb-8">
-            Mode démonstration : L'IA va simuler une analyse de votre photo
+            Notre IA OpenAI va analyser votre photo et créer automatiquement la recette complète
           </p>
 
           <label className="inline-block">
@@ -327,16 +657,17 @@ export default function AddRecipePage() {
             />
             <div className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
               <Upload className="w-5 h-5" />
-              Tester l'analyse IA (simulation)
+              Prendre une photo / Choisir une image
             </div>
           </label>
 
           <div className="mt-8 bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <h4 className="font-medium text-orange-800 mb-2">🔬 Mode démonstration</h4>
+            <h4 className="font-medium text-orange-800 mb-2">🤖 Conseils pour l'IA</h4>
             <ul className="text-sm text-orange-700 text-left space-y-1">
-              <li>• L'IA générera des données de test</li>
-              <li>• Vous pourrez modifier tous les champs</li>
-              <li>• La vraie IA OpenAI sera ajoutée plus tard</li>
+              <li>• Cadrez bien le plat au centre</li>
+              <li>• Éclairage naturel de préférence</li>
+              <li>• Évitez les reflets et ombres fortes</li>
+              <li>• L'IA fonctionne mieux avec des plats reconnaissables</li>
             </ul>
           </div>
         </div>
@@ -355,7 +686,7 @@ export default function AddRecipePage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            📄 Recette manuscrite (Simulation)
+            📄 Recette manuscrite
           </h1>
         </div>
 
@@ -368,7 +699,7 @@ export default function AddRecipePage() {
             Scannez votre recette
           </h2>
           <p className="text-gray-600 mb-8">
-            Mode démonstration : L'OCR va simuler la lecture de votre document
+            Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI va lire et structurer le texte automatiquement.
           </p>
 
           <label className="inline-block">
@@ -383,16 +714,17 @@ export default function AddRecipePage() {
             />
             <div className="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
               <Upload className="w-5 h-5" />
-              Tester l'OCR (simulation)
+              Prendre une photo de la recette
             </div>
           </label>
 
           <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-4">
-            <h4 className="font-medium text-green-800 mb-2">🔬 Mode démonstration</h4>
+            <h4 className="font-medium text-green-800 mb-2">📝 Conseils pour l'OCR</h4>
             <ul className="text-sm text-green-700 text-left space-y-1">
-              <li>• L'OCR générera du texte de test</li>
-              <li>• Vous pourrez tout modifier</li>
-              <li>• La vraie IA OpenAI sera ajoutée plus tard</li>
+              <li>• Placez la recette sur une surface plane</li>
+              <li>• Assurez-vous que tout le texte est visible</li>
+              <li>• Éclairage uniforme sans ombres</li>
+              <li>• L'IA lit même l'écriture manuscrite !</li>
             </ul>
           </div>
         </div>
@@ -415,13 +747,12 @@ export default function AddRecipePage() {
         </h1>
       </div>
 
-      {/* Badge confiance IA */}
       {aiConfidence && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
             <div className="text-2xl">🤖</div>
             <div>
-              <h4 className="font-medium text-green-800">Analyse IA terminée (simulation)</h4>
+              <h4 className="font-medium text-green-800">Analyse IA terminée</h4>
               <p className="text-sm text-green-700">
                 Confiance : {aiConfidence}% • Vous pouvez modifier les champs ci-dessous
               </p>
@@ -518,6 +849,11 @@ export default function AddRecipePage() {
                 />
                 📷 {isUploading ? "Upload..." : "Ma photo"}
               </label>
+
+              <ImageSearch 
+                onImageSelect={(url) => setImageUrl(url)}
+                initialQuery={title}
+              />
             </div>
             
             {imageUrl && (
