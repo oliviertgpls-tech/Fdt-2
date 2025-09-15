@@ -50,9 +50,12 @@ export default function BookPage() {
     !book?.recipeIds?.includes(recipe.id)
   );
 
-// 🆕 AJOUTE les nouveaux états
-const [bookTitle, setBookTitle] = useState(book?.title || '');
-const [editingTitle, setEditingTitle] = useState(false);
+  // 🆕 AJOUTE les nouveaux états
+  const [bookTitle, setBookTitle] = useState(book?.title || '');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingTitle, setEditingTitle] = useState(false);
+  // 🆕 États pour titre éditable
+  const [bookTitle, setBookTitle] = useState(book?.title || '');
   const [editingTitle, setEditingTitle] = useState(false);
   );
   // Initialiser les états
