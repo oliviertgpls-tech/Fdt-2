@@ -5,119 +5,33 @@ import { Plus, Eye, Edit3, X, Trash2 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
-// Composant pour afficher les vignettes des recettes d'un carnet
-function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: any[] }) {
-  // Récupérer les recettes du carnet avec des images
-  const carnetRecipes = recipes.filter(recipe => 
-    // Ici on devrait filtrer par carnet, mais pour l'instant on prend les 4 premières avec images
-    recipe.imageUrl
-  ).slice(0, 4);
-
-  if (carnetRecipes.length === 0) {
-    // Fallback vers l'icône si aucune image
-    return (
-      <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
-        📋
-      </div>
-    );
-  }
-
-  // Affichage en mosaïque selon le nombre d'images
-  if (carnetRecipes.length === 1) {
-    return (
-      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden">
-        <img 
-          src={carnetRecipes[0].imageUrl} 
-          alt={carnetRecipes[0].title}
-          className="w-full h-full object-cover"
-        />
-      </div>
-    );
-  }
-
-  if (carnetRecipes.length === 2) {
-    return (
-      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
-        {carnetRecipes.map((recipe, index) => (
-          <img 
-            key={recipe.id}
-            src={recipe.imageUrl} 
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (carnetRecipes.length === 3) {
-    return (
-      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
-        <img 
-          src={carnetRecipes[0].imageUrl} 
-          alt={carnetRecipes[0].title}
-          className="w-full h-full object-cover"
-        />
-        <div className="grid grid-rows-2 gap-0.5">
-          <img 
-            src={carnetRecipes[1].imageUrl} 
-            alt={carnetRecipes[1].title}
-            className="w-full h-full object-cover"
-          />
-          <img 
-            src={carnetRecipes[2].imageUrl} 
-            alt={carnetRecipes[2].title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // 4 images ou plus
-  return (
-    <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 grid-rows-2 gap-0.5">
-      {carnetRecipes.slice(0, 4).map((recipe, index) => (
-        <div key={recipe.id} className="relative">
-          <img 
-            src={recipe.imageUrl} 
-            alt={recipe.title}
-            className="w-full h-full object-cover"
-          />
-          {/* Badge "+X" si plus de 4 recettes */}
-          {index === 3 && carnetRecipes.length > 4 && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                +{carnetRecipes.length - 3}
-              </span>
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function CarnetsPage() {
   const { notebooks, createNotebook, recipes } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   
-  // ✅ CORRECTION - États séparés pour éviter les conflits
-  const [newNotebookTitle, setNewNotebookTitle] = useState('');
-  const [newNotebookDescription, setNewNotebookDescription] = useState('');
+  // ✅ ÉTATS COMPLÈTEMENT SÉPARÉS - CHACUN SA VARIABLE
+  const [carnetTitle, setCarnetTitle] = useState('');           // 🆕 RENOMMÉ
+  const [carnetDescription, setCarnetDescription] = useState(''); // 🆕 RENOMMÉ
 
   const handleCreateCarnet = async () => {
-    if (!newNotebookTitle.trim()) return;
+    if (!carnetTitle.trim()) return;
     
     try {
-      await createNotebook(newNotebookTitle.trim(), newNotebookDescription.trim());
-      // Reset des champs après création
-      setNewNotebookTitle('');
-      setNewNotebookDescription('');
+      await createNotebook(carnetTitle.trim(), carnetDescription.trim());
+      // ✅ RESET AVEC LES BONNES VARIABLES
+      setCarnetTitle('');
+      setCarnetDescription('');
       setShowCreateModal(false);
     } catch (error) {
       console.error('Erreur lors de la création du carnet:', error);
     }
+  };
+
+  // ✅ FONCTION DE RESET PROPRE
+  const resetForm = () => {
+    setCarnetTitle('');
+    setCarnetDescription('');
+    setShowCreateModal(false);
   };
 
   const CreateCarnetModal = () => (
@@ -130,12 +44,7 @@ export default function CarnetsPage() {
               <p className="text-gray-600 mt-1">Organisez vos recettes par thème</p>
             </div>
             <button 
-              onClick={() => {
-                setShowCreateModal(false);
-                // Reset des champs à la fermeture
-                setNewNotebookTitle('');
-                setNewNotebookDescription('');
-              }}
+              onClick={resetForm}
               className="text-gray-400 hover:text-gray-600 p-2"
             >
               <X className="w-5 h-5" />
@@ -143,28 +52,30 @@ export default function CarnetsPage() {
           </div>
 
           <div className="space-y-6">
+            {/* ✅ CHAMP TITRE - VARIABLE DÉDIÉE */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Nom du carnet *
               </label>
               <input
                 type="text"
-                value={newNotebookTitle}
-                onChange={(e) => setNewNotebookTitle(e.target.value)}
+                value={carnetTitle}
+                onChange={(e) => setCarnetTitle(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
                 placeholder="Ex: Desserts de Mamie, Plats du dimanche, Recettes végé..."
                 autoFocus
               />
             </div>
 
+            {/* ✅ CHAMP DESCRIPTION - VARIABLE SÉPARÉE */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Description (optionnel)
               </label>
               <textarea
                 rows={3}
-                value={newNotebookDescription}
-                onChange={(e) => setNewNotebookDescription(e.target.value)}
+                value={carnetDescription}
+                onChange={(e) => setCarnetDescription(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
                 placeholder="Décrivez le thème de ce carnet..."
               />
@@ -184,18 +95,14 @@ export default function CarnetsPage() {
 
             <div className="flex gap-3 pt-4">
               <button
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setNewNotebookTitle('');
-                  setNewNotebookDescription('');
-                }}
+                onClick={resetForm}
                 className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateCarnet}
-                disabled={!newNotebookTitle.trim()}
+                disabled={!carnetTitle.trim()}
                 className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
@@ -206,6 +113,98 @@ export default function CarnetsPage() {
       </div>
     </div>
   );
+
+  // Composant pour afficher les vignettes des recettes d'un carnet
+  function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: any[] }) {
+    // Récupérer les recettes du carnet avec des images
+    const carnetRecipes = recipes.filter(recipe => 
+      recipe.imageUrl
+    ).slice(0, 4);
+
+    if (carnetRecipes.length === 0) {
+      // Fallback vers l'icône si aucune image
+      return (
+        <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
+          📋
+        </div>
+      );
+    }
+
+    // Affichage en mosaïque selon le nombre d'images
+    if (carnetRecipes.length === 1) {
+      return (
+        <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden">
+          <img 
+            src={carnetRecipes[0].imageUrl} 
+            alt={carnetRecipes[0].title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      );
+    }
+
+    if (carnetRecipes.length === 2) {
+      return (
+        <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
+          {carnetRecipes.map((recipe, index) => (
+            <img 
+              key={recipe.id}
+              src={recipe.imageUrl} 
+              alt={recipe.title}
+              className="w-full h-full object-cover"
+            />
+          ))}
+        </div>
+      );
+    }
+
+    if (carnetRecipes.length === 3) {
+      return (
+        <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
+          <img 
+            src={carnetRecipes[0].imageUrl} 
+            alt={carnetRecipes[0].title}
+            className="w-full h-full object-cover"
+          />
+          <div className="grid grid-rows-2 gap-0.5">
+            <img 
+              src={carnetRecipes[1].imageUrl} 
+              alt={carnetRecipes[1].title}
+              className="w-full h-full object-cover"
+            />
+            <img 
+              src={carnetRecipes[2].imageUrl} 
+              alt={carnetRecipes[2].title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      );
+    }
+
+    // 4 images ou plus
+    return (
+      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 grid-rows-2 gap-0.5">
+        {carnetRecipes.slice(0, 4).map((recipe, index) => (
+          <div key={recipe.id} className="relative">
+            <img 
+              src={recipe.imageUrl} 
+              alt={recipe.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Badge "+X" si plus de 4 recettes */}
+            {index === 3 && carnetRecipes.length > 4 && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">
+                  +{carnetRecipes.length - 3}
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <section className="space-y-8">
