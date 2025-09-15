@@ -18,8 +18,7 @@ export default function CarnetPage() {
   // Recettes du carnet
   const carnetRecipes = useMemo(() => {
     if (!carnet) return [];
-    return recipes.filter(recipe 
-      => carnet.recipeIds.includes(recipe.id));
+    return recipes.filter(recipe => carnet.recipeIds.includes(recipe.id));
   }, [carnet, recipes]);
 
   // Filtrage par recherche
