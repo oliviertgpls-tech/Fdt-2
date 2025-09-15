@@ -64,27 +64,50 @@ export default function BookPage() {
   }, [book]);
 
   // 🆕 FONCTION save titre
-const saveTitle = () => {
-  if (book && bookTitle.trim()) {
-    updateBook(book.id, { title: bookTitle.trim() });
-    setEditingTitle(false);
-    }
-  };
+  const saveTitle = () => {
+    if (book && bookTitle.trim()) {
+      updateBook(book.id, { title: bookTitle.trim() });
+      setEditingTitle(false);
+      }
+    };
 
   // 🆕 FONCTION upload photo couverture
   const handleCoverImageUpload = async (file: File) => {
     setIsUploadingCover(true);
     
     try {
-      const tempUrl = URL.createObjectURL(file);
-      setCoverImageUrl(tempUrl);
-      // Sauvegarder immédiatement
-      if (book) {
-        updateBook(book.id, { coverImageUrl: tempUrl });
+      console.log('🚀 Upload couverture en cours...', file.name);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
       }
-    } catch (error) {
-      alert("Erreur lors de l'upload de l'image");
-      console.error(error);
+      
+      const result = await response.json();
+      console.log('✅ Upload couverture réussi:', result);
+      
+      if (result.success) {
+        setCoverImageUrl(result.imageUrl); // URL permanente
+        // Sauvegarder immédiatement dans le livre
+        if (book) {
+          updateBook(book.id, { coverImageUrl: result.imageUrl });
+        }
+        console.log('📸 Photo de couverture mise à jour:', result.imageUrl);
+      } else {
+        throw new Error(result.error || 'Erreur upload');
+      }
+      
+    } catch (error: any) {
+      console.error('💥 Erreur upload couverture:', error);
+      alert("Erreur lors de l'upload de l'image de couverture : " + error.message);
     } finally {
       setIsUploadingCover(false);
     }
