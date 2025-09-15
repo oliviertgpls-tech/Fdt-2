@@ -4,13 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
 
-// Service IA OpenAI simplifié
+// Service IA OpenAI avec debug
 class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
 
   constructor() {
     this.apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || '';
+    console.log('🔑 OpenAI Key disponible:', this.apiKey ? 'OUI' : 'NON');
+    console.log('🔑 Début de la clé:', this.apiKey ? this.apiKey.substring(0, 7) + '...' : 'MANQUANTE');
   }
 
   async analyzePhotoToRecipe(imageFile: File): Promise<{
@@ -22,13 +24,24 @@ class OpenAIService {
     steps: string;
     confidence: number;
   }> {
+    console.log('🚀 Début analyse photo...');
+    
     if (!this.apiKey) {
-      throw new Error('Clé OpenAI manquante');
+      console.error('❌ Clé OpenAI manquante');
+      throw new Error('Clé OpenAI manquante dans les variables d\'environnement');
+    }
+
+    if (!this.apiKey.startsWith('sk-')) {
+      console.error('❌ Format de clé OpenAI invalide');
+      throw new Error('Format de clé OpenAI invalide (doit commencer par sk-)');
     }
 
     try {
+      console.log('📸 Conversion de l\'image en base64...');
       const base64Image = await this.fileToBase64(imageFile);
+      console.log('✅ Image convertie, taille:', base64Image.length, 'caractères');
       
+      console.log('🌐 Appel API OpenAI...');
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -57,8 +70,8 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "author": "Recette générée par IA",
   "prepMinutes": 30,
   "servings": "4 personnes",
-  "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\n\nÉtape 2...\n\nÉtape 3...",
+  "ingredients": ["ingrédient 1", "ingrédient 2"],
+  "steps": "Étape 1...\n\nÉtape 2...",
   "confidence": 85
 }`
                 },
@@ -77,12 +90,19 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         })
       });
 
+      console.log('📡 Réponse API reçue, status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`Erreur API OpenAI: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Erreur API OpenAI:', response.status, errorText);
+        throw new Error(`Erreur API OpenAI: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ Données reçues:', data);
+      
       const content = data.choices[0]?.message?.content;
+      console.log('📝 Contenu de la réponse:', content);
       
       if (!content) {
         throw new Error('Pas de réponse de l\'IA');
@@ -90,14 +110,17 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('Format de réponse invalide');
+        console.error('❌ Pas de JSON trouvé dans:', content);
+        throw new Error('Format de réponse invalide - pas de JSON détecté');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      console.log('🎉 Analyse terminée avec succès:', result);
+      return result;
       
     } catch (error) {
-      console.error('Erreur analyse photo:', error);
-      throw new Error('Impossible d\'analyser cette image');
+      console.error('💥 Erreur complète:', error);
+      throw error;
     }
   }
 
@@ -110,6 +133,8 @@ FORMAT DE RÉPONSE (JSON uniquement) :
     steps: string;
     confidence: number;
   }> {
+    console.log('🚀 Début analyse manuscrit...');
+    
     if (!this.apiKey) {
       throw new Error('Clé OpenAI manquante');
     }
@@ -145,8 +170,8 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "author": "Nom trouvé ou 'Recette familiale'",
   "prepMinutes": 30,
   "servings": "4 personnes",
-  "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\n\nÉtape 2...\n\nÉtape 3...",
+  "ingredients": ["ingrédient 1", "ingrédient 2"],
+  "steps": "Étape 1...\n\nÉtape 2...",
   "confidence": 90
 }`
                 },
@@ -166,6 +191,8 @@ FORMAT DE RÉPONSE (JSON uniquement) :
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Erreur API OpenAI OCR:', response.status, errorText);
         throw new Error(`Erreur API OpenAI: ${response.status}`);
       }
 
@@ -185,7 +212,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
       
     } catch (error) {
       console.error('Erreur analyse manuscrit:', error);
-      throw new Error('Impossible de lire cette recette manuscrite');
+      throw error;
     }
   }
 
@@ -203,7 +230,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   }
 }
 
-// Composant pour recherche d'images Unsplash
+// Composant pour recherche d'images Unsplash simplifié
 function ImageSearch({ onImageSelect, initialQuery = "" }: {
   onImageSelect: (imageUrl: string) => void;
   initialQuery?: string;
@@ -214,6 +241,8 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const unsplashKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
+
   const searchImages = async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     
@@ -221,11 +250,15 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
     setError("");
     
     try {
+      if (!unsplashKey) {
+        throw new Error('Clé Unsplash manquante');
+      }
+
       const response = await fetch(
         `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=12&orientation=landscape`,
         {
           headers: {
-            'Authorization': `Client-ID ${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}`
+            'Authorization': `Client-ID ${unsplashKey}`
           }
         }
       );
@@ -240,8 +273,8 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
       if (data.results?.length === 0) {
         setError("Aucune image trouvée. Essayez d'autres mots-clés.");
       }
-    } catch (err) {
-      setError("Erreur lors de la recherche. Vérifiez votre connexion.");
+    } catch (err: any) {
+      setError(err.message || "Erreur lors de la recherche.");
       console.error('Erreur Unsplash:', err);
     } finally {
       setLoading(false);
@@ -307,6 +340,12 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
               {loading ? "..." : "Chercher"}
             </button>
           </form>
+
+          {!unsplashKey && (
+            <p className="text-red-600 text-sm mt-2">
+              ⚠️ Clé Unsplash manquante - recherche d'images désactivée
+            </p>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -360,6 +399,13 @@ export default function AddRecipePage() {
 
   // État pour IA
   const [aiConfidence, setAiConfidence] = useState<number | null>(null);
+
+  // Debug des variables d'environnement au chargement
+  useState(() => {
+    console.log('🔍 Variables d\'environnement:');
+    console.log('OpenAI:', process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'PRÉSENTE' : 'MANQUANTE');
+    console.log('Unsplash:', process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? 'PRÉSENTE' : 'MANQUANTE');
+  });
 
   // Upload d'image personnelle
   const handleImageUpload = async (file: File) => {
@@ -416,9 +462,10 @@ export default function AddRecipePage() {
     }
   };
 
-  // VRAIE analyse photo avec OpenAI
+  // Analyse photo avec debug détaillé
   const handlePhotoUpload = async (file: File) => {
     setIsProcessing(true);
+    console.log('🎬 Début handlePhotoUpload');
     
     try {
       const aiResult = await openAIService.analyzePhotoToRecipe(file);
@@ -436,15 +483,15 @@ export default function AddRecipePage() {
       
       setMode('manual');
       
-    } catch (error) {
-      console.error('Erreur analyse IA:', error);
-      alert('Erreur lors de l\'analyse IA. Essayez avec une autre image ou saisissez manuellement.');
+    } catch (error: any) {
+      console.error('💥 Erreur dans handlePhotoUpload:', error);
+      alert(`Erreur détaillée: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // VRAIE analyse manuscrit avec OpenAI
+  // Analyse manuscrit avec debug
   const handleScanUpload = async (file: File) => {
     setIsProcessing(true);
     
@@ -464,9 +511,9 @@ export default function AddRecipePage() {
       
       setMode('manual');
       
-    } catch (error) {
-      console.error('Erreur analyse manuscrit:', error);
-      alert('Erreur lors de l\'analyse du manuscrit. Vérifiez que le texte est bien lisible.');
+    } catch (error: any) {
+      console.error('💥 Erreur dans handleScanUpload:', error);
+      alert(`Erreur détaillée: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -491,6 +538,9 @@ export default function AddRecipePage() {
           <p className="text-sm text-gray-500 mt-4">
             Cela prend généralement 5-10 secondes...
           </p>
+          <p className="text-xs text-gray-400 mt-2">
+            🔧 Mode debug - Regardez la console (F12) pour plus d'infos
+          </p>
         </div>
       </div>
     );
@@ -506,6 +556,12 @@ export default function AddRecipePage() {
           <p className="text-xl text-gray-600">
             Choisissez comment vous souhaitez ajouter votre recette
           </p>
+          
+          {/* Debug info */}
+          <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+            🔧 Debug: OpenAI {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? '✅' : '❌'} | 
+            Unsplash {process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? '✅' : '❌'}
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -549,7 +605,7 @@ export default function AddRecipePage() {
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Photo d'un plat
+                  Photo d'un plat {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
                   Prenez en photo votre plat terminé. Notre IA OpenAI devine la recette et génère automatiquement les instructions.
@@ -561,7 +617,7 @@ export default function AddRecipePage() {
                   🤖 IA OpenAI - ~0,01€
                 </div>
                 <p className="text-xs text-gray-500">
-                  Analyse intelligente du plat
+                  {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à analyser' : 'Clé API manquante'}
                 </p>
               </div>
             </div>
@@ -579,7 +635,7 @@ export default function AddRecipePage() {
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Recette manuscrite
+                  Recette manuscrite {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
                   Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI lit et structure automatiquement le texte.
@@ -591,7 +647,7 @@ export default function AddRecipePage() {
                   🤖 IA OpenAI - ~0,01€
                 </div>
                 <p className="text-xs text-gray-500">
-                  OCR + structuration intelligente
+                  {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à lire' : 'Clé API manquante'}
                 </p>
               </div>
             </div>
