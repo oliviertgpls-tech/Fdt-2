@@ -303,7 +303,6 @@ export default function AddRecipePage() {
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handlePhotoUpload(file);
@@ -361,7 +360,6 @@ export default function AddRecipePage() {
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleScanUpload(file);
@@ -485,7 +483,6 @@ export default function AddRecipePage() {
                 <input
                   type="file"
                   accept="image/*"
-                  // ❌ SUPPRIMÉ : capture="environment" 
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleImageUpload(file);
