@@ -54,9 +54,6 @@ export default function BookPage() {
   const [bookTitle, setBookTitle] = useState(book?.title || '');
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingTitle, setEditingTitle] = useState(false);
-  // 🆕 États pour titre éditable
-  const [bookTitle, setBookTitle] = useState(book?.title || '');
-  const [editingTitle, setEditingTitle] = useState(false);
   
   // Initialiser les états
   useEffect(() => {
