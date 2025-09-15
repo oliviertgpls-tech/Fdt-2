@@ -119,11 +119,11 @@ export default function RecipesPage() {
       {/* Barre de recherche */}
       <div className="relative">
         <input
-          type="text"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 pl-12 pr-4 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          placeholder="Rechercher une recette (titre, ingrédients, auteur...)"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+        type="text"
+        className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        placeholder="Rechercher une recette (titre, ingrédients, auteur...)"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         />
         <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
           <span className="text-gray-400 text-lg">🔍</span>
