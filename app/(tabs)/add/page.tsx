@@ -401,7 +401,7 @@ export default function AddRecipePage() {
     );
   }
 
-  // Mode saisie manuelle (mode par défaut existant)
+  // Mode saisie manuelle
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-4 mb-6">
@@ -433,7 +433,7 @@ export default function AddRecipePage() {
 
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
         
-        {/* Titre - OBLIGATOIRE */}
+        {/* Titre */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Nom de la recette *
@@ -448,7 +448,7 @@ export default function AddRecipePage() {
           />
         </div>
 
-        {/* Rangée rapide : Auteur + Temps + Personnes */}
+        {/* Rangée rapide */}
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -458,6 +458,20 @@ export default function AddRecipePage() {
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              placeholder="Mamie, Papa..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Temps (min)
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="999"
+              value={prepMinutes}
+              onChange={(e) => setPrepMinutes(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="30"
             />
@@ -476,14 +490,13 @@ export default function AddRecipePage() {
           </div>
         </div>
 
-        {/* Photo - AMÉLIORÉE avec Upload + Unsplash */}
+        {/* Photo */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Photo (optionnel)
           </label>
           
           <div className="space-y-3">
-            {/* URL manuelle */}
             <input
               type="url"
               value={imageUrl}
@@ -492,9 +505,7 @@ export default function AddRecipePage() {
               placeholder="Collez un lien d'image..."
             />
             
-            {/* Boutons d'actions */}
             <div className="flex flex-wrap gap-3">
-              {/* Upload photo personnelle */}
               <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
                 <input
                   type="file"
@@ -509,14 +520,12 @@ export default function AddRecipePage() {
                 📷 {isUploading ? "Upload..." : "Ma photo"}
               </label>
 
-              {/* Recherche Unsplash */}
               <ImageSearch 
                 onImageSelect={(url) => setImageUrl(url)}
                 initialQuery={title}
               />
             </div>
             
-            {/* Aperçu */}
             {imageUrl && (
               <div className="mt-3 relative">
                 <img 
@@ -536,13 +545,9 @@ export default function AddRecipePage() {
               </div>
             )}
           </div>
-          
-          <p className="text-xs text-gray-500 mt-2">
-            💡 Prenez une photo, cherchez sur Unsplash ou collez un lien !
-          </p>
         </div>
 
-        {/* Ingrédients - SIMPLE textarea */}
+        {/* Ingrédients */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             🥄 Ingrédients
@@ -552,19 +557,15 @@ export default function AddRecipePage() {
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Tapez chaque ingrédient sur une nouvelle ligne :
+            placeholder="Un ingrédient par ligne :
 
 200g de farine
 3 œufs
-100ml de lait
-1 pincée de sel"
+100ml de lait"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Un ingrédient par ligne, c'est tout !
-          </p>
         </div>
 
-        {/* Étapes - SIMPLE textarea */}
+        {/* Étapes */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             📋 Instructions
@@ -574,21 +575,14 @@ export default function AddRecipePage() {
             value={steps}
             onChange={(e) => setSteps(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Écrivez les étapes comme vous le feriez naturellement :
+            placeholder="Écrivez les étapes naturellement :
 
 Préchauffer le four à 180°C.
 
-Mélanger la farine et le sucre dans un saladier.
+Mélanger la farine et le sucre.
 
-Ajouter les œufs un par un...
-
-Enfourner 25 minutes.
-
-Simple et naturel !"
+Enfourner 25 minutes."
           />
-          <p className="text-xs text-gray-500 mt-1">
-            💡 Laissez une ligne vide entre chaque étape pour une navigation plus facile !
-          </p>
         </div>
 
         {/* Actions */}
@@ -606,24 +600,10 @@ Simple et naturel !"
             disabled={isSaving || !title.trim() || isUploading}
             className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "✨ Créer"}
+            {isSaving ? "⏳ Sauvegarde..." : "✨ Créer"}
           </button>
         </div>
       </div>
     </div>
   );
-}500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-              placeholder="Mamie, Papa..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Temps (min)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="999"
-              value={prepMinutes}
-              onChange={(e) => setPrepMinutes(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-
+}
