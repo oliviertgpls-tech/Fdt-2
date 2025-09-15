@@ -4,8 +4,74 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRecipes } from "@/contexts/RecipesProvider";
 
+// Composant Skeleton pour les cartes de recettes
+function RecipeCardSkeleton() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
+      {/* Image skeleton */}
+      <div className="aspect-[4/3] bg-gray-200"></div>
+      
+      {/* Contenu skeleton */}
+      <div className="p-4 space-y-3">
+        {/* Titre */}
+        <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+        
+        {/* Auteur */}
+        <div className="h-4 bg-gray-150 rounded w-1/2"></div>
+        
+        {/* Description */}
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-150 rounded w-full"></div>
+          <div className="h-3 bg-gray-150 rounded w-2/3"></div>
+        </div>
+        
+        {/* Métadonnées */}
+        <div className="flex items-center gap-4 pt-2">
+          <div className="h-3 bg-gray-200 rounded w-16"></div>
+          <div className="h-3 bg-gray-200 rounded w-20"></div>
+        </div>
+        
+        {/* Tags */}
+        <div className="flex gap-1 pt-2">
+          <div className="h-6 bg-gray-150 rounded-full w-12"></div>
+          <div className="h-6 bg-gray-150 rounded-full w-16"></div>
+          <div className="h-6 bg-gray-150 rounded-full w-10"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Composant Skeleton pour l'état de chargement
+function RecipesLoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* En-tête skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+          <div className="h-5 bg-gray-150 rounded w-64 animate-pulse"></div>
+        </div>
+        <div className="h-10 bg-gray-200 rounded w-40 animate-pulse"></div>
+      </div>
+
+      {/* Barre de recherche skeleton */}
+      <div className="relative">
+        <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+      </div>
+
+      {/* Grille de cartes skeleton */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, index) => (
+          <RecipeCardSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function RecipesPage() {
-  const { recipes } = useRecipes();
+  const { recipes, loading } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRecipes = useMemo(() => {
@@ -26,6 +92,11 @@ export default function RecipesPage() {
       return searchText.includes(query);
     });
   }, [recipes, searchQuery]);
+
+  // 🆕 AFFICHAGE DU SKELETON PENDANT LE CHARGEMENT
+  if (loading) {
+    return <RecipesLoadingSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
@@ -72,7 +143,7 @@ export default function RecipesPage() {
                 Commencez par ajouter votre première recette !
               </p>
               <Link 
-                href="/(tabs)/add"
+                href="/add"
                 className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 ✨ Ajouter ma première recette
