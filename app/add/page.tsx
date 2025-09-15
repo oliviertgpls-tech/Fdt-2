@@ -408,15 +408,39 @@ export default function AddRecipePage() {
   });
 
   // Upload d'image personnelle
+// Dans app/add/page.tsx - Remplacer la fonction handleImageUpload existante
   const handleImageUpload = async (file: File) => {
     setIsUploading(true);
     
     try {
-      const tempUrl = URL.createObjectURL(file);
-      setImageUrl(tempUrl);
-    } catch (error) {
-      alert("Erreur lors de l'upload de l'image");
-      console.error(error);
+      console.log('🚀 Upload en cours...', file.name);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Upload réussi:', result);
+      
+      if (result.success) {
+        setImageUrl(result.imageUrl); // URL permanente : /uploads/filename.jpg
+        console.log('📸 Image URL mise à jour:', result.imageUrl);
+      } else {
+        throw new Error(result.error || 'Erreur upload');
+      }
+      
+    } catch (error: any) {
+      console.error('💥 Erreur upload:', error);
+      alert("Erreur lors de l'upload : " + error.message);
     } finally {
       setIsUploading(false);
     }
