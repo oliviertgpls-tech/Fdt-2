@@ -121,23 +121,24 @@ export function ImageSearch({ onImageSelect, initialQuery = "" }: ImageSearchPro
                 </button>
               </div>
               
-              {/* Barre de recherche */}
+              {/* 🆕 BARRE DE RECHERCHE CORRIGÉE */}
               <form onSubmit={handleSearch} className="flex gap-3">
                 <div className="flex-1 relative">
-                  <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Ex: pizza, gâteau au chocolat, salade..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     autoFocus
                   />
+                  {/* 🆕 ICÔNE CORRECTEMENT POSITIONNÉE */}
+                  <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
                 <button
                   type="submit"
                   disabled={loading || !query.trim()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
                   {loading ? <Loader className="w-5 h-5 animate-spin" /> : "Chercher"}
                 </button>
