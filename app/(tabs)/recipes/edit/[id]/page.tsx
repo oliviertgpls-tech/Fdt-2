@@ -260,7 +260,6 @@ export default function EditRecipePage() {
                   <input
                     type="file"
                     accept="image/*"
-                    capture="environment" // Ouvre la caméra sur mobile
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) handleImageUpload(file);
