@@ -481,11 +481,11 @@ export default function AddRecipePage() {
             {/* Boutons d'actions */}
             <div className="flex flex-wrap gap-3">
               {/* Upload photo personnelle */}
-              <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+               <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
-                  capture="environment" // Ouvre la caméra sur mobile
+                  // ❌ SUPPRIMÉ : capture="environment" 
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) handleImageUpload(file);
