@@ -5,6 +5,99 @@ import { Plus, Eye, Edit3, X, Trash2 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
+// Composant pour afficher les vignettes des recettes d'un carnet
+function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: any[] }) {
+  // Récupérer les recettes du carnet avec des images
+  const carnetRecipes = recipes.filter(recipe => 
+    // Ici on devrait filtrer par carnet, mais pour l'instant on prend les 4 premières avec images
+    recipe.imageUrl
+  ).slice(0, 4);
+
+  if (carnetRecipes.length === 0) {
+    // Fallback vers l'icône si aucune image
+    return (
+      <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
+        📋
+      </div>
+    );
+  }
+
+  // Affichage en mosaïque selon le nombre d'images
+  if (carnetRecipes.length === 1) {
+    return (
+      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden">
+        <img 
+          src={carnetRecipes[0].imageUrl} 
+          alt={carnetRecipes[0].title}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  if (carnetRecipes.length === 2) {
+    return (
+      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
+        {carnetRecipes.map((recipe, index) => (
+          <img 
+            key={recipe.id}
+            src={recipe.imageUrl} 
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (carnetRecipes.length === 3) {
+    return (
+      <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 gap-0.5">
+        <img 
+          src={carnetRecipes[0].imageUrl} 
+          alt={carnetRecipes[0].title}
+          className="w-full h-full object-cover"
+        />
+        <div className="grid grid-rows-2 gap-0.5">
+          <img 
+            src={carnetRecipes[1].imageUrl} 
+            alt={carnetRecipes[1].title}
+            className="w-full h-full object-cover"
+          />
+          <img 
+            src={carnetRecipes[2].imageUrl} 
+            alt={carnetRecipes[2].title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // 4 images ou plus
+  return (
+    <div className="aspect-[4/3] bg-gray-100 rounded-t-xl overflow-hidden grid grid-cols-2 grid-rows-2 gap-0.5">
+      {carnetRecipes.slice(0, 4).map((recipe, index) => (
+        <div key={recipe.id} className="relative">
+          <img 
+            src={recipe.imageUrl} 
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
+          {/* Badge "+X" si plus de 4 recettes */}
+          {index === 3 && carnetRecipes.length > 4 && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">
+                +{carnetRecipes.length - 3}
+              </span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CarnetsPage() {
   const { notebooks, createNotebook, recipes } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -156,12 +249,14 @@ export default function CarnetsPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {notebooks.map((carnet) => {
             const carnetRecipeCount = carnet.recipeIds?.length || 0;
+            const carnetRecipes = recipes.filter(recipe => 
+              carnet.recipeIds?.includes(recipe.id)
+            );
             
             return (
               <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
-                  📋
-                </div>
+                {/* 🆕 VIGNETTES AU LIEU D'ICÔNE */}
+                <CarnetThumbnails carnetId={carnet.id} recipes={carnetRecipes} />
                 
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900 text-lg mb-2">
