@@ -4,124 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
 
-const compressImagePremium = (file: File, maxWidth = 2400, quality = 0.95): Promise<File> => {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d')!;
-    const img = new Image();
-    
-    img.onload = () => {
-      // Calculer nouvelles dimensions en gardant le ratio
-      let { width, height } = img;
-      
-      if (width > maxWidth || height > maxWidth) {
-        const ratio = Math.min(maxWidth / width, maxWidth / height);
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-      }
-      
-      canvas.width = width;
-      canvas.height = height;
-      
-      // Améliorer la qualité de rendu
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      
-      // Dessiner l'image redimensionnée
-      ctx.drawImage(img, 0, 0, width, height);
-      
-      // Convertir en blob haute qualité
-      canvas.toBlob((blob) => {
-        const compressedFile = new File([blob!], file.name, { 
-          type: 'image/jpeg',
-          lastModified: file.lastModified 
-        });
-        resolve(compressedFile);
-      }, 'image/jpeg', quality);
-    };
-    
-    img.src = URL.createObjectURL(file);
-  });
-};
-
-// 🔄 MODIFIER LA FONCTION uploadImageToServer EXISTANTE
-
-const uploadImageToServer = async (file: File): Promise<string> => {
-  console.log('📤 Upload vers le serveur...', file.name);
-  console.log('📏 Taille originale:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
-  
-  let finalFile = file;
-  
-  // Compression automatique si > 3 Mo OU si dimensions > 2400px
-  if (file.size > 3 * 1024 * 1024) {
-    console.log('🎨 Compression premium en cours...');
-    finalFile = await compressImagePremium(file);
-    console.log('✨ Taille optimisée:', (finalFile.size / 1024 / 1024).toFixed(2), 'Mo');
-    console.log('🖨️ Qualité print conservée (2400px, 95%)');
-  }
-  
-  const formData = new FormData();
-  formData.append('file', finalFile);
-  
-  const response = await fetch('/api/upload', {
-    method: 'POST',
-    body: formData
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-  }
-  
-  const result = await response.json();
-  console.log('✅ Upload réussi:', result);
-  
-  if (result.success) {
-    return result.imageUrl; // URL permanente
-  } else {
-    throw new Error(result.error || 'Erreur upload');
-  }
-};
-
-// 🎯 LOGS DE DEBUG PREMIUM
-// Ces logs t'aideront à voir ce qui se passe
-
-const handlePhotoUpload = async (file: File) => {
-  setIsProcessing(true);
-  console.log('🎬 Début handlePhotoUpload');
-  console.log('📸 Fichier:', file.name, '-', (file.size / 1024 / 1024).toFixed(2), 'Mo');
-  
-  try {
-    // Analyse IA (déjà fonctionnelle)
-    console.log('🤖 Analyse IA en cours...');
-    const aiResult = await openAIService.analyzePhotoToRecipe(file);
-    console.log('✅ IA terminée:', aiResult.title);
-    
-    // Remplir les champs
-    setTitle(aiResult.title);
-    setAuthor(aiResult.author);
-    setPrepMinutes(aiResult.prepMinutes.toString());
-    setServings(aiResult.servings);
-    setIngredients(aiResult.ingredients.join('\n'));
-    setSteps(aiResult.steps);
-    setAiConfidence(aiResult.confidence);
-    
-    // Upload optimisé
-    console.log('📤 Upload optimisé en cours...');
-    const permanentUrl = await uploadImageToServer(file);
-    setImageUrl(permanentUrl);
-    console.log('🎉 Tout fini! URL:', permanentUrl);
-    
-    setMode('manual');
-    
-  } catch (error: any) {
-    console.error('💥 Erreur dans handlePhotoUpload:', error);
-    alert(`Erreur détaillée: ${error.message}`);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-
 // Service IA OpenAI avec debug
 class OpenAIService {
   private apiKey: string;
@@ -518,12 +400,64 @@ export default function AddRecipePage() {
   // État pour IA
   const [aiConfidence, setAiConfidence] = useState<number | null>(null);
 
-  // 🆕 AJOUTER ICI - Fonction utilitaire d'upload
+  // 🆕 FONCTION DE COMPRESSION PREMIUM
+  const compressImagePremium = (file: File, maxWidth = 2400, quality = 0.95): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculer nouvelles dimensions en gardant le ratio
+        let { width, height } = img;
+        
+        if (width > maxWidth || height > maxWidth) {
+          const ratio = Math.min(maxWidth / width, maxWidth / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Améliorer la qualité de rendu
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        
+        // Dessiner l'image redimensionnée
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir en blob haute qualité
+        canvas.toBlob((blob) => {
+          const compressedFile = new File([blob!], file.name, { 
+            type: 'image/jpeg',
+            lastModified: file.lastModified 
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', quality);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // 🆕 FONCTION D'UPLOAD AVEC COMPRESSION PREMIUM
   const uploadImageToServer = async (file: File): Promise<string> => {
     console.log('📤 Upload vers le serveur...', file.name);
+    console.log('📏 Taille originale:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+    
+    let finalFile = file;
+    
+    // Compression automatique si > 3 Mo
+    if (file.size > 3 * 1024 * 1024) {
+      console.log('🎨 Compression premium en cours...');
+      finalFile = await compressImagePremium(file);
+      console.log('✨ Taille optimisée:', (finalFile.size / 1024 / 1024).toFixed(2), 'Mo');
+      console.log('🖨️ Qualité print conservée (2400px, 95%)');
+    }
     
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', finalFile);
     
     const response = await fetch('/api/upload', {
       method: 'POST',
@@ -536,10 +470,10 @@ export default function AddRecipePage() {
     }
     
     const result = await response.json();
-    console.log('✅ Résultat upload:', result);
+    console.log('✅ Upload réussi:', result);
     
     if (result.success) {
-      return result.imageUrl; // Retourne /uploads/filename.jpg
+      return result.imageUrl; // URL permanente
     } else {
       throw new Error(result.error || 'Erreur upload');
     }
@@ -568,100 +502,20 @@ export default function AddRecipePage() {
   };
 
   const handleScanUpload = async (file: File) => {
-  setIsProcessing(true);
-  console.log('📄 Début handleScanUpload');
-  
-  try {
-    // Analyser avec l'IA d'abord
-    const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
-    console.log('🤖 Résultat IA manuscrit:', aiResult);
-    
-    // Puis uploader l'image RÉELLEMENT sur le serveur
-    console.log('📤 Upload du manuscrit...');
-    const permanentUrl = await uploadImageToServer(file);
-    console.log('✅ Manuscrit uploadé:', permanentUrl);
-    
-    // Remplir les champs
-    setTitle(aiResult.title);
-    setAuthor(aiResult.author);
-    setPrepMinutes(aiResult.prepMinutes.toString());
-    setServings(aiResult.servings);
-    setIngredients(aiResult.ingredients.join('\n'));
-    setSteps(aiResult.steps);
-    setAiConfidence(aiResult.confidence);
-    
-    // 🎯 UTILISER L'URL PERMANENTE
-    setImageUrl(permanentUrl);
-    
-    setMode('manual');
-    
-    console.log('🎉 handleScanUpload terminé avec succès');
-    
-  } catch (error: any) {
-    console.error('💥 Erreur dans handleScanUpload:', error);
-    alert(`Erreur détaillée: ${error.message}`);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-
-  const handleSave = async () => {
-  if (!title.trim()) {
-    alert("Le titre est obligatoire !");
-    return;
-  }
-
-  setIsSaving(true);
-
-  try {
-    const recipeData = {
-      title: title.trim(),
-      author: author.trim() || undefined,
-      prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
-      servings: servings.trim() || undefined,
-      imageUrl: imageUrl.trim() || undefined,
-      ingredients: ingredients
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line !== ""),
-      steps: steps.trim(),
-      updatedAt: Date.now()
-    };
-
-    console.log('💾 Sauvegarde de la recette:', recipeData);
-
-    const response = await fetch('/api/recipes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(recipeData)
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-    }
-    
-    const newRecipe = await response.json();
-    console.log('✅ Recette créée:', newRecipe);
-    
-    // Rediriger vers la liste des recettes
-    router.push("/recipes");
-  } catch (error: any) {
-    console.error('❌ Erreur sauvegarde:', error);
-    alert("Erreur lors de la sauvegarde : " + error.message);
-  } finally {
-    setIsSaving(false);
-  }
-};
-
-  // Analyse photo avec debug détaillé
-  const handlePhotoUpload = async (file: File) => {
     setIsProcessing(true);
-    console.log('🎬 Début handlePhotoUpload');
+    console.log('📄 Début handleScanUpload');
     
     try {
-      const aiResult = await openAIService.analyzePhotoToRecipe(file);
+      // Analyser avec l'IA d'abord
+      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
+      console.log('🤖 Résultat IA manuscrit:', aiResult);
       
+      // Puis uploader l'image RÉELLEMENT sur le serveur
+      console.log('📤 Upload du manuscrit...');
+      const permanentUrl = await uploadImageToServer(file);
+      console.log('✅ Manuscrit uploadé:', permanentUrl);
+      
+      // Remplir les champs
       setTitle(aiResult.title);
       setAuthor(aiResult.author);
       setPrepMinutes(aiResult.prepMinutes.toString());
@@ -670,8 +524,96 @@ export default function AddRecipePage() {
       setSteps(aiResult.steps);
       setAiConfidence(aiResult.confidence);
       
+      // Utiliser l'URL permanente
+      setImageUrl(permanentUrl);
+      
+      setMode('manual');
+      
+      console.log('🎉 handleScanUpload terminé avec succès');
+      
+    } catch (error: any) {
+      console.error('💥 Erreur dans handleScanUpload:', error);
+      alert(`Erreur détaillée: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!title.trim()) {
+      alert("Le titre est obligatoire !");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const recipeData = {
+        title: title.trim(),
+        author: author.trim() || undefined,
+        prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
+        servings: servings.trim() || undefined,
+        imageUrl: imageUrl.trim() || undefined,
+        ingredients: ingredients
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line !== ""),
+        steps: steps.trim(),
+        updatedAt: Date.now()
+      };
+
+      console.log('💾 Sauvegarde de la recette:', recipeData);
+
+      const response = await fetch('/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(recipeData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
+      
+      const newRecipe = await response.json();
+      console.log('✅ Recette créée:', newRecipe);
+      
+      // Rediriger vers la liste des recettes
+      router.push("/recipes");
+    } catch (error: any) {
+      console.error('❌ Erreur sauvegarde:', error);
+      alert("Erreur lors de la sauvegarde : " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Analyse photo avec debug détaillé
+  const handlePhotoUpload = async (file: File) => {
+    setIsProcessing(true);
+    console.log('🎬 Début handlePhotoUpload');
+    console.log('📸 Fichier:', file.name, '-', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+    
+    try {
+      // Analyse IA
+      console.log('🤖 Analyse IA en cours...');
+      const aiResult = await openAIService.analyzePhotoToRecipe(file);
+      console.log('✅ IA terminée:', aiResult.title);
+      
+      // Remplir les champs
+      setTitle(aiResult.title);
+      setAuthor(aiResult.author);
+      setPrepMinutes(aiResult.prepMinutes.toString());
+      setServings(aiResult.servings);
+      setIngredients(aiResult.ingredients.join('\n'));
+      setSteps(aiResult.steps);
+      setAiConfidence(aiResult.confidence);
+      
+      // Upload optimisé
+      console.log('📤 Upload optimisé en cours...');
       const permanentUrl = await uploadImageToServer(file);
       setImageUrl(permanentUrl);
+      console.log('🎉 Tout fini! URL:', permanentUrl);
       
       setMode('manual');
       
