@@ -979,7 +979,7 @@ Enfourner 25 minutes."
           </button>
           <button
             type="button"
-            onClick={handleSaveManual}
+            onClick={handleSave}
             disabled={isSaving || !title.trim() || isUploading}
             className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
