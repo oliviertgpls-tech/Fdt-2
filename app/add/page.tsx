@@ -400,6 +400,33 @@ export default function AddRecipePage() {
   // État pour IA
   const [aiConfidence, setAiConfidence] = useState<number | null>(null);
 
+  // 🆕 AJOUTER ICI - Fonction utilitaire d'upload
+  const uploadImageToServer = async (file: File): Promise<string> => {
+    console.log('📤 Upload vers le serveur...', file.name);
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('✅ Résultat upload:', result);
+    
+    if (result.success) {
+      return result.imageUrl; // Retourne /uploads/filename.jpg
+    } else {
+      throw new Error(result.error || 'Erreur upload');
+    }
+  };
+
   // Debug des variables d'environnement au chargement
   useState(() => {
     console.log('🔍 Variables d\'environnement:');
@@ -408,83 +435,88 @@ export default function AddRecipePage() {
   });
 
   // Upload d'image personnelle
-// Dans app/add/page.tsx - Remplacer la fonction handleImageUpload existante
   const handleImageUpload = async (file: File) => {
     setIsUploading(true);
     
     try {
-      console.log('🚀 Upload en cours...', file.name);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log('✅ Upload réussi:', result);
-      
-      if (result.success) {
-        setImageUrl(result.imageUrl); // URL permanente : /uploads/filename.jpg
-        console.log('📸 Image URL mise à jour:', result.imageUrl);
-      } else {
-        throw new Error(result.error || 'Erreur upload');
-      }
-      
+      const permanentUrl = await uploadImageToServer(file);
+      setImageUrl(permanentUrl);
     } catch (error: any) {
-      console.error('💥 Erreur upload:', error);
-      alert("Erreur lors de l'upload : " + error.message);
+      alert("Erreur lors de l'upload de l'image");
+      console.error(error);
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleSaveManual = async () => {
-    if (!title.trim()) {
-      alert("Le titre est obligatoire !");
-      return;
-    }
-
-    setIsSaving(true);
-
+  // 🔧 MODIFIER ICI - handlePhotoUpload
+  const handlePhotoUpload = async (file: File) => {
+    setIsProcessing(true);
+    console.log('🎬 Début handlePhotoUpload');
+    
     try {
-      const recipeData = {
-        title: title.trim(),
-        author: author.trim() || undefined,
-        prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
-        servings: servings.trim() || undefined,
-        imageUrl: imageUrl.trim() || undefined,
-        ingredients: ingredients
-          .split('\n')
-          .map(line => line.trim())
-          .filter(line => line !== ""),
-        steps: steps.trim(),
-        updatedAt: Date.now()
-      };
-
-      const response = await fetch('/api/recipes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(recipeData)
-      });
+      // Analyser avec l'IA d'abord
+      const aiResult = await openAIService.analyzePhotoToRecipe(file);
+      console.log('🤖 Résultat IA:', aiResult);
       
-      if (!response.ok) throw new Error('Erreur lors de la création');
+      // 🆕 PUIS uploader l'image RÉELLEMENT sur le serveur
+      console.log('📤 Upload de l\'image...');
+      const permanentUrl = await uploadImageToServer(file);
+      console.log('✅ Image uploadée:', permanentUrl);
       
-      router.push("/recipes");
-    } catch (error) {
-      alert("Erreur lors de la sauvegarde !");
-      console.error(error);
+      // Remplir les champs
+      setTitle(aiResult.title);
+      setAuthor(aiResult.author);
+      setPrepMinutes(aiResult.prepMinutes.toString());
+      setServings(aiResult.servings);
+      setIngredients(aiResult.ingredients.join('\n'));
+      setSteps(aiResult.steps);
+      setAiConfidence(aiResult.confidence);
+      
+      // 🎯 UTILISER L'URL PERMANENTE (remplace la ligne avec URL.createObjectURL)
+      setImageUrl(permanentUrl);
+      
+      setMode('manual');
+      
+    } catch (error: any) {
+      console.error('💥 Erreur dans handlePhotoUpload:', error);
+      alert(`Erreur détaillée: ${error.message}`);
     } finally {
-      setIsSaving(false);
+      setIsProcessing(false);
     }
   };
+
+  // 🔧 MODIFIER ICI AUSSI - handleScanUpload
+  const handleScanUpload = async (file: File) => {
+    setIsProcessing(true);
+    
+    try {
+      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
+      
+      // 🆕 PUIS uploader l'image
+      const permanentUrl = await uploadImageToServer(file);
+      
+      setTitle(aiResult.title);
+      setAuthor(aiResult.author);
+      setPrepMinutes(aiResult.prepMinutes.toString());
+      setServings(aiResult.servings);
+      setIngredients(aiResult.ingredients.join('\n'));
+      setSteps(aiResult.steps);
+      setAiConfidence(aiResult.confidence);
+      
+      // 🎯 UTILISER L'URL PERMANENTE
+      setImageUrl(permanentUrl);
+      
+      setMode('manual');
+      
+    } catch (error: any) {
+      console.error('💥 Erreur dans handleScanUpload:', error);
+      alert(`Erreur détaillée: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
 
   // Analyse photo avec debug détaillé
   const handlePhotoUpload = async (file: File) => {
