@@ -30,9 +30,8 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           file: dataURI,
-          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
-          use_filename: false, // Force Cloudinary à ignorer le nom original
-          unique_filename: true // Force un nom unique à chaque fois
+          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+          // Retour à la version ultra-simple
         }),
       }
     )
