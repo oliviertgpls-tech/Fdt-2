@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
+    // Debug des variables d'environnement
+    console.log('🔍 Cloudinary config:', {
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ? 'Présent' : 'MANQUANT',
+      uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ? 'Présent' : 'MANQUANT'
+    })
+
     const data = await request.formData()
     const file: File | null = data.get('file') as unknown as File
 
@@ -49,8 +55,12 @@ export async function POST(request: NextRequest) {
 
     if (!cloudinaryResponse.ok) {
       const errorData = await cloudinaryResponse.json()
-      console.error('❌ Erreur Cloudinary:', errorData)
-      throw new Error('Erreur upload Cloudinary')
+      console.error('❌ Erreur Cloudinary:', {
+        status: cloudinaryResponse.status,
+        statusText: cloudinaryResponse.statusText,
+        error: errorData
+      })
+      throw new Error(`Erreur Cloudinary ${cloudinaryResponse.status}: ${JSON.stringify(errorData)}`)
     }
 
     const cloudinaryData = await cloudinaryResponse.json()
