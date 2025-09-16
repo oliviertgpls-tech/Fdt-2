@@ -35,21 +35,26 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const filename = `${timestamp}-${randomString}.${extension}`
 
-    // Créer le dossier uploads s'il n'existe pas
+    // Définir les chemins
     const uploadsDir = join(process.cwd(), 'public', 'uploads')
+    const filePath = join(uploadsDir, filename)
+
+    console.log('📁 Dossier uploads:', uploadsDir)
+    console.log('💾 Fichier à créer:', filePath)
+
     try {
+      // Essayer de créer le dossier (sans erreur si existe déjà)
       await mkdir(uploadsDir, { recursive: true })
-      console.log('📁 Dossier uploads créé/vérifié:', uploadsDir)
+      
+      // Sauvegarder le fichier
+      await writeFile(filePath, buffer)
+      
     } catch (error: any) {
-      console.error('❌ Erreur création dossier uploads:', error)
+      console.error('❌ Erreur sauvegarde fichier:', error)
       return NextResponse.json({ 
-        error: `Impossible de créer le dossier uploads: ${error.message}` 
+        error: `Impossible de sauvegarder le fichier: ${error.message}` 
       }, { status: 500 })
     }
-
-    // Sauvegarder le fichier
-    const filePath = join(uploadsDir, filename)
-    await writeFile(filePath, buffer)
 
     // Retourner l'URL publique
     const imageUrl = `/uploads/${filename}`
@@ -65,7 +70,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('❌ Erreur upload:', error)
+    console.error('❌ Erreur upload générale:', error)
     return NextResponse.json({ 
       success: false, 
       error: error.message || "Erreur lors de l'upload" 
