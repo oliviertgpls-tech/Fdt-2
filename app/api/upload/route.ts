@@ -1,6 +1,5 @@
+// app/api/upload/route.ts - Version Cloudinary
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,66 +10,62 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Aucun fichier reçu" }, { status: 400 })
     }
 
-    // Vérification du type de fichier
+    // Vérifications
     if (!file.type.startsWith('image/')) {
       return NextResponse.json({ 
-        error: "Le fichier doit être une image (jpg, png, webp...)" 
+        error: "Le fichier doit être une image" 
       }, { status: 400 })
     }
 
-    // Vérification de la taille (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       return NextResponse.json({ 
-        error: "L'image est trop volumineuse (max 10MB)" 
+        error: "Image trop volumineuse (max 10MB)" 
       }, { status: 400 })
     }
 
+    // Convertir en base64 pour Cloudinary
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
+    const base64 = Buffer.from(bytes).toString('base64')
+    const dataURI = `data:${file.type};base64,${base64}`
 
-    // Créer un nom de fichier unique
-    const timestamp = Date.now()
-    const randomString = Math.random().toString(36).substring(2, 15)
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const filename = `${timestamp}-${randomString}.${extension}`
+    console.log('☁️ Upload vers Cloudinary...')
 
-    // Définir les chemins
-    const uploadsDir = join(process.cwd(), 'public', 'uploads')
-    const filePath = join(uploadsDir, filename)
+    // Upload vers Cloudinary
+    const cloudinaryResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file: dataURI,
+          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET, // preset "unsigned"
+          folder: 'food-memories', // optionnel : organiser dans un dossier
+        }),
+      }
+    )
 
-    console.log('📁 Dossier uploads:', uploadsDir)
-    console.log('💾 Fichier à créer:', filePath)
-
-    try {
-      // Essayer de créer le dossier (sans erreur si existe déjà)
-      await mkdir(uploadsDir, { recursive: true })
-      
-      // Sauvegarder le fichier
-      await writeFile(filePath, buffer)
-      
-    } catch (error: any) {
-      console.error('❌ Erreur sauvegarde fichier:', error)
-      return NextResponse.json({ 
-        error: `Impossible de sauvegarder le fichier: ${error.message}` 
-      }, { status: 500 })
+    if (!cloudinaryResponse.ok) {
+      const errorData = await cloudinaryResponse.json()
+      console.error('❌ Erreur Cloudinary:', errorData)
+      throw new Error('Erreur upload Cloudinary')
     }
 
-    // Retourner l'URL publique
-    const imageUrl = `/uploads/${filename}`
-    
-    console.log(`✅ Image uploadée: ${filename} (${file.size} bytes)`)
-    
+    const cloudinaryData = await cloudinaryResponse.json()
+    console.log('✅ Upload Cloudinary réussi:', cloudinaryData.secure_url)
+
     return NextResponse.json({ 
       success: true, 
-      imageUrl,
-      filename,
+      imageUrl: cloudinaryData.secure_url, // URL Cloudinary permanente
+      filename: cloudinaryData.public_id,
       size: file.size,
-      message: "Image uploadée avec succès" 
+      message: "Image uploadée avec succès sur Cloudinary" 
     })
     
   } catch (error: any) {
-    console.error('❌ Erreur upload générale:', error)
+    console.error('❌ Erreur upload:', error)
     return NextResponse.json({ 
       success: false, 
       error: error.message || "Erreur lors de l'upload" 
