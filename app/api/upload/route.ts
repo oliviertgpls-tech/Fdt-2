@@ -39,8 +39,12 @@ export async function POST(request: NextRequest) {
     const uploadsDir = join(process.cwd(), 'public', 'uploads')
     try {
       await mkdir(uploadsDir, { recursive: true })
-    } catch (error) {
-      // Le dossier existe déjà, c'est OK
+      console.log('📁 Dossier uploads créé/vérifié:', uploadsDir)
+    } catch (error: any) {
+      console.error('❌ Erreur création dossier uploads:', error)
+      return NextResponse.json({ 
+        error: `Impossible de créer le dossier uploads: ${error.message}` 
+      }, { status: 500 })
     }
 
     // Sauvegarder le fichier
