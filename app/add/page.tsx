@@ -450,73 +450,81 @@ export default function AddRecipePage() {
   };
 
   // 🔧 MODIFIER ICI - handlePhotoUpload
-  const handlePhotoUpload = async (file: File) => {
-    setIsProcessing(true);
-    console.log('🎬 Début handlePhotoUpload');
+ const handlePhotoUpload = async (file: File) => {
+  setIsProcessing(true);
+  console.log('🎬 Début handlePhotoUpload');
+  
+  try {
+    // Analyser avec l'IA d'abord
+    const aiResult = await openAIService.analyzePhotoToRecipe(file);
+    console.log('🤖 Résultat IA:', aiResult);
     
-    try {
-      // Analyser avec l'IA d'abord
-      const aiResult = await openAIService.analyzePhotoToRecipe(file);
-      console.log('🤖 Résultat IA:', aiResult);
-      
-      // 🆕 PUIS uploader l'image RÉELLEMENT sur le serveur
-      console.log('📤 Upload de l\'image...');
-      const permanentUrl = await uploadImageToServer(file);
-      console.log('✅ Image uploadée:', permanentUrl);
-      
-      // Remplir les champs
-      setTitle(aiResult.title);
-      setAuthor(aiResult.author);
-      setPrepMinutes(aiResult.prepMinutes.toString());
-      setServings(aiResult.servings);
-      setIngredients(aiResult.ingredients.join('\n'));
-      setSteps(aiResult.steps);
-      setAiConfidence(aiResult.confidence);
-      
-      // 🎯 UTILISER L'URL PERMANENTE (remplace la ligne avec URL.createObjectURL)
-      setImageUrl(permanentUrl);
-      
-      setMode('manual');
-      
-    } catch (error: any) {
-      console.error('💥 Erreur dans handlePhotoUpload:', error);
-      alert(`Erreur détaillée: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+    // Puis uploader l'image RÉELLEMENT sur le serveur
+    console.log('📤 Upload de l\'image...');
+    const permanentUrl = await uploadImageToServer(file);
+    console.log('✅ Image uploadée:', permanentUrl);
+    
+    // Remplir les champs
+    setTitle(aiResult.title);
+    setAuthor(aiResult.author);
+    setPrepMinutes(aiResult.prepMinutes.toString());
+    setServings(aiResult.servings);
+    setIngredients(aiResult.ingredients.join('\n'));
+    setSteps(aiResult.steps);
+    setAiConfidence(aiResult.confidence);
+    
+    // 🎯 UTILISER L'URL PERMANENTE (pas blob: temporaire)
+    setImageUrl(permanentUrl);
+    
+    setMode('manual');
+    
+    console.log('🎉 handlePhotoUpload terminé avec succès');
+    
+  } catch (error: any) {
+    console.error('💥 Erreur dans handlePhotoUpload:', error);
+    alert(`Erreur détaillée: ${error.message}`);
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
-  // 🔧 MODIFIER ICI AUSSI - handleScanUpload
   const handleScanUpload = async (file: File) => {
-    setIsProcessing(true);
+  setIsProcessing(true);
+  console.log('📄 Début handleScanUpload');
+  
+  try {
+    // Analyser avec l'IA d'abord
+    const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
+    console.log('🤖 Résultat IA manuscrit:', aiResult);
     
-    try {
-      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
-      
-      // 🆕 PUIS uploader l'image
-      const permanentUrl = await uploadImageToServer(file);
-      
-      setTitle(aiResult.title);
-      setAuthor(aiResult.author);
-      setPrepMinutes(aiResult.prepMinutes.toString());
-      setServings(aiResult.servings);
-      setIngredients(aiResult.ingredients.join('\n'));
-      setSteps(aiResult.steps);
-      setAiConfidence(aiResult.confidence);
-      
-      // 🎯 UTILISER L'URL PERMANENTE
-      setImageUrl(permanentUrl);
-      
-      setMode('manual');
-      
-    } catch (error: any) {
-      console.error('💥 Erreur dans handleScanUpload:', error);
-      alert(`Erreur détaillée: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
+    // Puis uploader l'image RÉELLEMENT sur le serveur
+    console.log('📤 Upload du manuscrit...');
+    const permanentUrl = await uploadImageToServer(file);
+    console.log('✅ Manuscrit uploadé:', permanentUrl);
+    
+    // Remplir les champs
+    setTitle(aiResult.title);
+    setAuthor(aiResult.author);
+    setPrepMinutes(aiResult.prepMinutes.toString());
+    setServings(aiResult.servings);
+    setIngredients(aiResult.ingredients.join('\n'));
+    setSteps(aiResult.steps);
+    setAiConfidence(aiResult.confidence);
+    
+    // 🎯 UTILISER L'URL PERMANENTE
+    setImageUrl(permanentUrl);
+    
+    setMode('manual');
+    
+    console.log('🎉 handleScanUpload terminé avec succès');
+    
+  } catch (error: any) {
+    console.error('💥 Erreur dans handleScanUpload:', error);
+    alert(`Erreur détaillée: ${error.message}`);
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   // Analyse photo avec debug détaillé
   const handlePhotoUpload = async (file: File) => {
