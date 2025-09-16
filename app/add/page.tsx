@@ -487,6 +487,55 @@ export default function AddRecipePage() {
   }
 };
 
+  const handleSave = async () => {
+  if (!title.trim()) {
+    alert("Le titre est obligatoire !");
+    return;
+  }
+
+  setIsSaving(true);
+
+  try {
+    const recipeData = {
+      title: title.trim(),
+      author: author.trim() || undefined,
+      prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
+      servings: servings.trim() || undefined,
+      imageUrl: imageUrl.trim() || undefined,
+      ingredients: ingredients
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== ""),
+      steps: steps.trim(),
+      updatedAt: Date.now()
+    };
+
+    console.log('💾 Sauvegarde de la recette:', recipeData);
+
+    const response = await fetch('/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(recipeData)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+    }
+    
+    const newRecipe = await response.json();
+    console.log('✅ Recette créée:', newRecipe);
+    
+    // Rediriger vers la liste des recettes
+    router.push("/recipes");
+  } catch (error: any) {
+    console.error('❌ Erreur sauvegarde:', error);
+    alert("Erreur lors de la sauvegarde : " + error.message);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
   // Analyse photo avec debug détaillé
   const handlePhotoUpload = async (file: File) => {
     setIsProcessing(true);
