@@ -449,45 +449,6 @@ export default function AddRecipePage() {
     }
   };
 
-  // 🔧 MODIFIER ICI - handlePhotoUpload
- const handlePhotoUpload = async (file: File) => {
-  setIsProcessing(true);
-  console.log('🎬 Début handlePhotoUpload');
-  
-  try {
-    // Analyser avec l'IA d'abord
-    const aiResult = await openAIService.analyzePhotoToRecipe(file);
-    console.log('🤖 Résultat IA:', aiResult);
-    
-    // Puis uploader l'image RÉELLEMENT sur le serveur
-    console.log('📤 Upload de l\'image...');
-    const permanentUrl = await uploadImageToServer(file);
-    console.log('✅ Image uploadée:', permanentUrl);
-    
-    // Remplir les champs
-    setTitle(aiResult.title);
-    setAuthor(aiResult.author);
-    setPrepMinutes(aiResult.prepMinutes.toString());
-    setServings(aiResult.servings);
-    setIngredients(aiResult.ingredients.join('\n'));
-    setSteps(aiResult.steps);
-    setAiConfidence(aiResult.confidence);
-    
-    // 🎯 UTILISER L'URL PERMANENTE (pas blob: temporaire)
-    setImageUrl(permanentUrl);
-    
-    setMode('manual');
-    
-    console.log('🎉 handlePhotoUpload terminé avec succès');
-    
-  } catch (error: any) {
-    console.error('💥 Erreur dans handlePhotoUpload:', error);
-    alert(`Erreur détaillée: ${error.message}`);
-  } finally {
-    setIsProcessing(false);
-  }
-};
-
   const handleScanUpload = async (file: File) => {
   setIsProcessing(true);
   console.log('📄 Début handleScanUpload');
@@ -554,35 +515,7 @@ export default function AddRecipePage() {
       setIsProcessing(false);
     }
   };
-
-  // Analyse manuscrit avec debug
-  const handleScanUpload = async (file: File) => {
-    setIsProcessing(true);
-    
-    try {
-      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
-      
-      setTitle(aiResult.title);
-      setAuthor(aiResult.author);
-      setPrepMinutes(aiResult.prepMinutes.toString());
-      setServings(aiResult.servings);
-      setIngredients(aiResult.ingredients.join('\n'));
-      setSteps(aiResult.steps);
-      setAiConfidence(aiResult.confidence);
-      
-      const tempUrl = URL.createObjectURL(file);
-      setImageUrl(tempUrl);
-      
-      setMode('manual');
-      
-    } catch (error: any) {
-      console.error('💥 Erreur dans handleScanUpload:', error);
-      alert(`Erreur détaillée: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
+  
   if (isProcessing) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
