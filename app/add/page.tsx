@@ -502,8 +502,8 @@ export default function AddRecipePage() {
       setSteps(aiResult.steps);
       setAiConfidence(aiResult.confidence);
       
-      const tempUrl = URL.createObjectURL(file);
-      setImageUrl(tempUrl);
+      const permanentUrl = await uploadImageToServer(file);
+      setImageUrl(permanentUrl);
       
       setMode('manual');
       
