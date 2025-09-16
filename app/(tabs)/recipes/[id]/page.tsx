@@ -185,14 +185,12 @@ export default function RecipeDetailPage() {
       )}
 
       <article className="space-y-6 max-w-4xl">
-        {/* Image principale */}
         {recipe.imageUrl && (
-          <div className="relative aspect-[4/3] overflow-hidden rounded-xl border">
-            <Image 
+          <div className="aspect-[4/3] overflow-hidden rounded-xl border">
+            <img 
               src={recipe.imageUrl} 
-              alt={recipe.title} 
-              fill 
-              className="object-cover" 
+              alt={recipe.title}
+              className="w-full h-full object-cover"
             />
           </div>
         )}
