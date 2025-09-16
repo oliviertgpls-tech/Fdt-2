@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 Cloudinary config:', {
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ? 'Présent' : 'MANQUANT',
-      uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ? 'Présent' : 'MANQUANT'
-    })
-
+    console.log('🚀 API Upload appelée')
+    
     const data = await request.formData()
     const file: File | null = data.get('file') as unknown as File
 
@@ -14,21 +11,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Aucun fichier reçu" }, { status: 400 })
     }
 
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ 
-        error: "Le fichier doit être une image" 
-      }, { status: 400 })
-    }
-
     // Convertir en base64
     const bytes = await file.arrayBuffer()
     const base64 = Buffer.from(bytes).toString('base64')
     const dataURI = `data:${file.type};base64,${base64}`
 
-    console.log('☁️ Upload vers Cloudinary...')
+    console.log('☁️ Tentative upload Cloudinary')
+    console.log('📋 Cloud name:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
+    console.log('📋 Upload preset:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
 
-    // Upload vers Cloudinary - VERSION MINIMALE
-    const cloudinaryResponse = await fetch(
+    // Upload ULTRA-SIMPLE vers Cloudinary
+    const response = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: 'POST',
@@ -37,38 +30,36 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           file: dataURI,
-          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-          // Rien d'autre - pas de public_id ni folder
+          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+          use_filename: false, // Force Cloudinary à ignorer le nom original
+          unique_filename: true // Force un nom unique à chaque fois
         }),
       }
     )
 
-    if (!cloudinaryResponse.ok) {
-      const errorData = await cloudinaryResponse.json()
-      console.error('❌ Erreur Cloudinary:', {
-        status: cloudinaryResponse.status,
-        statusText: cloudinaryResponse.statusText,
-        error: errorData
-      })
-      throw new Error(`Erreur Cloudinary ${cloudinaryResponse.status}: ${JSON.stringify(errorData)}`)
+    console.log('📡 Réponse Cloudinary status:', response.status)
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('❌ Erreur complète Cloudinary:', JSON.stringify(errorData, null, 2))
+      return NextResponse.json({ 
+        error: `Cloudinary error: ${JSON.stringify(errorData)}` 
+      }, { status: 400 })
     }
 
-    const cloudinaryData = await cloudinaryResponse.json()
-    console.log('✅ Upload Cloudinary réussi:', cloudinaryData.secure_url)
+    const result = await response.json()
+    console.log('✅ Upload réussi! URL:', result.secure_url)
 
     return NextResponse.json({ 
       success: true, 
-      imageUrl: cloudinaryData.secure_url,
-      filename: cloudinaryData.public_id,
-      size: file.size,
-      message: "Image uploadée avec succès sur Cloudinary" 
+      imageUrl: result.secure_url,
+      message: "Upload réussi!" 
     })
     
   } catch (error: any) {
-    console.error('❌ Erreur upload:', error)
+    console.error('❌ Erreur serveur:', error.message)
     return NextResponse.json({ 
-      success: false, 
-      error: error.message || "Erreur lors de l'upload" 
+      error: error.message 
     }, { status: 500 })
   }
 }
