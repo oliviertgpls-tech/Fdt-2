@@ -5,8 +5,17 @@ import { Plus, Eye, Edit3, X, Trash2 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-orange-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base"
+        >
+          <Plus className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="sm:hidden">Nouveau</span>
+          <span className="hidden sm:inline">Nouveau carnet</span>
+        </button>
+
 export default function CarnetsPage() {
-  const { notebooks, createNotebook, recipes, deleteNotebook } = useRecipes();
+  const { notebooks, createNotebook, recipes, deleteNotebook, loading} = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   
   // ✅ ÉTATS COMPLÈTEMENT SÉPARÉS - CHACUN SA VARIABLE
@@ -206,6 +215,10 @@ export default function CarnetsPage() {
     );
   }
 
+    if (loading) {
+    return <NotebooksLoadingSkeleton />;
+  }
+  
   return (
     <section className="space-y-8">
       {/* 🚀 EN-TÊTE AVEC BOUTON NOUVEAU CARNET */}
