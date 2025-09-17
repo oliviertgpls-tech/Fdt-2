@@ -15,6 +15,36 @@ type RecipesContextType = {
   createNotebook: (title: string, description?: string) => Promise<Book>;
   addRecipeToNotebook: (notebookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromNotebook: (notebookId: string, recipeId: string) => Promise<void>;
+
+  const deleteNotebook = async (id: string) => {
+  try {
+    const response = await fetch(`/api/notebooks/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Erreur lors de la suppression du carnet');
+    
+    setNotebooks(prev => prev.filter(notebook => notebook.id !== id));
+  } catch (err) {
+    setError('Erreur lors de la suppression du carnet');
+    throw err;
+  }
+};
+
+const deleteBook = async (id: string) => {
+  try {
+    const response = await fetch(`/api/books/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Erreur lors de la suppression du livre');
+    
+    setBooks(prev => prev.filter(book => book.id !== id));
+  } catch (err) {
+    setError('Erreur lors de la suppression du livre');
+    throw err;
+  }
+};
   
   // 📖 LIVRES IMPRIMABLES (versions print avec recettes sélectionnées)
   books: any[];
