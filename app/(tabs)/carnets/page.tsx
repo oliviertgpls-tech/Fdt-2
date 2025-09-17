@@ -6,7 +6,7 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function CarnetsPage() {
-  const { notebooks, createNotebook, recipes } = useRecipes();
+  const { notebooks, createNotebook, recipes, deleteNotebook } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
   
   // ✅ ÉTATS COMPLÈTEMENT SÉPARÉS - CHACUN SA VARIABLE
