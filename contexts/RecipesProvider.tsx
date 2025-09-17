@@ -263,33 +263,35 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  return (
-    <RecipesContext.Provider
-      value={{
-        // Recettes
-        recipes,
-        addRecipe,
-        updateRecipe,
-        deleteRecipe,
-        
-        // Carnets
-        notebooks,
-        createNotebook,
-        addRecipeToNotebook,
-        removeRecipeFromNotebook,
-        
-        // Livres
-        books,
-        createBook,
-        updateBook,
-        addRecipeToBook,
-        removeRecipeFromBook,
-        
-        // État
-        loading,
-        error
-      }}
-    >
+    return (
+      <RecipesContext.Provider
+        value={{
+          // Recettes
+          recipes,
+          addRecipe,
+          updateRecipe,
+          deleteRecipe,
+          
+          // Carnets
+          notebooks,
+          createNotebook,
+          addRecipeToNotebook,
+          removeRecipeFromNotebook,
+          deleteNotebook, // 🆕 AJOUTE ÇA
+          
+          // Livres
+          books,
+          createBook,
+          updateBook,
+          addRecipeToBook,
+          removeRecipeFromBook,
+          deleteBook, // 🆕 AJOUTE ÇA
+          
+          // État
+          loading,
+          error
+        }}
+      >
       {children}
     </RecipesContext.Provider>
   );
