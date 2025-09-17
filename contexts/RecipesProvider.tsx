@@ -45,16 +45,19 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [recipesRes, notebooksRes] = await Promise.all([
+      const [recipesRes, notebooksRes, booksRes] = await Promise.all([
         fetch('/api/recipes'),
-        fetch('/api/notebooks')
+        fetch('/api/notebooks'),
+        fetch('/api/books') // 🆕 Charger aussi les livres
       ]);
       
       const recipesData = await recipesRes.json();
       const notebooksData = await notebooksRes.json();
+      const booksData = await booksRes.json(); // 🆕
       
       setRecipes(recipesData);
       setNotebooks(notebooksData);
+      setBooks(booksData); // 🆕
       setError(null);
     } catch (err) {
       setError('Erreur lors du chargement des données');
