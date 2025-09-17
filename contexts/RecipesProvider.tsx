@@ -4,61 +4,18 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import type { Recipe, Book } from "@/lib/types";
 
 type RecipesContextType = {
-// 🍽️ RECETTES
+  // 🍽️ RECETTES
   recipes: Recipe[];
   addRecipe: (recipeData: Omit<Recipe, 'id' | 'createdAt'>) => Promise<void>;
   updateRecipe: (id: string, recipeData: Partial<Recipe>) => Promise<void>;
   deleteRecipe: (id: string) => Promise<void>;
   
-  // 📚 CARNETS
+  // 📚 CARNETS (collections thématiques)
   notebooks: Book[];
   createNotebook: (title: string, description?: string) => Promise<Book>;
   addRecipeToNotebook: (notebookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromNotebook: (notebookId: string, recipeId: string) => Promise<void>;
-  deleteNotebook: (id: string) => Promise<void>; // 🆕 AJOUTE ÇA
-  
-  // 📖 LIVRES
-  books: any[];
-  createBook: (title: string, selectedRecipeIds: string[]) => Promise<any>;
-  updateBook: (id: string, bookData: any) => Promise<void>;
-  addRecipeToBook: (bookId: string, recipeId: string) => Promise<void>;
-  removeRecipeFromBook: (bookId: string, recipeId: string) => Promise<void>;
-  deleteBook: (id: string) => Promise<void>; // 🆕 AJOUTE ÇA
-  
-  // État
-  loading: boolean;
-  error: string | null;
-  };
-
-  const deleteNotebook = async (id: string) => {
-  try {
-    const response = await fetch(`/api/notebooks/${id}`, {
-      method: 'DELETE'
-    });
-    
-    if (!response.ok) throw new Error('Erreur lors de la suppression du carnet');
-    
-    setNotebooks(prev => prev.filter(notebook => notebook.id !== id));
-  } catch (err) {
-    setError('Erreur lors de la suppression du carnet');
-    throw err;
-  }
-};
-
-const deleteBook = async (id: string) => {
-  try {
-    const response = await fetch(`/api/books/${id}`, {
-      method: 'DELETE'
-    });
-    
-    if (!response.ok) throw new Error('Erreur lors de la suppression du livre');
-    
-    setBooks(prev => prev.filter(book => book.id !== id));
-  } catch (err) {
-    setError('Erreur lors de la suppression du livre');
-    throw err;
-  }
-};
+  deleteNotebook: (id: string) => Promise<void>; // 🆕
   
   // 📖 LIVRES IMPRIMABLES (versions print avec recettes sélectionnées)
   books: any[];
@@ -66,6 +23,7 @@ const deleteBook = async (id: string) => {
   updateBook: (id: string, bookData: any) => Promise<void>;
   addRecipeToBook: (bookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromBook: (bookId: string, recipeId: string) => Promise<void>;
+  deleteBook: (id: string) => Promise<void>; // 🆕
   
   // État de chargement
   loading: boolean;
@@ -223,6 +181,22 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // 🆕 NOUVELLE FONCTION : Supprimer un carnet
+  const deleteNotebook = async (id: string) => {
+    try {
+      const response = await fetch(`/api/notebooks/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la suppression du carnet');
+      
+      setNotebooks(prev => prev.filter(notebook => notebook.id !== id));
+    } catch (err) {
+      setError('Erreur lors de la suppression du carnet');
+      throw err;
+    }
+  };
+
   // 📖 GESTION DES LIVRES (version simplifiée pour l'instant)
   const createBook = async (title: string, selectedRecipeIds: string[]) => {
     const newBook = {
@@ -263,35 +237,51 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-    return (
-      <RecipesContext.Provider
-        value={{
-          // Recettes
-          recipes,
-          addRecipe,
-          updateRecipe,
-          deleteRecipe,
-          
-          // Carnets
-          notebooks,
-          createNotebook,
-          addRecipeToNotebook,
-          removeRecipeFromNotebook,
-          deleteNotebook, // 🆕 AJOUTE ÇA
-          
-          // Livres
-          books,
-          createBook,
-          updateBook,
-          addRecipeToBook,
-          removeRecipeFromBook,
-          deleteBook, // 🆕 AJOUTE ÇA
-          
-          // État
-          loading,
-          error
-        }}
-      >
+  // 🆕 NOUVELLE FONCTION : Supprimer un livre
+  const deleteBook = async (id: string) => {
+    try {
+      const response = await fetch(`/api/books/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la suppression du livre');
+      
+      setBooks(prev => prev.filter(book => book.id !== id));
+    } catch (err) {
+      setError('Erreur lors de la suppression du livre');
+      throw err;
+    }
+  };
+
+  return (
+    <RecipesContext.Provider
+      value={{
+        // Recettes
+        recipes,
+        addRecipe,
+        updateRecipe,
+        deleteRecipe,
+        
+        // Carnets
+        notebooks,
+        createNotebook,
+        addRecipeToNotebook,
+        removeRecipeFromNotebook,
+        deleteNotebook, // 🆕
+        
+        // Livres
+        books,
+        createBook,
+        updateBook,
+        addRecipeToBook,
+        removeRecipeFromBook,
+        deleteBook, // 🆕
+        
+        // État
+        loading,
+        error
+      }}
+    >
       {children}
     </RecipesContext.Provider>
   );
