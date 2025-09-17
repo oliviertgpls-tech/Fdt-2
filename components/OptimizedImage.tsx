@@ -1,17 +1,17 @@
 import React from 'react';
 
-// Types pour les versions d'images
+// Types pour les versions d'images (doit matcher le format de l'API)
 type ImageVersions = {
-  thumbnail: string;
-  medium: string;
-  large: string;
+  thumbnail: string;  // 200px
+  medium: string;     // 800px
+  large: string;      // 2400px
 }
 
 // Tailles possibles avec leurs cas d'usage
 type ImageSize = 'thumbnail' | 'medium' | 'large';
 
 interface OptimizedImageProps {
-  src: string | ImageVersions; // Peut être une URL simple ou un objet avec versions
+  src: string | ImageVersions | null | undefined; // Plus robuste avec null/undefined
   alt: string;
   size: ImageSize;
   className?: string;
@@ -22,14 +22,27 @@ interface OptimizedImageProps {
 /**
  * 🎯 Composant OptimizedImage
  * 
- * Usage:
- * - thumbnail: listes, vignettes, avatars (200px)
- * - medium: cartes, aperçus, galeries (800px)  
- * - large: affichage plein, détails (2400px)
+ * Utilise automatiquement la bonne taille d'image selon le contexte :
  * 
- * Exemples:
- * <OptimizedImage src={recipe.imageUrl} alt="Recette" size="medium" />
- * <OptimizedImage src={recipe.imageVersions} alt="Recette" size="thumbnail" />
+ * - **thumbnail** (200px) : listes, vignettes, avatars
+ * - **medium** (800px) : cartes, aperçus, galeries  
+ * - **large** (2400px) : affichage plein écran, détails
+ * 
+ * Compatible avec :
+ * - ✅ Nouveau format (objet avec versions) : `{ thumbnail: "...", medium: "...", large: "..." }`
+ * - ✅ Ancien format (URL simple) : `"https://cloudinary.com/..."`
+ * 
+ * Exemples :
+ * ```jsx
+ * // Pour une liste de recettes (vignettes rapides)
+ * <OptimizedImage src={recipe.imageVersions || recipe.imageUrl} alt="Recette" size="thumbnail" />
+ * 
+ * // Pour une carte de recette (aperçu de qualité) 
+ * <OptimizedImage src={recipe.imageVersions || recipe.imageUrl} alt="Recette" size="medium" />
+ * 
+ * // Pour la page de détail (haute qualité)
+ * <OptimizedImage src={recipe.imageVersions || recipe.imageUrl} alt="Recette" size="large" />
+ * ```
  */
 export function OptimizedImage({ 
   src, 
@@ -42,12 +55,17 @@ export function OptimizedImage({
   
   // Détermine l'URL à utiliser selon le type de src et la taille demandée
   const getOptimizedUrl = (): string => {
+    // Si pas d'image du tout, retourne une image par défaut
+    if (!src) {
+      return 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=400'; // Placeholder food
+    }
+
     if (typeof src === 'string') {
       // URL simple (ancien format) - on essaie de l'optimiser via Cloudinary
       return optimizeCloudinaryUrl(src, size);
     } else {
-      // Objet avec versions - on prend la bonne taille
-      return src[size];
+      // Objet avec versions (nouveau format) - on prend la bonne taille
+      return src[size] || src.large || src.medium || src.thumbnail;
     }
   };
 
@@ -64,6 +82,8 @@ export function OptimizedImage({
         // Fallback en cas d'erreur - essaie l'URL originale si disponible
         if (typeof src === 'object' && e.currentTarget.src !== src.large) {
           e.currentTarget.src = src.large;
+        } else if (typeof src === 'string' && e.currentTarget.src !== src) {
+          e.currentTarget.src = src;
         }
       }}
     />
