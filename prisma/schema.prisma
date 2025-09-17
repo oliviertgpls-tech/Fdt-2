@@ -57,6 +57,7 @@ model Book {
   id          String   @id @default(cuid())
   title       String
   description String?
+  coverImageUrl  String?  // 🆕 Photo de couverture dédiée
   status      String   @default("draft") // draft, ready, ordered, printed
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
