@@ -4,6 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
 
+// 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
+type UploadResult = {
+  success: boolean;
+  versions: {
+    thumbnail: string;  // 200px
+    medium: string;     // 800px  
+    large: string;      // 2400px
+  };
+  originalUrl: string;
+  message: string;
+}
+
 // Service IA OpenAI avec debug
 class OpenAIService {
   private apiKey: string;
@@ -397,87 +409,11 @@ export default function AddRecipePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+  // 🆕 NOUVEL ÉTAT pour les versions optimisées
+  const [imageVersions, setImageVersions] = useState<UploadResult['versions'] | null>(null);
+
   // État pour IA
   const [aiConfidence, setAiConfidence] = useState<number | null>(null);
-
-  // 🆕 FONCTION DE COMPRESSION PREMIUM
-  const compressImagePremium = (file: File, maxWidth = 2400, quality = 0.95): Promise<File> => {
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d')!;
-      const img = new Image();
-      
-      img.onload = () => {
-        // Calculer nouvelles dimensions en gardant le ratio
-        let { width, height } = img;
-        
-        if (width > maxWidth || height > maxWidth) {
-          const ratio = Math.min(maxWidth / width, maxWidth / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Améliorer la qualité de rendu
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        
-        // Dessiner l'image redimensionnée
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convertir en blob haute qualité
-        canvas.toBlob((blob) => {
-          const compressedFile = new File([blob!], file.name, { 
-            type: 'image/jpeg',
-            lastModified: file.lastModified 
-          });
-          resolve(compressedFile);
-        }, 'image/jpeg', quality);
-      };
-      
-      img.src = URL.createObjectURL(file);
-    });
-  };
-
-  // 🆕 FONCTION D'UPLOAD AVEC COMPRESSION PREMIUM
-  const uploadImageToServer = async (file: File): Promise<string> => {
-    console.log('📤 Upload vers le serveur...', file.name);
-    console.log('📏 Taille originale:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
-    
-    let finalFile = file;
-    
-    // Compression automatique si > 3 Mo
-    if (file.size > 3 * 1024 * 1024) {
-      console.log('🎨 Compression premium en cours...');
-      finalFile = await compressImagePremium(file);
-      console.log('✨ Taille optimisée:', (finalFile.size / 1024 / 1024).toFixed(2), 'Mo');
-      console.log('🖨️ Qualité print conservée (2400px, 95%)');
-    }
-    
-    const formData = new FormData();
-    formData.append('file', finalFile);
-    
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('✅ Upload réussi:', result);
-    
-    if (result.success) {
-      return result.imageUrl; // URL permanente
-    } else {
-      throw new Error(result.error || 'Erreur upload');
-    }
-  };
 
   // Debug des variables d'environnement au chargement
   useState(() => {
@@ -486,16 +422,47 @@ export default function AddRecipePage() {
     console.log('Unsplash:', process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? 'PRÉSENTE' : 'MANQUANTE');
   });
 
-  // Upload d'image personnelle
+  // 🔄 FONCTION D'UPLOAD MISE À JOUR avec optimisations
   const handleImageUpload = async (file: File) => {
     setIsUploading(true);
     
     try {
-      const permanentUrl = await uploadImageToServer(file);
-      setImageUrl(permanentUrl);
+      console.log('📤 Upload optimisé en cours...', file.name);
+      console.log('📏 Taille originale:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
+      
+      const result: UploadResult = await response.json();
+      console.log('✅ Upload optimisé réussi:', result);
+      
+      if (result.success) {
+        // 🆕 Stocker les versions optimisées
+        setImageVersions(result.versions);
+        // Garder compatibilité avec l'ancien système
+        setImageUrl(result.originalUrl);
+        
+        console.log('🎯 Versions créées:');
+        console.log('  - Thumbnail (200px):', result.versions.thumbnail);
+        console.log('  - Medium (800px):', result.versions.medium);
+        console.log('  - Large (2400px):', result.versions.large);
+      } else {
+        throw new Error(result.message || 'Erreur upload');
+      }
+      
     } catch (error: any) {
-      alert("Erreur lors de l'upload de l'image");
-      console.error(error);
+      console.error('💥 Erreur upload optimisé:', error);
+      alert("Erreur lors de l'upload optimisé : " + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -510,10 +477,9 @@ export default function AddRecipePage() {
       const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
       console.log('🤖 Résultat IA manuscrit:', aiResult);
       
-      // Puis uploader l'image RÉELLEMENT sur le serveur
-      console.log('📤 Upload du manuscrit...');
-      const permanentUrl = await uploadImageToServer(file);
-      console.log('✅ Manuscrit uploadé:', permanentUrl);
+      // Puis uploader l'image avec optimisations
+      console.log('📤 Upload du manuscrit optimisé...');
+      await handleImageUpload(file);
       
       // Remplir les champs
       setTitle(aiResult.title);
@@ -523,9 +489,6 @@ export default function AddRecipePage() {
       setIngredients(aiResult.ingredients.join('\n'));
       setSteps(aiResult.steps);
       setAiConfidence(aiResult.confidence);
-      
-      // Utiliser l'URL permanente
-      setImageUrl(permanentUrl);
       
       setMode('manual');
       
@@ -539,6 +502,7 @@ export default function AddRecipePage() {
     }
   };
 
+  // 🔄 FONCTION DE SAUVEGARDE MISE À JOUR
   const handleSave = async () => {
     if (!title.trim()) {
       alert("Le titre est obligatoire !");
@@ -553,7 +517,9 @@ export default function AddRecipePage() {
         author: author.trim() || undefined,
         prepMinutes: prepMinutes ? parseInt(prepMinutes) : undefined,
         servings: servings.trim() || undefined,
+        // 🆕 NOUVEAU : stocker les versions optimisées
         imageUrl: imageUrl.trim() || undefined,
+        imageVersions: imageVersions || undefined,
         ingredients: ingredients
           .split('\n')
           .map(line => line.trim())
@@ -562,7 +528,7 @@ export default function AddRecipePage() {
         updatedAt: Date.now()
       };
 
-      console.log('💾 Sauvegarde de la recette:', recipeData);
+      console.log('💾 Sauvegarde avec optimisations:', recipeData);
 
       const response = await fetch('/api/recipes', {
         method: 'POST',
@@ -576,7 +542,7 @@ export default function AddRecipePage() {
       }
       
       const newRecipe = await response.json();
-      console.log('✅ Recette créée:', newRecipe);
+      console.log('✅ Recette créée avec optimisations:', newRecipe);
       
       // Rediriger vers la liste des recettes
       router.push("/recipes");
@@ -611,9 +577,8 @@ export default function AddRecipePage() {
       
       // Upload optimisé
       console.log('📤 Upload optimisé en cours...');
-      const permanentUrl = await uploadImageToServer(file);
-      setImageUrl(permanentUrl);
-      console.log('🎉 Tout fini! URL:', permanentUrl);
+      await handleImageUpload(file);
+      console.log('🎉 Tout fini! Image optimisée et données IA prêtes');
       
       setMode('manual');
       
@@ -623,6 +588,44 @@ export default function AddRecipePage() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  // 🎨 COMPOSANT APERÇU AMÉLIORÉ
+  const PreviewSection = () => {
+    if (!imageUrl && !imageVersions) return null;
+
+    return (
+      <div className="mt-3 relative">
+        {/* 🆕 Utilise la version medium pour l'aperçu (800px au lieu de 2400px) */}
+        <img 
+          src={imageVersions ? imageVersions.medium : imageUrl} 
+          alt="Aperçu" 
+          className="w-full max-w-xs h-32 object-cover rounded-lg border"
+          onError={(e) => {
+            // Fallback vers l'URL originale si erreur
+            if (imageVersions && e.currentTarget.src !== imageVersions.large) {
+              e.currentTarget.src = imageVersions.large;
+            }
+          }}
+        />
+        <button
+          onClick={() => {
+            setImageUrl("");
+            setImageVersions(null); // 🆕 Reset aussi les versions
+          }}
+          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+        >
+          ×
+        </button>
+        
+        {/* 🆕 Indicateur d'optimisation */}
+        {imageVersions && (
+          <div className="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
+            ✨ Optimisé
+          </div>
+        )}
+      </div>
+    );
   };
   
   if (isProcessing) {
@@ -804,7 +807,7 @@ export default function AddRecipePage() {
             Photographiez votre plat
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA OpenAI va analyser votre photo et créer automatiquement la recette complète
+            Notre IA OpenAI va analyser votre photo et créer automatiquement la recette complète avec optimisation d'image
           </p>
 
           <label className="inline-block">
@@ -830,6 +833,7 @@ export default function AddRecipePage() {
               <li>• Éclairage naturel de préférence</li>
               <li>• Évitez les reflets et ombres fortes</li>
               <li>• L'IA fonctionne mieux avec des plats reconnaissables</li>
+              <li>• 🆕 Votre image sera automatiquement optimisée (3 tailles)</li>
             </ul>
           </div>
         </div>
@@ -861,7 +865,7 @@ export default function AddRecipePage() {
             Scannez votre recette
           </h2>
           <p className="text-gray-600 mb-8">
-            Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI va lire et structurer le texte automatiquement.
+            Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI va lire et structurer le texte automatiquement avec optimisation d'image.
           </p>
 
           <label className="inline-block">
@@ -887,6 +891,7 @@ export default function AddRecipePage() {
               <li>• Assurez-vous que tout le texte est visible</li>
               <li>• Éclairage uniforme sans ombres</li>
               <li>• L'IA lit même l'écriture manuscrite !</li>
+              <li>• 🆕 Image automatiquement optimisée pour stockage</li>
             </ul>
           </div>
         </div>
@@ -982,7 +987,7 @@ export default function AddRecipePage() {
           </div>
         </div>
 
-        {/* Photo */}
+        {/* 🔄 SECTION PHOTO MISE À JOUR avec optimisations */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
             Photo (optionnel)
@@ -992,7 +997,10 @@ export default function AddRecipePage() {
             <input
               type="url"
               value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
+              onChange={(e) => {
+                setImageUrl(e.target.value);
+                setImageVersions(null); // Reset versions si URL manuelle
+              }}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="Collez un lien d'image..."
             />
@@ -1009,34 +1017,25 @@ export default function AddRecipePage() {
                   className="hidden"
                   disabled={isUploading}
                 />
-                📷 {isUploading ? "Upload..." : "Ma photo"}
+                📷 {isUploading ? "Optimisation..." : "Ma photo (optimisée)"}
               </label>
 
               <ImageSearch 
-                onImageSelect={(url) => setImageUrl(url)}
+                onImageSelect={(url) => {
+                  setImageUrl(url);
+                  setImageVersions(null); // Reset versions pour URL externe
+                }}
                 initialQuery={title}
               />
             </div>
             
-            {imageUrl && (
-              <div className="mt-3 relative">
-                <img 
-                  src={imageUrl} 
-                  alt="Aperçu" 
-                  className="w-full max-w-xs h-32 object-cover rounded-lg border"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <button
-                  onClick={() => setImageUrl("")}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                >
-                  ×
-                </button>
-              </div>
-            )}
+            {/* 🆕 APERÇU OPTIMISÉ */}
+            <PreviewSection />
           </div>
+          
+          <p className="text-xs text-gray-500 mt-2">
+            💡 Upload optimisé automatique : 3 tailles (200px, 800px, 2400px) pour des performances optimales !
+          </p>
         </div>
 
         {/* Ingrédients */}
