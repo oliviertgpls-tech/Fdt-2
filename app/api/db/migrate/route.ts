@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export async function GET() {
+  return POST(); // Réutilise la logique POST
+}
+
 export async function POST() {
   try {
     // Créer les tables avec du SQL brut (plus simple que Prisma migrate)
