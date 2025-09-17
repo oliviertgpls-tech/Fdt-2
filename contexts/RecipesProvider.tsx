@@ -4,17 +4,31 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import type { Recipe, Book } from "@/lib/types";
 
 type RecipesContextType = {
-  // 🍽️ RECETTES
+// 🍽️ RECETTES
   recipes: Recipe[];
   addRecipe: (recipeData: Omit<Recipe, 'id' | 'createdAt'>) => Promise<void>;
   updateRecipe: (id: string, recipeData: Partial<Recipe>) => Promise<void>;
   deleteRecipe: (id: string) => Promise<void>;
   
-  // 📚 CARNETS (collections thématiques)
+  // 📚 CARNETS
   notebooks: Book[];
   createNotebook: (title: string, description?: string) => Promise<Book>;
   addRecipeToNotebook: (notebookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromNotebook: (notebookId: string, recipeId: string) => Promise<void>;
+  deleteNotebook: (id: string) => Promise<void>; // 🆕 AJOUTE ÇA
+  
+  // 📖 LIVRES
+  books: any[];
+  createBook: (title: string, selectedRecipeIds: string[]) => Promise<any>;
+  updateBook: (id: string, bookData: any) => Promise<void>;
+  addRecipeToBook: (bookId: string, recipeId: string) => Promise<void>;
+  removeRecipeFromBook: (bookId: string, recipeId: string) => Promise<void>;
+  deleteBook: (id: string) => Promise<void>; // 🆕 AJOUTE ÇA
+  
+  // État
+  loading: boolean;
+  error: string | null;
+  };
 
   const deleteNotebook = async (id: string) => {
   try {
