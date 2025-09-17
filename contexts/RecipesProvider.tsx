@@ -210,7 +210,7 @@ const createBook = async (title: string, selectedRecipeIds: string[]) => {
         coverImageUrl: undefined
       })
     });
-
+    
     if (!response.ok) throw new Error('Erreur lors de la création du livre');
     
     const newBook = await response.json();
