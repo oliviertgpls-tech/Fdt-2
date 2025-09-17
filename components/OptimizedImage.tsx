@@ -80,9 +80,9 @@ export function OptimizedImage({
       onClick={onClick}
       onError={(e) => {
         // Fallback en cas d'erreur - essaie l'URL originale si disponible
-        if (typeof src === 'object' && e.currentTarget.src !== src.large) {
+        if (src && typeof src === 'object' && e.currentTarget.src !== src.large) {
           e.currentTarget.src = src.large;
-        } else if (typeof src === 'string' && e.currentTarget.src !== src) {
+        } else if (src && typeof src === 'string' && e.currentTarget.src !== src) {
           e.currentTarget.src = src;
         }
       }}
