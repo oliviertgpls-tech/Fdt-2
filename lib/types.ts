@@ -2,7 +2,13 @@ export type Recipe = {
   id: string;
   title: string;
   description?: string;
-  imageUrl?: string;        // URL de l'image principale
+  imageUrl?: string;        // URL de l'image principale (ancien format)
+  // 🆕 NOUVEAU : Versions optimisées d'images
+  imageVersions?: {
+    thumbnail: string;      // 200px - pour listes/vignettes
+    medium: string;         // 800px - pour cartes/aperçus  
+    large: string;          // 2400px - pour affichage plein
+  };
   ingredients: string[];    // Liste des ingrédients (1 par ligne)
   steps: string;           // Instructions (texte libre pour commencer)
   author?: string;         // "Mamie Jeanne", "Papa", etc.
