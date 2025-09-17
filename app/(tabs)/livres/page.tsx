@@ -38,54 +38,54 @@ function BookCardSkeleton() {
 // Composant Skeleton pour l'état de chargement
 function BooksLoadingSkeleton() {
   return (
-    <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
-      {/* En-tête skeleton */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-2">
-          <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
-          <div className="h-5 bg-gray-150 rounded w-80 animate-pulse"></div>
+      <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
+        {/* En-tête skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+            <div className="h-5 bg-gray-150 rounded w-80 animate-pulse"></div>
+          </div>
         </div>
-      </div>
-
-      {/* Section "Mes livres en cours" skeleton */}
-      <div className="space-y-4">
-        <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[...Array(4)].map((_, index) => (
-            <BookCardSkeleton key={index} />
-          ))}
+  
+        {/* Section "Mes livres en cours" skeleton */}
+        <div className="space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(4)].map((_, index) => (
+              <BookCardSkeleton key={index} />
+            ))}
+          </div>
         </div>
-      </div>
-
-      {/* Section sélection recettes skeleton */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-        <div className="h-6 bg-gray-200 rounded w-96 animate-pulse mb-6"></div>
-        
-        {/* Filtres skeleton */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 h-10 bg-gray-150 rounded-lg"></div>
-          <div className="w-48 h-10 bg-gray-150 rounded-lg"></div>
-        </div>
-
-        {/* Liste recettes skeleton */}
-        <div className="grid gap-3 md:gap-4">
-          {[...Array(6)].map((_, index) => (
-            <div key={index} className="border border-gray-200 rounded-xl p-3 md:p-4 animate-pulse">
-              <div className="flex gap-3 md:gap-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-150 rounded w-1/2"></div>
-                  <div className="h-3 bg-gray-150 rounded w-1/4"></div>
+  
+        {/* Section sélection recettes skeleton */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+          <div className="h-6 bg-gray-200 rounded w-96 animate-pulse mb-6"></div>
+          
+          {/* Filtres skeleton */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 h-10 bg-gray-150 rounded-lg"></div>
+            <div className="w-48 h-10 bg-gray-150 rounded-lg"></div>
+          </div>
+  
+          {/* Liste recettes skeleton */}
+          <div className="grid gap-3 md:gap-4">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="border border-gray-200 rounded-xl p-3 md:p-4 animate-pulse">
+                <div className="flex gap-3 md:gap-4">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-150 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-150 rounded w-1/4"></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 export default function LivresPage() {
   const { notebooks, recipes, books, createBook, deleteBook, loading } = useRecipes();
