@@ -6,7 +6,7 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
 export default function LivresPage() {
-  const { notebooks, recipes, books, createBook } = useRecipes();
+  const { notebooks, recipes, books, createBook, deleteBook} = useRecipes();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotebook, setSelectedNotebook] = useState<string>('all');
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
