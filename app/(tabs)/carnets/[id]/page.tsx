@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
-import { ArrowLeft, Edit3, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit3, Plus, Trash2 } from "lucide-react";
 
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
@@ -39,7 +39,6 @@ export default function CarnetPage() {
         .toLowerCase();
       return searchText.includes(query);
     });
-    
   }, [carnetRecipes, searchQuery]);
 
   const handleCreateBookFromCarnet = async () => {
@@ -53,9 +52,16 @@ export default function CarnetPage() {
       
       // Rediriger vers la page du livre créé
       router.push(`/livres/${newBook.id}`);
-     } catch (error) {
+    } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
       alert('Erreur lors de la création du livre');
+    }
+  };
+
+  const handleDeleteCarnet = () => {
+    if (window.confirm(`Supprimer le carnet "${carnet?.title}" ?\n\nCette action est irréversible.`)) {
+      deleteNotebook(id);
+      router.push('/carnets');
     }
   };
 
@@ -88,19 +94,19 @@ export default function CarnetPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
+          
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">📚 {carnet.title}</h1>
+            <p className="text-gray-600">
+              {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
+            </p>
+            {carnet.description && (
+              <p className="text-gray-500 text-sm mt-1">{carnet.description}</p>
+            )}
+          </div>
         </div>
         
-      <div>
-          <h1 className="text-3xl font-bold text-gray-900">📚 {carnet.title}</h1>
-          <p className="text-gray-600">
-            {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
-          </p>
-          {carnet.description && (
-            <p className="text-gray-500 text-sm mt-1">{carnet.description}</p>
-          )}
-        </div>
-        
-       <div className="flex gap-3">
+        <div className="flex gap-3">
           <Link
             href={`/carnets/${id}/edit`}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
@@ -118,20 +124,16 @@ export default function CarnetPage() {
               Créer un livre
             </button>
           )}
-        
+          
           <button
-            onClick={() => {
-              if (window.confirm(`Supprimer le carnet "${carnet.title}" ?\n\nCette action est irréversible.`)) {
-                deleteNotebook(carnet.id);
-                router.push('/carnets');
-              }
-            }}
+            onClick={handleDeleteCarnet}
             className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium flex items-center gap-2"
           >
             <Trash2 className="w-4 h-4" />
             Supprimer
           </button>
         </div>
+      </div>
 
       {/* Barre de recherche */}
       {carnetRecipes.length > 0 && (
