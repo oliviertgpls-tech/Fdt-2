@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  + Recette
+                  + Nouvelle Recette
                 </Link>
             </div>
 
@@ -89,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  + Ajouter une recette
+                  + Nouvelle recette
                 </Link>
               </div>
             </div>
