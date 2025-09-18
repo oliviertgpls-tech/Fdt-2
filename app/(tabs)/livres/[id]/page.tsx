@@ -524,31 +524,29 @@ export default function BookPage() {
       <div className="max-w-6xl mx-auto pt-8 px-8">
         
         {/* En-tête avec titre éditable */}
-<div className="bg-white rounded-lg shadow-sm border p-4 flex items-center justify-between mb-8">
-  <div className="flex items-center gap-4">
+<div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 md:mb-8">
+  <div className="flex items-center gap-4 w-full sm:w-auto">
     <button
       onClick={() => router.back()}
-      className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2"
+      className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 text-sm md:text-base"
     >
       <ArrowLeft className="w-4 h-4" />
-      Retour
+      <span className="hidden sm:inline">Retour</span>
     </button>
     
     <div className="flex-1">
       {editingTitle ? (
         <div className="flex items-center gap-3">
-          <input
+         <input
             type="text"
             value={bookTitle}
             onChange={(e) => setBookTitle(e.target.value)}
-            className="text-xl font-semibold text-gray-800 border border-gray-300 rounded px-3 py-1 focus:border-orange-500 focus:outline-none"
-            placeholder="Titre du livre"
-            autoFocus
+            className="text-lg md:text-xl font-semibold text-gray-800 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
           />
           <button
             onClick={saveTitle}
             disabled={!bookTitle.trim()}
-            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+            className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50 min-w-[32px] flex items-center justify-center"
           >
             ✓
           </button>
@@ -557,7 +555,7 @@ export default function BookPage() {
               setBookTitle(book.title);
               setEditingTitle(false);
             }}
-            className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200"
+            className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded text-sm hover:bg-gray-200 min-w-[32px] flex items-center justify-center"
           >
             ✕
           </button>
