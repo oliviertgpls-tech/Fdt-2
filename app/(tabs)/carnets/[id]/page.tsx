@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
-import { ArrowLeft, Edit3, Plus, Search, Trash3 } from "lucide-react";
+import { ArrowLeft, Edit3, Plus, Search, Trash2 } from "lucide-react";
 
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
