@@ -188,17 +188,21 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
 };
 
 
-  // 🆕 NOUVELLE FONCTION : Supprimer un carnet
-  const deleteNotebook = async (id: string) => {
+  // SUPPRIMER UN CARNET
+ const deleteNotebook = async (id: string) => {
     try {
       const response = await fetch(`/api/notebooks/${id}`, {
         method: 'DELETE'
       });
       
-      if (!response.ok) throw new Error('Erreur lors de la suppression du carnet');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la suppression du carnet');
+      }
       
       setNotebooks(prev => prev.filter(notebook => notebook.id !== id));
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Erreur deleteNotebook:', err);
       setError('Erreur lors de la suppression du carnet');
       throw err;
     }
