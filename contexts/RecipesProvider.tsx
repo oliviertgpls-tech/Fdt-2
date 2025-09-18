@@ -15,7 +15,8 @@ type RecipesContextType = {
   createNotebook: (title: string, description?: string) => Promise<Book>;
   addRecipeToNotebook: (notebookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromNotebook: (notebookId: string, recipeId: string) => Promise<void>;
-  deleteNotebook: (id: string) => Promise<void>; // 🆕
+  deleteNotebook: (id: string) => Promise<void>;
+  updateNotebook: (id: string, updates: { title?: string; description?: string }) => Promise<void>;
   
   // 📖 LIVRES IMPRIMABLES (versions print avec recettes sélectionnées)
   books: any[];
@@ -203,6 +204,30 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
   } catch (err: any) {
     console.error('Erreur removeRecipeFromNotebook:', err);
     setError('Erreur lors de la suppression de la recette du carnet');
+    throw err;
+  }
+};
+
+  const updateNotebook = async (id: string, updates: { title?: string; description?: string }) => {
+  try {
+    const response = await fetch(`/api/notebooks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+    }
+    
+    const updatedNotebook = await response.json();
+    setNotebooks(prev => 
+      prev.map(notebook => notebook.id === id ? updatedNotebook : notebook)
+    );
+  } catch (err: any) {
+    console.error('Erreur updateNotebook:', err);
+    setError('Erreur lors de la mise à jour du carnet');
     throw err;
   }
 };
