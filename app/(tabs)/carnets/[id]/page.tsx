@@ -53,17 +53,11 @@ export default function CarnetPage() {
       
       // Rediriger vers la page du livre créé
       router.push(`/livres/${newBook.id}`);
-      } catch (error) {
+     } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
       alert('Erreur lors de la création du livre');
-      }
-  };
-
-  if (!carnet) {
     }
   };
-  }
- 
 
   if (!carnet) {
     return (
