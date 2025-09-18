@@ -335,7 +335,8 @@ const createBook = async (title: string, selectedRecipeIds: string[]) => {
         createNotebook,
         addRecipeToNotebook,
         removeRecipeFromNotebook,
-        deleteNotebook, // 🆕
+        deleteNotebook, 
+        updateNotebook,
         
         // Livres
         books,
@@ -343,7 +344,7 @@ const createBook = async (title: string, selectedRecipeIds: string[]) => {
         updateBook,
         addRecipeToBook,
         removeRecipeFromBook,
-        deleteBook, // 🆕
+        deleteBook, 
         
         // État
         loading,
