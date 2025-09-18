@@ -125,9 +125,9 @@ export default function CarnetEditPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">✏️ Modifier le carnet</h1>
+            <h1 className="text-xl font-bold text-gray-900">✏️ Edition </h1>
             <p className="text-gray-600">
-              {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans ce carnet
+              {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes actuellement
             </p>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function CarnetEditPage() {
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
         >
           <Eye className="w-4 h-4" />
-          Voir le carnet
+          Voir
         </Link>
       </div>
 
