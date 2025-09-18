@@ -90,10 +90,10 @@ export default function CarnetPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">📚 {carnet.title}</h1>
             <p className="text-gray-600">
-              {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
-            </p>
             {carnet.description && (
               <p className="text-gray-500 text-sm mt-1">{carnet.description}</p>
+            </p>
+              {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
             )}
           </div>
         </div>
