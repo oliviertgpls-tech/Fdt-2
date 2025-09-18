@@ -58,6 +58,8 @@ export default function CarnetPage() {
       alert('Erreur lors de la création du livre');
     }
   };
+  }
+ 
 
   if (!carnet) {
     return (
