@@ -254,55 +254,83 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
   };
 
   // 📖 GESTION DES LIVRES 
-const createBook = async (title: string, selectedRecipeIds: string[]) => {
-  try {
-    const response = await fetch('/api/books', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        title, 
-        recipeIds: selectedRecipeIds,
-        description: undefined,
-        coverImageUrl: undefined
-      })
-    });
-    
-    if (!response.ok) throw new Error('Erreur lors de la création du livre');
-    
-    const newBook = await response.json();
-    setBooks(prev => [newBook, ...prev]);
-    return newBook;
-  } catch (err) {
-    setError('Erreur lors de la création du livre');
-    throw err;
-  }
-};
-
   const updateBook = async (id: string, bookData: any) => {
-    setBooks(prev =>
-      prev.map(book => book.id === id ? { ...book, ...bookData } : book)
-    );
+    try {
+      const response = await fetch(`/api/books/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la mise à jour');
+      }
+      
+      const updatedBook = await response.json();
+      setBooks(prev =>
+        prev.map(book => book.id === id ? updatedBook : book)
+      );
+    } catch (err: any) {
+      console.error('Erreur updateBook:', err);
+      setError('Erreur lors de la mise à jour du livre');
+      throw err;
+    }
   };
-
+  
   const addRecipeToBook = async (bookId: string, recipeId: string) => {
-    setBooks(prev =>
-      prev.map(book => {
-        if (book.id === bookId && !book.recipeIds.includes(recipeId)) {
-          return { ...book, recipeIds: [...book.recipeIds, recipeId] };
-        }
-        return book;
-      })
-    );
+    try {
+      const response = await fetch(`/api/books/${bookId}/recipes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeId })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de l\'ajout');
+      }
+      
+      // Mettre à jour le state local après succès de l'API
+      setBooks(prev =>
+        prev.map(book => {
+          if (book.id === bookId && !book.recipeIds.includes(recipeId)) {
+            return { ...book, recipeIds: [...book.recipeIds, recipeId] };
+          }
+          return book;
+        })
+      );
+    } catch (err: any) {
+      console.error('Erreur addRecipeToBook:', err);
+      setError('Erreur lors de l\'ajout de la recette au livre');
+      throw err;
+    }
   };
-
+  
   const removeRecipeFromBook = async (bookId: string, recipeId: string) => {
-    setBooks(prev =>
-      prev.map(book =>
-        book.id === bookId
-          ? { ...book, recipeIds: book.recipeIds.filter((id: string) => id !== recipeId) }
-          : book
-      )
-    );
+    try {
+      const response = await fetch(`/api/books/${bookId}/recipes?recipeId=${recipeId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la suppression');
+      }
+      
+      // Mettre à jour le state local après succès de l'API
+      setBooks(prev =>
+        prev.map(book =>
+          book.id === bookId
+            ? { ...book, recipeIds: book.recipeIds.filter((id: string) => id !== recipeId) }
+            : book
+        )
+      );
+    } catch (err: any) {
+      console.error('Erreur removeRecipeFromBook:', err);
+      setError('Erreur lors de la suppression de la recette du livre');
+      throw err;
+    }
   };
 
   // 🆕 NOUVELLE FONCTION : Supprimer un livre
