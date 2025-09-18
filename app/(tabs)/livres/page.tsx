@@ -240,7 +240,7 @@ export default function LivresPage() {
                             className="w-full h-full object-cover rounded-lg shadow-sm"
                           />
                         </div>
-                      ) : (
+                      ):(
                   // ICONE LIVRE PAR DEFAUT
                   <div className="aspect-[2/1] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-3xl md:text-4xl">
                     📖
@@ -274,9 +274,6 @@ export default function LivresPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
 
       {/* Sélection de recettes */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
