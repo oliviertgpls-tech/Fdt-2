@@ -229,6 +229,19 @@ export default function LivresPage() {
               
               return (
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                   {/* 🆕 COUVERTURE AVEC IMAGE OU ICÔNE */}
+                    <div className="aspect-[2/1] relative overflow-hidden">
+                      {book.coverImageUrl ? (
+                        // Photo de couverture personnalisée
+                        <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+                          <img 
+                            src={book.coverImageUrl} 
+                            alt={`Couverture - ${book.title}`}
+                            className="w-full h-full object-cover rounded-lg shadow-sm"
+                          />
+                        </div>
+                      ) : (
+                  // ICONE LIVRE PAR DEFAUT
                   <div className="aspect-[2/1] bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-3xl md:text-4xl">
                     📖
                   </div>
