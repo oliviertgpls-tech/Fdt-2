@@ -124,7 +124,27 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   };
 
   // 📚 GESTION DES CARNETS
-const addRecipeToNotebook = async (notebookId: string, recipeId: string) => {
+
+  const createNotebook = async (title: string, description?: string): Promise<Book> => {
+    try {
+      const response = await fetch('/api/notebooks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description })
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la création du carnet');
+      
+      const newNotebook = await response.json();
+      setNotebooks(prev => [newNotebook, ...prev]);
+      return newNotebook;
+    } catch (err) {
+      setError('Erreur lors de la création du carnet');
+      throw err;
+    }
+  };
+  
+  const addRecipeToNotebook = async (notebookId: string, recipeId: string) => {
   try {
     const response = await fetch(`/api/notebooks/${notebookId}/recipes`, {
       method: 'POST',
