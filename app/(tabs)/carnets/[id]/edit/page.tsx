@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { Plus, Eye, Move, Trash2, ArrowRight, ArrowLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Eye, Move, Trash2, ArrowRight, ArrowLeft, Edit3, X } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
@@ -9,10 +9,24 @@ import Link from 'next/link';
 export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook } = useRecipes();
+  
+  // États pour l'édition du carnet
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [carnetTitle, setCarnetTitle] = useState('');
+  const [carnetDescription, setCarnetDescription] = useState('');
   
   // Trouver le carnet actuel
   const currentCarnet = notebooks.find(n => n.id === id);
+
+  // Initialiser les états avec les valeurs actuelles
+  React.useEffect(() => {
+    if (currentCarnet) {
+      setCarnetTitle(currentCarnet.title);
+      setCarnetDescription(currentCarnet.description || '');
+    }
+  }, [currentCarnet]);
 
   if (!currentCarnet) {
     return (
@@ -67,6 +81,39 @@ export default function CarnetEditPage() {
     }
   };
 
+  // Fonctions pour sauvegarder les modifications
+  const saveTitle = async () => {
+    if (!carnetTitle.trim()) return;
+    
+    try {
+      await updateNotebook(actualCarnet.id, { title: carnetTitle.trim() });
+      setEditingTitle(false);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du titre:', error);
+      alert('Erreur lors de la sauvegarde du titre');
+    }
+  };
+
+  const saveDescription = async () => {
+    try {
+      await updateNotebook(actualCarnet.id, { description: carnetDescription.trim() });
+      setEditingDescription(false);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de la description:', error);
+      alert('Erreur lors de la sauvegarde de la description');
+    }
+  };
+
+  const cancelTitleEdit = () => {
+    setCarnetTitle(actualCarnet.title);
+    setEditingTitle(false);
+  };
+
+  const cancelDescriptionEdit = () => {
+    setCarnetDescription(actualCarnet.description || '');
+    setEditingDescription(false);
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -78,7 +125,7 @@ export default function CarnetEditPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">✏️ Modifier - {actualCarnet.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900">✏️ Modifier le carnet</h1>
             <p className="text-gray-600">
               {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans ce carnet
             </p>
@@ -92,6 +139,100 @@ export default function CarnetEditPage() {
           <Eye className="w-4 h-4" />
           Voir le carnet
         </Link>
+      </div>
+
+      {/* 🆕 SECTION ÉDITION DU CARNET */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+        <h2 className="text-xl font-semibold text-gray-800">📝 Informations du carnet</h2>
+        
+        {/* Titre du carnet */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-semibold text-gray-700">Nom du carnet</label>
+            <button
+              onClick={() => setEditingTitle(!editingTitle)}
+              className="text-gray-500 hover:text-gray-700 p-1"
+            >
+              <Edit3 className="w-4 h-4" />
+            </button>
+          </div>
+          
+          {editingTitle ? (
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={carnetTitle}
+                onChange={(e) => setCarnetTitle(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none text-lg"
+                placeholder="Nom du carnet"
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={saveTitle}
+                  disabled={!carnetTitle.trim()}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  Sauvegarder
+                </button>
+                <button
+                  onClick={cancelTitleEdit}
+                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-lg font-medium text-gray-900 py-2 px-3 bg-gray-50 rounded-lg">
+              {actualCarnet.title}
+            </div>
+          )}
+        </div>
+        
+        {/* Description du carnet */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-semibold text-gray-700">Description (optionnel)</label>
+            <button
+              onClick={() => setEditingDescription(!editingDescription)}
+              className="text-gray-500 hover:text-gray-700 p-1"
+            >
+              <Edit3 className="w-4 h-4" />
+            </button>
+          </div>
+          
+          {editingDescription ? (
+            <div className="space-y-3">
+              <textarea
+                value={carnetDescription}
+                onChange={(e) => setCarnetDescription(e.target.value)}
+                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
+                placeholder="Décrivez ce carnet..."
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={saveDescription}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Sauvegarder
+                </button>
+                <button
+                  onClick={cancelDescriptionEdit}
+                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[60px]">
+              {actualCarnet.description || (
+                <span className="text-gray-400 italic">Aucune description</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
