@@ -254,6 +254,31 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
   };
 
   // 📖 GESTION DES LIVRES 
+
+  const createBook = async (title: string, selectedRecipeIds: string[]) => {
+    try {
+      const response = await fetch('/api/books', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          title, 
+          recipeIds: selectedRecipeIds,
+          description: undefined,
+          coverImageUrl: undefined
+        })
+      });
+      
+      if (!response.ok) throw new Error('Erreur lors de la création du livre');
+      
+      const newBook = await response.json();
+      setBooks(prev => [newBook, ...prev]);
+      return newBook;
+    } catch (err) {
+      setError('Erreur lors de la création du livre');
+      throw err;
+    }
+  };
+  
   const updateBook = async (id: string, bookData: any) => {
     try {
       const response = await fetch(`/api/books/${id}`, {
