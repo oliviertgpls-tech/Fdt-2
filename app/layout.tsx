@@ -19,6 +19,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Menu desktop */}
             <div className="hidden md:flex items-center gap-6 text-sm">
               <Link 
+                href="/recipes" 
+                className="hover:text-orange-600 transition-colors"
+              >
+                Mes Recettes
+              </Link>
+
+              <Link 
                 href="/carnets" 
                 className="hover:text-orange-600 transition-colors"
               >
@@ -30,12 +37,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               >
                 Mes Livres
               </Link>
-              <Link 
-                href="/recipes" 
-                className="hover:text-orange-600 transition-colors"
-              >
-                Mes Recettes
-              </Link>
+               <Link 
+                  href="/add"
+                  className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  + Recette
+                </Link>
             </div>
 
             {/* Burger button mobile */}
@@ -55,6 +63,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="md:hidden border-t bg-white/95 backdrop-blur">
               <div className="px-4 py-3 space-y-3">
                 <Link 
+                  href="/recipes"
+                  className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Mes Recettes
+                </Link>
+                <Link 
                   href="/carnets"
                   className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
@@ -68,13 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 >
                   Mes Livres
                 </Link>
-                <Link 
-                  href="/recipes"
-                  className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Mes Recettes
-                </Link>
+               
                 <Link 
                   href="/add"
                   className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
