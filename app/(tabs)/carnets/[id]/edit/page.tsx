@@ -125,7 +125,7 @@ export default function CarnetEditPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">✏️ Modifier le carnet</h1>
+            <h1 className="text-xl font-bold text-gray-900">✏️ Modifier le carnet</h1>
             <p className="text-gray-600">
               {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans ce carnet
             </p>
