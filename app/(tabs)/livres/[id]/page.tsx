@@ -795,10 +795,10 @@ export default function BookPage() {
 
                 {/* Recettes */}
                 {bookRecipes.map((recipe, index) => (
-                  <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-4 group">
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                  <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group">
+                    <div className="flex gap-3 md:gap-4">
+                      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                        <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">
                           {6 + (index * 2)}-{7 + (index * 2)}
                         </span>
                         <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
@@ -809,7 +809,7 @@ export default function BookPage() {
                       <img 
                         src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
                         alt={recipe.title}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
                       />
                       
                       <div className="flex-1">
