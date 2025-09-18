@@ -9,7 +9,7 @@ import { ArrowLeft, Edit3, Plus, Search, Trash2 } from "lucide-react";
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, createBook } = useRecipes();
+  const { notebooks, recipes, createBook, deleteNotebook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Trouver le carnet
@@ -53,9 +53,13 @@ export default function CarnetPage() {
       
       // Rediriger vers la page du livre créé
       router.push(`/livres/${newBook.id}`);
-    } catch (error) {
+      } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
       alert('Erreur lors de la création du livre');
+      }
+  };
+
+  if (!carnet) {
     }
   };
   }
