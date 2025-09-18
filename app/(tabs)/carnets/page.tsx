@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Eye, Edit3, X, Trash2 } from 'lucide-react';
+import { Plus, Eye, X} from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
