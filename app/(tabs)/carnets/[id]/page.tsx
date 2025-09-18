@@ -88,7 +88,9 @@ export default function CarnetPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-        <div>
+        </div>
+        
+      <div>
           <h1 className="text-3xl font-bold text-gray-900">📚 {carnet.title}</h1>
           <p className="text-gray-600">
             {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
