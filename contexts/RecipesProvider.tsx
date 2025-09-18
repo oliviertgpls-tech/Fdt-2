@@ -124,62 +124,69 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   };
 
   // 📚 GESTION DES CARNETS
-  const createNotebook = async (title: string, description?: string): Promise<Book> => {
-    try {
-      const response = await fetch('/api/notebooks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description })
-      });
-      
-      if (!response.ok) throw new Error('Erreur lors de la création du carnet');
-      
-      const newNotebook = await response.json();
-      setNotebooks(prev => [newNotebook, ...prev]);
-      return newNotebook;
-    } catch (err) {
-      setError('Erreur lors de la création du carnet');
-      throw err;
+const addRecipeToNotebook = async (notebookId: string, recipeId: string) => {
+  try {
+    const response = await fetch(`/api/notebooks/${notebookId}/recipes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recipeId })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de l\'ajout');
     }
-  };
+    
+    // Mettre à jour le state local après succès de l'API
+    setNotebooks(prev =>
+      prev.map(notebook => {
+        if (notebook.id === notebookId && !notebook.recipeIds.includes(recipeId)) {
+          return {
+            ...notebook,
+            recipeIds: [...notebook.recipeIds, recipeId],
+            updatedAt: Date.now()
+          };
+        }
+        return notebook;
+      })
+    );
+  } catch (err: any) {
+    console.error('Erreur addRecipeToNotebook:', err);
+    setError('Erreur lors de l\'ajout de la recette au carnet');
+    throw err;
+  }
+};
 
-  const addRecipeToNotebook = async (notebookId: string, recipeId: string) => {
-    try {
-      // Pour l'instant, on garde la logique simple en attendant l'API complète
-      setNotebooks(prev =>
-        prev.map(notebook => {
-          if (notebook.id === notebookId && !notebook.recipeIds.includes(recipeId)) {
-            return {
-              ...notebook,
-              recipeIds: [...notebook.recipeIds, recipeId],
+const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) => {
+  try {
+    const response = await fetch(`/api/notebooks/${notebookId}/recipes?recipeId=${recipeId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de la suppression');
+    }
+    
+    // Mettre à jour le state local après succès de l'API
+    setNotebooks(prev =>
+      prev.map(notebook =>
+        notebook.id === notebookId
+          ? { 
+              ...notebook, 
+              recipeIds: notebook.recipeIds.filter((id: string) => id !== recipeId),
               updatedAt: Date.now()
-            };
-          }
-          return notebook;
-        })
-      );
-    } catch (err) {
-      setError('Erreur lors de l\'ajout de la recette au carnet');
-    }
-  };
+            }
+          : notebook
+      )
+    );
+  } catch (err: any) {
+    console.error('Erreur removeRecipeFromNotebook:', err);
+    setError('Erreur lors de la suppression de la recette du carnet');
+    throw err;
+  }
+};
 
-  const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) => {
-    try {
-      setNotebooks(prev =>
-        prev.map(notebook =>
-          notebook.id === notebookId
-            ? { 
-                ...notebook, 
-                recipeIds: notebook.recipeIds.filter((id: string) => id !== recipeId),
-                updatedAt: Date.now()
-              }
-            : notebook
-        )
-      );
-    } catch (err) {
-      setError('Erreur lors de la suppression de la recette du carnet');
-    }
-  };
 
   // 🆕 NOUVELLE FONCTION : Supprimer un carnet
   const deleteNotebook = async (id: string) => {
