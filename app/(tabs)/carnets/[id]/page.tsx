@@ -261,7 +261,7 @@ export default function CarnetPage() {
                 Créer un livre avec ce carnet
               </h3>
               <p className="text-sm md:text-base text-orange-700 leading-relaxed">
-                Transformez ce carnet en un beau livre à imprimer avec toutes ses {carnetRecipes.length} recettes
+                Transformez ce carnet en un beau livre à imprimer avec toutes ou certaines de ses {carnetRecipes.length} recettes
               </p>
               <button
                 onClick={handleCreateBookFromCarnet}
