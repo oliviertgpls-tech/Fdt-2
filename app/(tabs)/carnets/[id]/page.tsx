@@ -39,6 +39,7 @@ export default function CarnetPage() {
         .toLowerCase();
       return searchText.includes(query);
     });
+    
   }, [carnetRecipes, searchQuery]);
 
   const handleCreateBookFromCarnet = async () => {
