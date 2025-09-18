@@ -85,52 +85,48 @@ export default function CarnetPage() {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
+      {/* En-tête amélioré pour mobile */}
+      <div className="space-y-4">
+        {/* Ligne 1: Bouton retour + Titre */}
+        <div className="flex items-start gap-3">
           <button
             onClick={() => router.push('/carnets')}
-            className="text-gray-600 hover:text-gray-800 transition-colors"
+            className="text-gray-600 hover:text-gray-800 transition-colors mt-1 flex-shrink-0"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">📚 {carnet.title}</h1>
-            <p className="text-gray-600">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+              📚 {carnet.title}
+            </h1>
+            <p className="text-gray-600 text-sm md:text-base mt-1">
               {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
             </p>
             {carnet.description && (
-              <p className="text-gray-500 text-sm mt-1">{carnet.description}</p>
+              <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+                {carnet.description}
+              </p>
             )}
           </div>
         </div>
         
-        <div className="flex gap-3">
+        {/* Ligne 2: Boutons d'actions - Responsive */}
+        <div className="flex flex-wrap gap-2">
           <Link
             href={`/carnets/${id}/edit`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+            className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 text-sm"
           >
             <Edit3 className="w-4 h-4" />
             Modifier
           </Link>
           
-          {carnetRecipes.length > 0 && (
-            <button
-              onClick={handleCreateBookFromCarnet}
-              className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Créer un livre
-            </button>
-          )}
-          
           <button
             onClick={handleDeleteCarnet}
-            className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium flex items-center gap-2"
+            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center gap-1 text-sm font-medium"
           >
             <Trash2 className="w-4 h-4" />
-            Supprimer
+            <span className="hidden sm:inline">Supprimer</span>
           </button>
         </div>
       </div>
@@ -139,7 +135,7 @@ export default function CarnetPage() {
       {carnetRecipes.length > 0 && (
         <input
           type="text"
-          className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
           placeholder="Rechercher dans ce carnet..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -184,76 +180,99 @@ export default function CarnetPage() {
           )}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredRecipes.map((recipe) => (
-            <Link
-              key={recipe.id}
-              href={`/recipes/${recipe.id}`}
-              className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
-            >
-              {/* Image */}
-              {recipe.imageUrl && (
-                <div className="aspect-[4/3] bg-gray-100">
-                  <img 
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                </div>
-              )}
-              
-              {/* Contenu */}
-              <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {recipe.title}
-                </h3>
-                
-                {recipe.author && (
-                  <p className="text-sm text-gray-600">par {recipe.author}</p>
+        <>
+          {/* Grille des recettes */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredRecipes.map((recipe) => (
+              <Link
+                key={recipe.id}
+                href={`/recipes/${recipe.id}`}
+                className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
+              >
+                {/* Image */}
+                {recipe.imageUrl && (
+                  <div className="aspect-[4/3] bg-gray-100">
+                    <img 
+                      src={recipe.imageUrl}
+                      alt={recipe.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
+                  </div>
                 )}
                 
-                {recipe.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {recipe.description}
-                  </p>
-                )}
-                
-                {/* Métadonnées */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  {recipe.prepMinutes && (
-                    <span className="flex items-center gap-1">
-                      ⏱️ {recipe.prepMinutes}min
-                    </span>
+                {/* Contenu */}
+                <div className="p-4 space-y-2">
+                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {recipe.title}
+                  </h3>
+                  
+                  {recipe.author && (
+                    <p className="text-sm text-gray-600">par {recipe.author}</p>
                   )}
-                  {recipe.ingredients && recipe.ingredients.length > 0 && (
-                    <span className="flex items-center gap-1">
-                      🥄 {recipe.ingredients.length} ingrédients
-                    </span>
+                  
+                  {recipe.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {recipe.description}
+                    </p>
                   )}
-                </div>
-                
-                {/* Tags */}
-                {recipe.tags && recipe.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {recipe.tags.slice(0, 3).map((tag) => (
-                      <span 
-                        key={tag}
-                        className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs"
-                      >
-                        {tag}
+                  
+                  {/* Métadonnées */}
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    {recipe.prepMinutes && (
+                      <span className="flex items-center gap-1">
+                        ⏱️ {recipe.prepMinutes}min
                       </span>
-                    ))}
-                    {recipe.tags.length > 3 && (
-                      <span className="text-xs text-gray-400">
-                        +{recipe.tags.length - 3}
+                    )}
+                    {recipe.ingredients && recipe.ingredients.length > 0 && (
+                      <span className="flex items-center gap-1">
+                        🥄 {recipe.ingredients.length} ingrédients
                       </span>
                     )}
                   </div>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+                  
+                  {/* Tags */}
+                  {recipe.tags && recipe.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {recipe.tags.slice(0, 3).map((tag) => (
+                        <span 
+                          key={tag}
+                          className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {recipe.tags.length > 3 && (
+                        <span className="text-xs text-gray-400">
+                          +{recipe.tags.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Section "Créer un livre" en bas - Nouveau design */}
+          <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-6 text-center">
+            <div className="max-w-md mx-auto space-y-4">
+              <div className="text-4xl">📖</div>
+              <h3 className="text-lg md:text-xl font-semibold text-orange-900">
+                Créer un livre avec ce carnet
+              </h3>
+              <p className="text-sm md:text-base text-orange-700 leading-relaxed">
+                Transformez ce carnet en un beau livre à imprimer avec toutes ses {carnetRecipes.length} recettes
+              </p>
+              <button
+                onClick={handleCreateBookFromCarnet}
+                className="w-full sm:w-auto bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center justify-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Créer le livre ({carnetRecipes.length} recettes)
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
