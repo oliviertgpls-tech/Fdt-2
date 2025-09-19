@@ -71,14 +71,8 @@ export default function CarnetsPage() {
   const [carnetTitle, setCarnetTitle] = useState('');
   const [carnetDescription, setCarnetDescription] = useState('');
 
-  // Trouver le carnet
-  const carnet = notebooks.find(n => n.id === id);
-  
   // Recettes du carnet
-  const carnetRecipes = useMemo(() => {
-    if (!carnet) return [];
-    return recipes.filter(recipe => carnet.recipeIds.includes(recipe.id));
-  }, [carnet, recipes]);
+  const carnetRecipes = recipes;
 
   // Filtrage par recherche
   const filteredRecipes = useMemo(() => {
