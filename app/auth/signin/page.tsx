@@ -60,7 +60,7 @@ export default function SignInPage() {
           {providers && Object.values(providers).map((provider) => (
             <Button
               key={provider.name}
-              onClick={() => signIn(provider.id, { callbackUrl: '/' })}
+              onClick={() => signIn(provider.id, { callbackUrl: '/recipes' })}
               className={`w-full flex items-center justify-center gap-2 ${getProviderColor(provider.id)}`}
             >
               {getProviderIcon(provider.id)}
