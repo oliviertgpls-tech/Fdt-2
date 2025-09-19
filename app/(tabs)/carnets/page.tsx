@@ -312,9 +312,7 @@ export default function CarnetsPage() {
             
             return (
               <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-                 <Link
-                  key={recipe.id}
-                  href={`/recipes/${recipe.id}`}
+               <Link href={`/carnets/${carnets.id}`}
                   >
                 {/* 🆕 VIGNETTES AU LIEU D'ICÔNE */}
                 <CarnetThumbnails carnetId={carnet.id} recipes={carnetRecipes} />
@@ -332,7 +330,7 @@ export default function CarnetsPage() {
                     {carnetRecipeCount > 0 && (
                     )}
                   </div>
-                  </Link>
+                </Link>
                 </div>
               </div>
             );
