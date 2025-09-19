@@ -77,7 +77,7 @@ export default function HomePage() {
             Un cadeau inoubliable qui traverse les générations.
           </p>
           <Link 
-            href="/add"
+            href="/auth/signin"
             className="btn btn-primary text-lg px-8 py-4"
           >
             🌟 Créer mon premier carnet
