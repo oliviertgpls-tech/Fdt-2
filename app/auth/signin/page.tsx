@@ -1,29 +1,15 @@
 'use client'
 
-import { signIn, getProviders } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Github, Chrome } from "lucide-react"
 
-interface Provider {
-  id: string
-  name: string
-  type: string
-  signinUrl: string
-  callbackUrl: string
-}
-
 export default function SignInPage() {
-  const [providers, setProviders] = useState<Record<string, Provider> | null>(null)
-
-  useEffect(() => {
-    const fetchProviders = async () => {
-      const res = await getProviders()
-      setProviders(res)
-    }
-    fetchProviders()
-  }, [])
+  const providers = [
+    { id: 'google', name: 'Google' },
+    { id: 'github', name: 'GitHub' }
+  ]
 
   const getProviderIcon = (providerId: string) => {
     switch (providerId) {
@@ -57,7 +43,7 @@ export default function SignInPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {providers && Object.values(providers).map((provider) => (
+          {providers.map((provider) => (
             <Button
               key={provider.name}
               onClick={() => signIn(provider.id, { callbackUrl: '/' })}
