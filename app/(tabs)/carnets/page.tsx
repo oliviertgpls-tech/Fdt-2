@@ -326,8 +326,7 @@ export default function CarnetsPage() {
                     
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                       <span>{carnetRecipeCount} recettes</span>
-                      {carnetRecipeCount > 0 && (
-                        <span className="text-green-600">Prêt à imprimer</span>
+                      {carnetRecipeCount > 0 &&
                       )}
                     </div>
                   </div>
