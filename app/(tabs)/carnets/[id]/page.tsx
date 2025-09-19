@@ -115,7 +115,7 @@ export default function CarnetPage() {
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/carnets/${id}/edit`}
-            className="flex-1 sm:flex-none bg-blue-200 text-white px-4 py-2.5 rounded-lg hover:bg-blue-300 transition-colors font-medium flex items-center justify-center gap-2 text-sm self-start"
+            className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 text-sm"
           >
             <Edit3 className="w-4 h-4" />
             Modifier
@@ -123,13 +123,12 @@ export default function CarnetPage() {
           
           <button
             onClick={handleDeleteCarnet}
-            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center gap-1 text-sm font-medium"
+            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
           >
             <Trash2 className="w-4 h-4" />
             <span className="hidden sm:inline">Supprimer</span>
           </button>
         </div>
-      </div>
 
       {/* Barre de recherche */}
       {carnetRecipes.length > 0 && (
