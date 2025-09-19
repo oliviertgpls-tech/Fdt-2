@@ -65,6 +65,7 @@ export default function BookPage() {
   // 🆕 FONCTION upload photo couverture
   const handleCoverImageUpload = async (file: File) => {
     setIsUploadingCover(true);
+    };
 
   // FONCTION SUPPRESSION LIVRE
   const handleDeleteBook = () => {
