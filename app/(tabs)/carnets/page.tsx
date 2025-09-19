@@ -68,33 +68,54 @@ export default function CarnetsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   
   // ✅ ÉTATS COMPLÈTEMENT SÉPARÉS - CHACUN SA VARIABLE
-  const [carnetTitle, setCarnetTitle] = useState('');           // 🆕 RENOMMÉ
-  const [carnetDescription, setCarnetDescription] = useState(''); // 🆕 RENOMMÉ
+  const [carnetTitle, setCarnetTitle] = useState('');
+  const [carnetDescription, setCarnetDescription] = useState('');
 
-  // 🆕 AFFICHAGE DU SKELETON PENDANT LE CHARGEMENT
-  if (loading) {
-    return <NotebooksLoadingSkeleton />;
-  }
+  // Trouver le carnet
+  const carnet = notebooks.find(n => n.id === id);
+  
+  // Recettes du carnet
+  const carnetRecipes = useMemo(() => {
+    if (!carnet) return [];
+    return recipes.filter(recipe => carnet.recipeIds.includes(recipe.id));
+  }, [carnet, recipes]);
 
+  // Filtrage par recherche
+  const filteredRecipes = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return carnetRecipes;
+    
+    return carnetRecipes.filter((recipe) => {
+      const searchText = [
+        recipe.title || "",
+        ...(recipe.tags || []),
+        ...(recipe.ingredients || []),
+        recipe.steps || "",
+        recipe.author || "",
+        recipe.description || "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      return searchText.includes(query);
+    });
+  }, [carnetRecipes, searchQuery]);
+
+  // ✅ TOUTES LES FONCTIONS DANS LE COMPOSANT
   const handleCreateCarnet = async () => {
     if (!carnetTitle.trim()) return;
     
     try {
       await createNotebook(carnetTitle.trim(), carnetDescription.trim());
-      // ✅ RESET AVEC LES BONNES VARIABLES
       setCarnetTitle('');
       setCarnetDescription('');
-      setShowCreateModal(false);
     } catch (error) {
       console.error('Erreur lors de la création du carnet:', error);
     }
   };
 
-  // ✅ FONCTION DE RESET PROPRE
   const resetForm = () => {
     setCarnetTitle('');
     setCarnetDescription('');
-    setShowCreateModal(false);
   };
 
   const CreateCarnetModal = () => (
