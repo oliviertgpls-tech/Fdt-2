@@ -65,6 +65,7 @@ export default function CarnetPage() {
     }
   };
 
+  // Gestion du carnet introuvable
   if (!carnet) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
@@ -81,7 +82,9 @@ export default function CarnetPage() {
         </div>
       </div>
     );
+  }
 
+  // Rendu principal - UN SEUL return
   return (
     <div className="space-y-6">
       {/* En-tête amélioré pour mobile */}
@@ -128,6 +131,7 @@ export default function CarnetPage() {
             <span className="hidden sm:inline">Supprimer</span>
           </button>
         </div>
+      </div>
 
       {/* Barre de recherche */}
       {carnetRecipes.length > 0 && (
