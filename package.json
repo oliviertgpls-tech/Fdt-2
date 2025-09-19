@@ -24,6 +24,7 @@
     "postcss": "^8.4.35",
     "autoprefixer": "^10.4.20",
     "prisma": "^5.7.1"
+    "next-auth": "5.0.0-beta.4" 
   },
   "engines": {
     "node": ">=18"
