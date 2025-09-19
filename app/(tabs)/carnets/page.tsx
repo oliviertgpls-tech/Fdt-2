@@ -155,14 +155,14 @@ export default function CarnetsPage() {
             <div className="inline-flex gap-3 pt-4">
               <button
                 onClick={resetForm}
-                className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                className="flex-1 bg-gray-100 text-gray-700 py-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateCarnet}
                 disabled={!carnetTitle.trim()}
-                className="inline-flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                className="flex-1 bg-orange-600 text-white py-4 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
               </button>
@@ -278,7 +278,7 @@ export default function CarnetsPage() {
         
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-bleu-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-bleu-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base self-start sm:self-auto"
+          className="bg-blue-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base self-start sm:self-auto"
         >
           <span className="sm:hidden">✨ Nouveau Carnet</span>
           <span className="hidden sm:inline">✨ Nouveau carnet</span>
