@@ -333,7 +333,7 @@ export default function CarnetsPage() {
                   <div className="flex gap-2">
                     <Link
                       href={`/carnets/${carnet.id}`}
-                      className="flex-1 bg-blue-100 text-blue-700 py-1.5 md:py-2 rounded-lg hover:bg-blue-200 transition-colors font-medium text-xs md:text-sm text-center"
+                      className="inflex-flex-1 bg-orange-100 text-orange-700 py-3 md:py-4 rounded-lg hover:bg-orange-200 transition-colors font-medium text-s md:text-sm text-center"
                     >
                       Voir
                     </Link>
