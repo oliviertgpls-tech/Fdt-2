@@ -1,23 +1,11 @@
-import './globals.css'
-import { Providers } from './providers'
-
-export const metadata = {
-  title: 'Food Memories',
-  description: 'Préservez votre patrimoine culinaire',
-}
-
-export default function RootLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen bg-white text-gray-900">
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
+    <div className="min-h-screen bg-gray-50">
+      {children}
+    </div>
   )
 }
