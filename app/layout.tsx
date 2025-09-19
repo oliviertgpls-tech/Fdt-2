@@ -1,5 +1,5 @@
 import './globals.css'
-import { SessionProvider } from "next-auth/react"
+import { Providers } from './providers'
 
 export const metadata = {
   title: 'Food Memories',
@@ -14,9 +14,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-white text-gray-900">
-        <SessionProvider>
+        <Providers>
           {children}
-        </SessionProvider>
+        </Providers>
       </body>
     </html>
   )
