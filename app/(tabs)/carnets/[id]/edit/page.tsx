@@ -26,7 +26,7 @@ export default function CarnetEditPage() {
       setCarnetTitle(currentCarnet.title);
       setCarnetDescription(currentCarnet.description || '');
     }
-  }, [currentCarnet]);
+  }, [currentCarnet?.id]);
 
   if (!currentCarnet) {
     return (
