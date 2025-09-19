@@ -312,11 +312,15 @@ export default function CarnetsPage() {
             
             return (
               <div key={carnet.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                 <Link
+                  key={recipe.id}
+                  href={`/recipes/${recipe.id}`}
+                  >
                 {/* 🆕 VIGNETTES AU LIEU D'ICÔNE */}
                 <CarnetThumbnails carnetId={carnet.id} recipes={carnetRecipes} />
                 
                 <div className="p-6">
-                  <h3 className="font-semibold text-gray-900 text-lg mb-2">
+                  <h3 className="font-semibold text-gray-900 text-xlg mb-2">
                     {carnet.title}
                   </h3>
                   <p className="text-gray-600 text-sm line-clamp-2 mb-4">
@@ -326,19 +330,9 @@ export default function CarnetsPage() {
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <span>{carnetRecipeCount} recettes</span>
                     {carnetRecipeCount > 0 && (
-                      <span className="text-green-600">Prêt à imprimer</span>
                     )}
                   </div>
-                  
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/carnets/${carnet.id}`}
-                      className="inflex-flex-1 bg-orange-100 text-orange-700 py-3 md:py-4 rounded-lg hover:bg-orange-200 transition-colors font-medium text-s md:text-sm text-center"
-                    >
-                      Voir
-                    </Link>
-                    
-                  </div>
+                  </Link>
                 </div>
               </div>
             );
