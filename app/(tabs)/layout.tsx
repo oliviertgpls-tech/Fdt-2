@@ -50,6 +50,12 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
               >
                 Mes Recettes
               </Link>
+               <Link 
+                href="/carnets" 
+                className="hover:text-orange-600 transition-colors"
+              >
+                Mes Carnets
+              </Link>
               <Link 
                 href="/livres" 
                 className="hover:text-orange-600 transition-colors"
