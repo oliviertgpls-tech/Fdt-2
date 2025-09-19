@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/auth-server'
 
-// GET /api/notebooks - Récupérer tous les carnets avec leurs recettes
+// GET /api/notebooks - Récupérer tous les carnets DU USER CONNECTÉ
 export async function GET() {
   try {
+    // 🔒 Vérification auth
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return unauthorizedResponse()
+    }
+
     const notebooks = await prisma.notebook.findMany({
+      where: { userId: user.id }, // 🎯 Filtrage par user
       include: {
         recipes: {
           include: {
@@ -28,20 +36,28 @@ export async function GET() {
     
     return NextResponse.json(formattedNotebooks)
   } catch (error: any) {
+    console.error('Erreur GET notebooks:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
 
-// POST /api/notebooks - Créer un nouveau carnet
+// POST /api/notebooks - Créer un nouveau carnet POUR LE USER CONNECTÉ
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Vérification auth
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return unauthorizedResponse()
+    }
+
     const body = await request.json()
     
     const notebook = await prisma.notebook.create({
       data: {
         id: `notebook-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         title: body.title,
-        description: body.description
+        description: body.description,
+        userId: user.id // 🎯 NOUVEAU : assigne au user connecté
       }
     })
     
@@ -54,6 +70,7 @@ export async function POST(request: NextRequest) {
       recipeIds: []
     })
   } catch (error: any) {
+    console.error('Erreur POST notebooks:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
