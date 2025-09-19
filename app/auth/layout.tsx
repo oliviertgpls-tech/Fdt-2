@@ -1,18 +1,23 @@
-'use client'
+import './globals.css'
+import { Providers } from './providers'
 
-import { SessionProvider } from "next-auth/react"
+export const metadata = {
+  title: 'Food Memories',
+  description: 'Préservez votre patrimoine culinaire',
+}
 
-export default function AuthLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <SessionProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Pas de header/menu ici, juste le contenu */}
-        {children}
-      </div>
-    </SessionProvider>
+    <html lang="fr">
+      <body className="min-h-screen bg-white text-gray-900">
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
   )
 }
