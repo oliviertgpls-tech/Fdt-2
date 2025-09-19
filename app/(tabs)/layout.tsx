@@ -94,6 +94,13 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
                   Mes Recettes
                 </Link>
                 <Link 
+                  href="/carnets"
+                  className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Mes Carnets
+                </Link>
+                <Link 
                   href="/livres"
                   className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
@@ -101,11 +108,11 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
                   Mes Livres
                 </Link>
                 <Link 
-                  href="/recipes/add"
+                  href="/profile"
                   className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  + Nouvelle recette
+                  Mon Compte
                 </Link>
               </div>
             </div>
