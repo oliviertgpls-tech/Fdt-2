@@ -1,182 +1,145 @@
-'use client'
+"use client";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import "./globals.css";
 import Link from "next/link";
+import { useState } from "react";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { RecipesProvider } from "@/contexts/RecipesProvider";
 
-export default function HomePage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+// Composant interne pour la protection auth
+function ProtectedContent({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Protection : rediriger si pas connecté
   useEffect(() => {
-    // Si connecté, rediriger vers les recettes
-    if (status === "authenticated") {
-      router.push("/recipes")
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
     }
-  }, [status, router])
+  }, [status, router]);
 
-  // Pendant le chargement
+  // Affichage loading pendant vérification
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-600"></div>
       </div>
-    )
+    );
   }
 
-  // Si pas connecté, afficher la landing page
+  // Si pas de session, pas d'affichage (redirection en cours)
+  if (!session) {
+    return null;
+  }
+
+  // Ton layout actuel avec menu
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-16 pb-24 text-center">
-          <div className="space-y-8">
-            {/* Badge */}
-            <div className="inline-block bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
-              ✨ Préservez votre patrimoine culinaire
-            </div>
-            
-            {/* Titre principal */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
-              Food <span className="text-orange-600">Memories</span>
-            </h1>
-            
-            {/* Sous-titre */}
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Transformez vos <strong>recettes familiales</strong> en magnifiques livres de cuisine. 
-              Un héritage précieux à transmettre aux générations futures.
-            </p>
-
-            {/* CTA */}
-            <div className="space-y-4 pt-4">
-              <Link
-                href="/auth/signin"
-                className="inline-block bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-orange-700 transition-all transform hover:scale-105 shadow-lg"
-              >
-                🚀 Commencer gratuitement
-              </Link>
-              
-              <p className="text-gray-500">
-                Connexion avec Google • Gratuit • Sécurisé
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Comment ça marche ?
-          </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            En 3 étapes simples, créez des livres de recettes dignes d'un chef
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Étape 1 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <div className="text-3xl">📝</div>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium inline-block">
-                ÉTAPE 1
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Ajoutez vos recettes</h3>
-              <p className="text-gray-600">
-                Saisissez vos recettes manuellement ou photographiez vos carnets manuscrits. 
-                Notre IA peut même analyser vos photos de plats !
-              </p>
-            </div>
-          </div>
-
-          {/* Étape 2 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-            <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <div className="text-3xl">📚</div>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium inline-block">
-                ÉTAPE 2
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Organisez en carnets</h3>
-              <p className="text-gray-600">
-                Classez vos recettes par thème : "Desserts de Mamie", "Plats du dimanche", 
-                "Recettes végétariennes"...
-              </p>
-            </div>
-          </div>
-
-          {/* Étape 3 */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-            <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <div className="text-3xl">📖</div>
-            </div>
-            <div className="text-center space-y-3">
-              <div className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-medium inline-block">
-                ÉTAPE 3
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Créez votre livre</h3>
-              <p className="text-gray-600">
-                Générez un magnifique PDF avec mise en page professionnelle. 
-                Parfait pour l'impression ou le partage !
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Social Proof */}
-      <div className="bg-white border-y border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">
-            Pourquoi Food Memories ?
-          </h3>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="text-4xl">🔒</div>
-              <h4 className="font-semibold text-gray-900">Sécurisé et privé</h4>
-              <p className="text-gray-600">
-                Vos recettes familiales restent <strong>privées</strong>. 
-                Seul vous avez accès à votre patrimoine culinaire.
-              </p>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="text-4xl">🎁</div>
-              <h4 className="font-semibold text-gray-900">Le cadeau parfait</h4>
-              <p className="text-gray-600">
-                Créez un <strong>héritage unique</strong> à offrir à vos enfants et petits-enfants. 
-                Un cadeau qui traverse les générations.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Final */}
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl p-12 text-white">
-          <h3 className="text-3xl md:text-4xl font-bold mb-4">
-            Prêt à préserver vos recettes ?
-          </h3>
-          <p className="text-xl mb-8 opacity-90">
-            Rejoignez les familles qui préservent déjà leur patrimoine culinaire
-          </p>
-          
-          <Link
-            href="/auth/signin"
-            className="inline-block bg-white text-orange-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg"
-          >
-            Commencer mon premier carnet →
+    <RecipesProvider>
+      <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6 py-3">
+          <Link href="/recipes" className="font-semibold text-base md:text-lg">
+            FOOD MEMORIES
           </Link>
-        </div>
-      </div>
-    </div>
+          
+          {/* Menu desktop */}
+          <div className="hidden md:flex items-center gap-6 text-sm">
+            <Link 
+              href="/recipes" 
+              className="hover:text-orange-600 transition-colors"
+            >
+              Mes Recettes
+            </Link>
+
+            <Link 
+              href="/carnets" 
+              className="hover:text-orange-600 transition-colors"
+            >
+              Mes Carnets
+            </Link>
+            <Link 
+              href="/livres" 
+              className="hover:text-orange-600 transition-colors"
+            >
+              Mes Livres
+            </Link>
+             <Link 
+                href="/recipes/add"
+                className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                + Nouvelle Recette
+              </Link>
+          </div>
+
+          {/* Burger button mobile */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden flex flex-col gap-1 p-2"
+            aria-label="Menu"
+          >
+            <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+            <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+            <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+          </button>
+        </nav>
+
+        {/* Menu mobile dropdown */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t bg-white/95 backdrop-blur">
+            <div className="px-4 py-3 space-y-3">
+              <Link 
+                href="/recipes"
+                className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Mes Recettes
+              </Link>
+              <Link 
+                href="/carnets"
+                className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Mes Carnets
+              </Link>
+              <Link 
+                href="/livres"
+                className="block py-2 text-gray-700 hover:text-orange-600 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Mes Livres
+              </Link>
+             
+              <Link 
+                href="/recipes/add"
+                className="block py-2 text-orange-600 font-medium hover:text-orange-700 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                + Nouvelle recette
+              </Link>
+            </div>
+          </div>
+        )}
+      </header>
+      <main className="mx-auto max-w-6xl px-4 md:px-6 py-4 md:py-8">
+        {children}
+      </main>
+    </RecipesProvider>
+  );
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="fr">
+      <body className="min-h-dvh bg-white text-gray-900">
+        <SessionProvider>
+          <ProtectedContent>
+            {children}
+          </ProtectedContent>
+        </SessionProvider>
+      </body>
+    </html>
   );
 }
