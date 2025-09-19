@@ -91,12 +91,6 @@ export default function CarnetPage() {
       <div className="space-y-4">
         {/* Ligne 1: Bouton retour + Titre */}
         <div className="flex items-start gap-3">
-          <button
-            onClick={() => router.push('/carnets')}
-            className="text-gray-600 hover:text-gray-800 transition-colors mt-1 flex-shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
           
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
@@ -129,6 +123,13 @@ export default function CarnetPage() {
           >
             <Trash2 className="w-4 h-4" />
             <span className="hidden sm:inline">Supprimer</span>
+          </button>
+          
+          <button
+            onClick={() => router.push('/carnets')}
+            className="text-gray-600 hover:text-gray-800 transition-colors mt-1 flex-shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
           </button>
         </div>
       </div>
