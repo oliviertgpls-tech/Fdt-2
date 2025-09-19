@@ -111,7 +111,7 @@ export default function CarnetPage() {
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/carnets/${id}/edit`}
-            className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 text-sm"
+            className="bg-blue-400 text-white px-4 py-2.5 rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2 text-sm"
           >
             <Edit3 className="w-4 h-4" />
             Modifier
@@ -129,7 +129,7 @@ export default function CarnetPage() {
             onClick={() => router.push('/carnets')}
             className="text-gray-600 hover:text-gray-800 transition-colors mt-1 flex-shrink-0"
           >
-            <ArrowLeft className="w-5 h-5" />
+            Voir tous les carnets
           </button>
         </div>
       </div>
