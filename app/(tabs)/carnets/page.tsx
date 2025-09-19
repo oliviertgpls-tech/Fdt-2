@@ -271,15 +271,14 @@ export default function CarnetsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">📚 Mes Carnets</h1>
           <p className="text-gray-600 mt-1">
-            Organisez vos recettes par thème et créez vos livres
+            Organisez vos recettes par thèmatique
           </p>
         </div>
         
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-orange-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base self-start sm:self-auto"
+          className="bg-bleu-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-bleu-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4 md:w-5 md:h-5" />
           <span className="sm:hidden">✨ Nouveau Carnet</span>
           <span className="hidden sm:inline">✨ Nouveau carnet</span>
         </button>
