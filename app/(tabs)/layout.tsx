@@ -64,7 +64,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
               </Link>
               <Link 
                 href="/profile"
-                className="bg-grey-200 text-grey-900 px-4 py-2 rounded-lg hover:bg-grey-300 transition-colors"
+                className="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
               >
                 Mon compte
               </Link>
