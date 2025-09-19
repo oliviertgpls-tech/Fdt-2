@@ -51,20 +51,27 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
       const [recipesRes, notebooksRes, booksRes] = await Promise.all([
         fetch('/api/recipes'),
         fetch('/api/notebooks'),
-        fetch('/api/books') // 🆕 Charger aussi les livres
+        fetch('/api/books')
       ]);
       
-      const recipesData = await recipesRes.json();
-      const notebooksData = await notebooksRes.json();
-      const booksData = await booksRes.json(); // 🆕
+      // ✅ Vérifier les réponses avant de parser
+      const recipesData = recipesRes.ok ? await recipesRes.json() : [];
+      const notebooksData = notebooksRes.ok ? await notebooksRes.json() : [];
+      const booksData = booksRes.ok ? await booksRes.json() : [];
       
-      setRecipes(recipesData);
-      setNotebooks(notebooksData);
-      setBooks(booksData); // 🆕
+      // ✅ S'assurer que ce sont des arrays
+      setRecipes(Array.isArray(recipesData) ? recipesData : []);
+      setNotebooks(Array.isArray(notebooksData) ? notebooksData : []);
+      setBooks(Array.isArray(booksData) ? booksData : []);
+      
       setError(null);
     } catch (err) {
+      console.error('Erreur loadData:', err);
       setError('Erreur lors du chargement des données');
-      console.error(err);
+      // ✅ En cas d'erreur, initialiser avec des arrays vides
+      setRecipes([]);
+      setNotebooks([]);
+      setBooks([]);
     } finally {
       setLoading(false);
     }
