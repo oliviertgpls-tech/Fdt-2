@@ -63,10 +63,10 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
                 Mes Livres
               </Link>
               <Link 
-                href="/recipes/add"
-                className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+                href="/profile"
+                className="bg-grey-200 text-grey-900 px-4 py-2 rounded-lg hover:bg-grey-300 transition-colors"
               >
-                + Nouvelle Recette
+                Mon compte
               </Link>
             </div>
 
