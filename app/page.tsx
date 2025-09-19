@@ -17,16 +17,6 @@ export default function HomePage() {
           Créez de beaux livres de recettes à imprimer et partager avec ceux que vous aimez.
         </p>
       </div>
-
-      <div className="text-center space-y-6">
-        <div className="card p-8">
-          <Link 
-            href="/auth/signin"
-            className="btn btn-primary text-lg px-8 py-4"
-          >
-            🌟 Je teste Recett.io !
-          </Link>
-        </div>
       
       {/* Actions principales */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
