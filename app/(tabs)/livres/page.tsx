@@ -94,7 +94,7 @@ export default function LivresPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBookTitle, setNewBookTitle] = useState('');
 
-  // 🆕 AFFICHAGE DU SKELETON PENDANT LE CHARGEMENT
+  // Affichage du skeleton pendant le chargement
   if (loading) {
     return <BooksLoadingSkeleton />;
   }
@@ -203,8 +203,12 @@ export default function LivresPage() {
         </div>
       </div>
     </div>
-    
-    {/* Section En-tête */}  
+  );
+
+  // Rendu principal du composant - UN SEUL return
+  return (
+    <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
+      {/* Section En-tête */}  
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
@@ -215,7 +219,7 @@ export default function LivresPage() {
         
         <Link 
           href="/livres/nouveau" 
-          className="bg-bleu-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-bleu-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
+          className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span className="sm:hidden">+ Nouveau Livre</span>
@@ -236,7 +240,7 @@ export default function LivresPage() {
               return (
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                   
-                  {/* 🆕 COUVERTURE AVEC IMAGE OU ICÔNE */}
+                  {/* Couverture avec image ou icône */}
                   <div className="aspect-[2/1] relative overflow-hidden">
                     {book.coverImageUrl ? (
                       // Photo de couverture personnalisée
@@ -428,6 +432,7 @@ export default function LivresPage() {
         )}
       </div>
 
+      {/* Modale de création de livre */}
       {showCreateModal && <CreateBookModal />}
     </div>
   );
