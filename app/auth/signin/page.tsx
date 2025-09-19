@@ -1,15 +1,29 @@
 'use client'
 
-import { signIn } from "next-auth/react"
+import { signIn, getProviders } from "next-auth/react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Github, Chrome } from "lucide-react"
 
+interface Provider {
+  id: string
+  name: string
+  type: string
+  signinUrl: string
+  callbackUrl: string
+}
+
 export default function SignInPage() {
-  const providers = [
-    { id: 'google', name: 'Google' },
-    { id: 'github', name: 'GitHub' }
-  ]
+  const [providers, setProviders] = useState<Record<string, Provider> | null>(null)
+
+  useEffect(() => {
+    const fetchProviders = async () => {
+      const res = await getProviders()
+      setProviders(res)
+    }
+    fetchProviders()
+  }, [])
 
   const getProviderIcon = (providerId: string) => {
     switch (providerId) {
@@ -25,11 +39,11 @@ export default function SignInPage() {
   const getProviderColor = (providerId: string) => {
     switch (providerId) {
       case 'google':
-        return 'bg-red-600 hover:bg-red-700'
+        return 'bg-red-600 hover:bg-red-700 text-white'
       case 'github':
-        return 'bg-gray-900 hover:bg-gray-800'
+        return 'bg-gray-900 hover:bg-gray-800 text-white'
       default:
-        return 'bg-blue-600 hover:bg-blue-700'
+        return 'bg-blue-600 hover:bg-blue-700 text-white'
     }
   }
 
@@ -43,12 +57,11 @@ export default function SignInPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {providers.map((provider) => (
+          {providers && Object.values(providers).map((provider) => (
             <Button
               key={provider.name}
               onClick={() => signIn(provider.id, { callbackUrl: '/' })}
               className={`w-full flex items-center justify-center gap-2 ${getProviderColor(provider.id)}`}
-              variant="default"
             >
               {getProviderIcon(provider.id)}
               Se connecter avec {provider.name}
