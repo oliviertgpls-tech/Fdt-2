@@ -61,19 +61,10 @@ export default function BookPage() {
       setEditingTitle(false);
       }
     };
-
-  // 🆕 FONCTION upload photo couverture
+  
+  // FONCTION UPLAOD COUVERTURE
   const handleCoverImageUpload = async (file: File) => {
     setIsUploadingCover(true);
-    };
-
-  // FONCTION SUPPRESSION LIVRE
-  const handleDeleteBook = () => {
-    if (window.confirm(`Supprimer le livre "${book?.title}" ?\n\nCette action est irréversible.`)) {
-      deleteBook(id);
-      router.push('/livres'); // Retour à la liste
-      }
-    };
     
     try {
       console.log('🚀 Upload couverture en cours...', file.name);
@@ -110,6 +101,14 @@ export default function BookPage() {
       alert("Erreur lors de l'upload de l'image de couverture : " + error.message);
     } finally {
       setIsUploadingCover(false);
+    }
+  };
+  
+  // FONCTION SUPPRESSION LIVRE
+  const handleDeleteBook = () => {
+    if (window.confirm(`Supprimer le livre "${book?.title}" ?\n\nCette action est irréversible.`)) {
+      deleteBook(id);
+      router.push('/livres'); // Retour à la liste
     }
   };
 
