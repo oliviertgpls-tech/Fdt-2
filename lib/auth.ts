@@ -1,11 +1,11 @@
 // lib/auth.ts
-import NextAuth from "next-auth"
+import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma" // Votre instance Prisma
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { prisma } from "@/lib/prisma"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -19,7 +19,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   pages: {
     signIn: '/auth/signin',
-    // signOut: '/auth/signout', // optionnel
   },
   callbacks: {
     session: async ({ session, token }) => {
@@ -30,9 +29,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     jwt: async ({ user, token }) => {
       if (user) {
-        token.uid = user.id
+        token.sub = user.id
       }
       return token
     },
   },
-})
+}
