@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getAuthenticatedUser, unauthorizedResponse } from '@/lib/auth-server'
 
-// GET /api/books - Récupérer tous les livres avec leurs recettes
+// GET /api/books - Récupérer tous les livres DU USER CONNECTÉ
 export async function GET() {
   try {
+    // 🔒 Vérification auth
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return unauthorizedResponse()
+    }
+
     const books = await prisma.book.findMany({
+      where: { userId: user.id }, // 🎯 Filtrage par user
       include: {
         recipes: {
           include: {
@@ -35,9 +43,15 @@ export async function GET() {
   }
 }
 
-// POST /api/books - Créer un nouveau livre
+// POST /api/books - Créer un nouveau livre POUR LE USER CONNECTÉ
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 Vérification auth
+    const user = await getAuthenticatedUser()
+    if (!user) {
+      return unauthorizedResponse()
+    }
+
     const body = await request.json()
     const { title, description, recipeIds = [], coverImageUrl } = body
     
@@ -50,7 +64,8 @@ export async function POST(request: NextRequest) {
         title: title,
         description: description || null,
         status: 'draft',
-        coverImageUrl: coverImageUrl || null
+        coverImageUrl: coverImageUrl || null,
+        userId: user.id // 🎯 AJOUTÉ : assigne au user connecté
       }
     })
     
