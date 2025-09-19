@@ -205,24 +205,24 @@ export default function LivresPage() {
     </div>
   );
 
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
-        <p className="text-gray-600 mt-1 text-sm md:text-base">
-          Créez de beaux livres à imprimer et transmettez votre patrimoine
-        </p>
+    return (
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
+          <p className="text-gray-600 mt-1 text-sm md:text-base">
+            Créez de beaux livres à imprimer et transmettez votre patrimoine
+          </p>
+        </div>
+        
+        <Link 
+          href="/livres/nouveau" 
+          className="bg-bleu-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-bleu-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="sm:hidden">+ Nouveau Livre</span>
+          <span className="hidden sm:inline">+ Nouveau livre</span>
+        </Link>
       </div>
-      
-      <Link 
-        href="/livres/nouveau" 
-        className="bg-bleu-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-bleu-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
-      >
-        <Plus className="w-4 h-4" />
-        <span className="sm:hidden">+ Nouveau Livre</span>
-        <span className="hidden sm:inline">+ Nouveau livre</span>
-      </Link>
-    </div>
 
       {/* Livres existants */}
       {books.length > 0 && (
