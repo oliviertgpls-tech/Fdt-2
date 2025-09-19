@@ -221,9 +221,8 @@ export default function LivresPage() {
           href="/livres/nouveau" 
           className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
-          <span className="sm:hidden">+ Nouveau Livre</span>
-          <span className="hidden sm:inline">+ Nouveau livre</span>
+          <span className="sm:hidden">✨Nouveau Livre</span>
+          <span className="hidden sm:inline">✨Nouveau livre</span>
         </Link>
       </div>
 
