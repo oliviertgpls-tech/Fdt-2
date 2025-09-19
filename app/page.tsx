@@ -21,7 +21,7 @@ export default function HomePage() {
       {/* Actions principales */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <Link 
-          href="/carnets" 
+          href="/auth/signin" 
           className="card group p-8 hover:-translate-y-1 transition-all duration-200"
         >
           <div className="text-center space-y-4">
@@ -36,7 +36,7 @@ export default function HomePage() {
         </Link>
 
         <Link 
-          href="/recipes" 
+          href="/auth/signin" 
           className="card group p-8 hover:-translate-y-1 transition-all duration-200"
         >
           <div className="text-center space-y-4">
@@ -51,7 +51,7 @@ export default function HomePage() {
         </Link>
 
         <Link 
-          href="/add" 
+          href="/auth/signin" 
           className="card group p-8 hover:-translate-y-1 transition-all duration-200 sm:col-span-2 lg:col-span-1"
         >
           <div className="text-center space-y-4">
