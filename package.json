@@ -15,6 +15,7 @@
     "lucide-react": "^0.475.0",
     "pdf-lib": "^1.17.1",
     "@prisma/client": "^5.7.1"
+    "next-auth": "5.0.0-beta.4" 
   },
   "devDependencies": {
     "typescript": "^5.4.0",
@@ -24,7 +25,6 @@
     "postcss": "^8.4.35",
     "autoprefixer": "^10.4.20",
     "prisma": "^5.7.1"
-    "next-auth": "5.0.0-beta.4" 
   },
   "engines": {
     "node": ">=18"
