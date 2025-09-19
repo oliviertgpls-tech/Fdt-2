@@ -74,26 +74,6 @@ export default function CarnetsPage() {
   // Recettes du carnet
   const carnetRecipes = recipes;
 
-  // Filtrage par recherche
-  const filteredRecipes = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return carnetRecipes;
-    
-    return carnetRecipes.filter((recipe) => {
-      const searchText = [
-        recipe.title || "",
-        ...(recipe.tags || []),
-        ...(recipe.ingredients || []),
-        recipe.steps || "",
-        recipe.author || "",
-        recipe.description || "",
-      ]
-        .join(" ")
-        .toLowerCase();
-      return searchText.includes(query);
-    });
-  }, [carnetRecipes, searchQuery]);
-
   // ✅ TOUTES LES FONCTIONS DANS LE COMPOSANT
   const handleCreateCarnet = async () => {
     if (!carnetTitle.trim()) return;
@@ -300,8 +280,8 @@ export default function CarnetsPage() {
           className="bg-orange-600 text-white px-3 md:px-6 py-2 md:py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium flex items-center gap-1 md:gap-2 text-sm md:text-base self-start sm:self-auto"
         >
           <Plus className="w-4 h-4 md:w-5 md:h-5" />
-          <span className="sm:hidden">Nouveau</span>
-          <span className="hidden sm:inline">Nouveau carnet</span>
+          <span className="sm:hidden">✨ Nouveau Carnet</span>
+          <span className="hidden sm:inline">✨ Nouveau carnet</span>
         </button>
       </div>
 
