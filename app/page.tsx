@@ -18,7 +18,26 @@ export default function HomePage() {
         </p>
       </div>
       
-      {/* Actions principales */}
+      {/* CTA final */}
+      <div className="text-center space-y-6">
+        <h2 className="text-3xl font-bold" style={{ color: '#44403c' }}>
+          Plus qu'un carnet de recettes
+        </h2>
+        <div className="card p-8">
+          <p className="text-lg text-gray-600 leading-relaxed mb-6">
+            Créez un <span className="font-semibold text-orange-600">héritage culinaire unique</span> pour votre famille. 
+            Un cadeau inoubliable qui traverse les générations.
+          </p>
+          <Link 
+            href="/auth/signin"
+            className="btn btn-primary text-lg px-8 py-4"
+          >
+            🌟 Créer mon premier carnet
+          </Link>
+        </div>
+      </div>
+
+       {/* Actions principales */}
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         <Link 
           href="/auth/signin" 
@@ -64,25 +83,6 @@ export default function HomePage() {
             </p>
           </div>
         </Link>
-      </div>
-
-      {/* CTA final */}
-      <div className="text-center space-y-6">
-        <h2 className="text-3xl font-bold" style={{ color: '#44403c' }}>
-          Plus qu'un carnet de recettes
-        </h2>
-        <div className="card p-8">
-          <p className="text-lg text-gray-600 leading-relaxed mb-6">
-            Créez un <span className="font-semibold text-orange-600">héritage culinaire unique</span> pour votre famille. 
-            Un cadeau inoubliable qui traverse les générations.
-          </p>
-          <Link 
-            href="/auth/signin"
-            className="btn btn-primary text-lg px-8 py-4"
-          >
-            🌟 Créer mon premier carnet
-          </Link>
-        </div>
       </div>
     </div>
   );
