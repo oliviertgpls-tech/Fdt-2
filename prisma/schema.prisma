@@ -24,10 +24,12 @@ model Recipe {
   tags        String[] // Array of strings
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  userId      String
   
   // Relations
   notebookRecipes NotebookRecipe[]
   bookRecipes     BookRecipe[]
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Notebook {
@@ -36,9 +38,11 @@ model Notebook {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  userId      String
   
   // Relations
   recipes NotebookRecipe[]
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model NotebookRecipe {
@@ -54,16 +58,18 @@ model NotebookRecipe {
 }
 
 model Book {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  coverImageUrl  String?  // 🆕 Photo de couverture dédiée
-  status      String   @default("draft") // draft, ready, ordered, printed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  coverImageUrl String?  // Photo de couverture dédiée
+  status        String   @default("draft") // draft, ready, ordered, printed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userId        String
   
   // Relations
   recipes BookRecipe[]
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BookRecipe {
@@ -115,8 +121,10 @@ model User {
   accounts      Account[]
   sessions      Session[]
   
-  // 🆕 Relations avec tes tables existantes
-  // (on les ajoutera après)
+  // Relations avec tes tables
+  recipes       Recipe[]
+  notebooks     Notebook[]
+  books         Book[]
 }
 
 model VerificationToken {
