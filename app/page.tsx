@@ -66,36 +66,6 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Prochainement */}
-      <div className="card p-8 text-center bg-orange-50">
-        <div className="space-y-6 max-w-2xl mx-auto">
-          <div className="flex items-center justify-center gap-3">
-            <div className="text-4xl">🚀</div>
-            <h2 className="text-3xl font-bold" style={{ color: '#44403c' }}>
-              Bientôt disponible
-            </h2>
-          </div>
-          
-          <div className="grid gap-6 sm:grid-cols-3 text-center">
-            <div className="space-y-2">
-              <div className="text-3xl">📸</div>
-              <p className="font-semibold text-orange-600">Photo → Recette</p>
-              <p className="text-gray-500 text-sm">IA magique</p>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl">🖨️</div>
-              <p className="font-semibold text-green-600">Impression PDF</p>
-              <p className="text-gray-500 text-sm">Livres magnifiques</p>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl">🎥</div>
-              <p className="font-semibold text-yellow-600">QR vidéos</p>
-              <p className="text-gray-500 text-sm">Tours de main</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* CTA final */}
       <div className="text-center space-y-6">
         <h2 className="text-3xl font-bold" style={{ color: '#44403c' }}>
@@ -110,7 +80,7 @@ export default function HomePage() {
             href="/add"
             className="btn btn-primary text-lg px-8 py-4"
           >
-            🌟 Commencer mon premier carnet
+            🌟 Créer mon premier carnet
           </Link>
         </div>
       </div>
