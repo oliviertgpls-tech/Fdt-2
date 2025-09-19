@@ -162,7 +162,7 @@ export default function CarnetsPage() {
               <button
                 onClick={handleCreateCarnet}
                 disabled={!carnetTitle.trim()}
-                className="flex-1 bg-orange-600 text-white py-4 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                className="inline-flex-1 bg-orange-600 text-white py-4 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
               </button>
