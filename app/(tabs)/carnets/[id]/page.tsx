@@ -81,7 +81,6 @@ export default function CarnetPage() {
         </div>
       </div>
     );
-  }
 
   return (
     <div className="space-y-6">
