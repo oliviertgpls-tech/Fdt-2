@@ -2,17 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { 
-  ArrowLeft, 
-  Edit3, 
-  Trash2, 
-  Plus, 
-  Eye, 
-  Download, 
-  X, 
-  Loader,
-  GripVertical 
-} from 'lucide-react';
+import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader,GripVertical } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { ImageSearch } from '@/components/ImageSearch';
 
@@ -26,7 +16,8 @@ export default function BookPage() {
     recipes, 
     updateBook,
     addRecipeToBook,
-    removeRecipeFromBook 
+    removeRecipeFromBook,
+    deleteBook
   } = useRecipes();
   
   // États locaux
@@ -74,6 +65,14 @@ export default function BookPage() {
   // 🆕 FONCTION upload photo couverture
   const handleCoverImageUpload = async (file: File) => {
     setIsUploadingCover(true);
+
+  // FONCTION SUPPRESSION LIVRE
+  const handleDeleteBook = () => {
+    if (window.confirm(`Supprimer le livre "${book?.title}" ?\n\nCette action est irréversible.`)) {
+      deleteBook(id);
+      router.push('/livres'); // Retour à la liste
+      }
+    };
     
     try {
       console.log('🚀 Upload couverture en cours...', file.name);
@@ -595,6 +594,14 @@ export default function BookPage() {
           Aperçu PDF
         </>
       )}
+    </button>
+
+    <button
+      onClick={handleDeleteBook}
+      className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
+    >
+      <Trash2 className="w-4 h-4" />
+      Supprimer
     </button>
   </div>
 </div>
