@@ -2,9 +2,6 @@
 
 import { useSession, signOut } from "next-auth/react"
 import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Mail, Calendar, LogOut } from "lucide-react"
 
 export default function ProfilePage() {
@@ -34,24 +31,30 @@ export default function ProfilePage() {
           <p className="text-gray-600">Gérez vos informations personnelles</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="w-5 h-5" />
-              Informations personnelles
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        {/* Card Profile */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <User className="w-5 h-5" />
+            <h2 className="text-xl font-semibold">Informations personnelles</h2>
+          </div>
+          
+          <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <Avatar className="w-20 h-20">
-                <AvatarImage 
-                  src={session?.user?.image || ""} 
-                  alt={session?.user?.name || "Avatar"}
-                />
-                <AvatarFallback className="text-xl">
-                  {session?.user?.name?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              {/* Avatar */}
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                {session?.user?.image ? (
+                  <img 
+                    src={session.user.image} 
+                    alt={session.user.name || "Avatar"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xl font-semibold text-gray-600">
+                    {session?.user?.name?.[0]?.toUpperCase() || "U"}
+                  </span>
+                )}
+              </div>
+              
               <div>
                 <h3 className="text-xl font-semibold">{session?.user?.name}</h3>
                 <p className="text-gray-600 flex items-center gap-1">
@@ -65,7 +68,6 @@ export default function ProfilePage() {
               <h4 className="font-medium mb-2">Compte créé</h4>
               <p className="text-gray-600 flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {/* Vous pouvez ajouter la date de création depuis votre base de données */}
                 Récemment
               </p>
             </div>
@@ -85,17 +87,16 @@ export default function ProfilePage() {
             </div>
 
             <div className="border-t pt-4 flex justify-end">
-              <Button 
+              <button 
                 onClick={handleSignOut}
-                variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Se déconnecter
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
