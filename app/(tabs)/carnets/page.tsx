@@ -90,6 +90,7 @@ export default function CarnetsPage() {
   const resetForm = () => {
     setCarnetTitle('');
     setCarnetDescription('');
+    setShowCreateModal(false);
   };
 
   const CreateCarnetModal = () => (
@@ -151,7 +152,7 @@ export default function CarnetsPage() {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="inline-flex gap-3 pt-4">
               <button
                 onClick={resetForm}
                 className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
@@ -161,7 +162,7 @@ export default function CarnetsPage() {
               <button
                 onClick={handleCreateCarnet}
                 disabled={!carnetTitle.trim()}
-                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                className="inline-flex-1 bg-orange-600 text-white py-3 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
               >
                 ✨ Créer le carnet
               </button>
