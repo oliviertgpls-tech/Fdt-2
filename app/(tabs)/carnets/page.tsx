@@ -173,7 +173,7 @@ export default function CarnetsPage() {
     </div>
   );
 
-  // Composant pour afficher les vignettes des recettes d'un carnet
+  // Composant pour afficher les vignettes des recettes du carnet
   function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: any[] }) {
     // Récupérer les recettes du carnet avec des images
     const carnetRecipes = recipes.filter(recipe => 
