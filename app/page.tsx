@@ -8,13 +8,13 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-4 mb-6">
           <div className="text-6xl"></div>
           <h1 style={{ color: '#292524' }}>
-            Vos recettes font partie de votre patrimoine&nbsp!
+            Vos recettes font partie de votre patrimoine !
           </h1>
         </div>
         
         <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Préservez et transmettez votre <strong className="text-orange-600">patrimoine culinaire familial</strong>. 
-          Créez de beaux livres de recettes à imprimer et partager avec ceux que vous aimez.
+          Préservez et transmettez votre <strong className="text-orange-600">patrimoine culinaire familial</strong>.
+          Créez votre propre livre de recettes à imprimer et partager avec ceux que vous aimez.
         </p>
       </div>
       
@@ -79,7 +79,7 @@ export default function HomePage() {
               Nouvelle Recette
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Ajoutez rapidement une <strong>nouvelle recette</strong> à votre collection
+              Ajoutez rapidement une <strong>première recette</strong> à votre collection
             </p>
           </div>
         </Link>
