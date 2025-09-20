@@ -53,7 +53,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\\n\\nÉtape 2...\\n\\nÉtape 3...",
+  "steps": "Étape 1...\\n\\n\\nÉtape 2...\\n\\n\\nÉtape 3...",
   "confidence": 85
 }`
                 },
@@ -139,7 +139,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\\n\\nÉtape 2...\\n\\nÉtape 3...",
+  "steps": "Étape 1...\\n\\n\\nÉtape 2...\\n\\n\\nÉtape 3...",
   "confidence": 90
 }`
                 },
