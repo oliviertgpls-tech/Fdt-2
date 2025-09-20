@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="flex items-center justify-center gap-4 mb-6">
           <div className="text-6xl"></div>
           <h1 style={{ color: '#292524' }}>
-            Les recettes sont votre patrimoine !
+            Vos recettes font partie de votre patrimoine&nbsp!
           </h1>
         </div>
         
@@ -64,7 +64,7 @@ export default function HomePage() {
               Mes Recettes
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Consultez, modifiez et ajoutez de <strong>nouvelles recettes</strong> à votre collection précieuse
+              Consultez, modifiez et ajoutez de <strong>nouvelles recettes</strong> à votre précieuse collection
             </p>
           </div>
         </Link>
