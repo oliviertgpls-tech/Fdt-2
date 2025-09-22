@@ -97,7 +97,7 @@ export default function SignInPage() {
                   className="w-full flex items-center justify-center gap-3 px-6 py-8 rounded-xl font-semibold bg-gray-100 text-gray-400 border-2 border-gray-100 cursor-not-allowed"
                 >
                   <Mail className="w-5 h-5" />
-                  Se connecter avec Email <br/>(bientôt disponible)
+                  Se connecter avec Email  (bientôt disponible)
                 </button>
               </div>
 
