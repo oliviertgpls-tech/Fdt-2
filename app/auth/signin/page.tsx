@@ -64,9 +64,9 @@ export default function SignInPage() {
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
             <div className="bg-gradient-to-r from-orange-200 to-orange-300 px-8 py-12 text-center text-white">
-              <h1 className="text-2xl font-bold mb-2">Bienvenue !</h1>
+              <h1 className="text-2xl font-bold mb-2">Food Memories</h1>
               <p className="text-orange-100 text-lg">
-                Connectez-vous pour accéder à vos recettes familiales
+                Connectez-vous pour accéder à vos recettes. <br> Première visite ? Pas de souci ! La connexion créera automatiquement votre compte.</br> 
               </p>
             </div>
 
@@ -130,7 +130,7 @@ export default function SignInPage() {
           {/* Message sous la card */}
           <div className="text-center mt-8">
             <p className="text-gray-600">
-              Première visite ? Pas de souci ! La connexion créera automatiquement votre compte.
+             Food  Memories - Tous droits Réservés - 2025
             </p>
           </div>
         </div>
