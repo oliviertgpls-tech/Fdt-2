@@ -639,16 +639,13 @@ export default function AddRecipePage() {
             🤖 IA en cours d'analyse...
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA OpenAI analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
+            Notre IA analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
             Cela prend généralement 5-10 secondes...
-          </p>
-          <p className="text-xs text-gray-400 mt-2">
-            🔧 Mode debug - Regardez la console (F12) pour plus d'infos
           </p>
         </div>
       </div>
@@ -666,11 +663,6 @@ export default function AddRecipePage() {
             Choisissez comment vous souhaitez ajouter votre recette
           </p>
           
-          {/* Debug info */}
-          <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-            🔧 Debug: OpenAI {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? '✅' : '❌'} | 
-            Unsplash {process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? '✅' : '❌'}
-          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -717,13 +709,13 @@ export default function AddRecipePage() {
                   Photo d'un plat {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Prenez en photo votre plat terminé. Notre IA OpenAI devine la recette et génère automatiquement les instructions.
+                  Prenez en photo votre plat terminé. Notre IA devine la recette et génère automatiquement les instructions.
                 </p>
               </div>
               
               <div className="pt-4 space-y-2">
                 <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
-                  🤖 IA OpenAI - ~0,01€
+                  🤖 IA - 5 offertes
                 </div>
                 <p className="text-xs text-gray-500">
                   {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à analyser' : 'Clé API manquante'}
@@ -747,13 +739,13 @@ export default function AddRecipePage() {
                   Recette manuscrite {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI lit et structure automatiquement le texte.
+                  Photographiez une recette écrite à la main ou imprimée. Notre IA lit et structure automatiquement le texte.
                 </p>
               </div>
               
               <div className="pt-4">
                 <div className="bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
-                  🤖 IA OpenAI - ~0,01€
+                  🤖 IA - 5 offertes
                 </div>
                 <p className="text-xs text-gray-500">
                   {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à lire' : 'Clé API manquante'}
@@ -768,12 +760,12 @@ export default function AddRecipePage() {
             <div className="text-3xl">🤖</div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">
-                Powered by OpenAI GPT-4 Vision
+                Powered by IA
               </h4>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>• <strong>Analyse intelligente</strong> : Reconnaît les plats et ingrédients</li>
                 <li>• <strong>OCR avancé</strong> : Lit même l'écriture manuscrite</li>
-                <li>• <strong>Coût transparent</strong> : ~0,01€ par analyse</li>
+                <li>• <strong>Coût transparent</strong> : 10 premières analyses offertes</li>
                 <li>• <strong>Éditable</strong> : Vous pouvez corriger le résultat</li>
               </ul>
             </div>
@@ -865,7 +857,7 @@ export default function AddRecipePage() {
             Scannez votre recette
           </h2>
           <p className="text-gray-600 mb-8">
-            Photographiez une recette écrite à la main ou imprimée. Notre IA OpenAI va lire et structurer le texte automatiquement avec optimisation d'image.
+            Photographiez une recette écrite à la main ou imprimée. Notre IA va lire et structurer le texte automatiquement avec optimisation d'image.
           </p>
 
           <label className="inline-block">
