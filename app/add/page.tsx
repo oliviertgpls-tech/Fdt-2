@@ -137,9 +137,9 @@ FORMAT DE RÉPONSE (JSON uniquement) :
     }
   }
 
-  async analyzeManuscriptToRecipe(imageFile: File): Promise<{
+async analyzeManuscriptToRecipe(imageFile: File, firstName: string): Promise<{   
     title: string;
-    author: "${firstName}";
+    author: string;
     prepMinutes: number;
     servings: string;
     ingredients: string[];
@@ -180,7 +180,7 @@ INSTRUCTIONS :
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
   "title": "Titre de la recette",
-  "author": "Nom trouvé ou 'Recette familiale'",
+  "author": "${firstName}",
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2"],
