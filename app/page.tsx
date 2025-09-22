@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center">
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
@@ -15,8 +15,8 @@ export default function HomePage() {
             {/* Titre principal */}
             <div className="space-y-6">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                Préservez votre 
-                <span className="text-orange-600"> patrimoine culinaire</span>
+                Votre 
+                <span className="text-orange-600">patrimoine culinaire</span>
               </h1>
               
               {/* Sous-titre */}
@@ -30,7 +30,7 @@ export default function HomePage() {
             <div className="space-y-4 pt-6">
               <Link
                 href="/auth/signin"
-                className="inline-block bg-orange-400 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-500 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
+                className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-700 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               >
                 🚀 Commencer gratuitement
               </Link>
@@ -39,6 +39,18 @@ export default function HomePage() {
                 Connexion avec Google • Gratuit • Sécurisé
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Image illustrative */}
+        <div className="max-w-4xl mx-auto px-4 pb-16">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img 
+              src="/famille-cuisine.jpg" 
+              alt="Trois générations cuisinent ensemble - grand-mère, mère et enfant regardent un livre de recettes dans une cuisine chaleureuse"
+              className="w-full h-auto"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
         </div>
       </div>
@@ -98,7 +110,7 @@ export default function HomePage() {
       </div>
 
       {/* Fonctionnalités avancées */}
-      <div className="bg-white py-10">
+      <div className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -155,7 +167,7 @@ export default function HomePage() {
       </div>
 
       {/* CTA final */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-500 py-20">
+      <div className="bg-gradient-to-r from-orange-600 to-orange-700 py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Prêt à préserver vos recettes familiales ?
