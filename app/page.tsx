@@ -15,7 +15,7 @@ export default function HomePage() {
             {/* Titre principal */}
             <div className="space-y-6">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                Votre 
+                Préservez votre 
                 <span className="text-orange-600"> patrimoine culinaire</span>
               </h1>
               
