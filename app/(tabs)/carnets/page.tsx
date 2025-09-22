@@ -91,25 +91,8 @@ export default function CarnetsPage() {
     setCarnetTitle('');
     setCarnetDescription('');
     setShowCreateModal(false);
-    setShowCreateModal(false);
   };
   
-  const handleCreateCarnet = async () => {
-    if (!carnetTitle.trim()) return;
-    
-    try {
-      await createNotebook(carnetTitle.trim(), carnetDescription.trim());
-      // Succès : on reset tout et on ferme
-      setCarnetTitle('');
-      setCarnetDescription('');
-      setShowCreateModal(false);
-    } catch (error) {
-      console.error('Erreur lors de la création du carnet:', error);
-      alert('Erreur lors de la création du carnet');
-      // En cas d'erreur, on ne ferme PAS la modale
-    }
-  };
-
   const CreateCarnetModal = () => (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl max-w-2xl w-full shadow-2xl">
