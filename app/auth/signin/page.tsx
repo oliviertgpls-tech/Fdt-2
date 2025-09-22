@@ -2,9 +2,8 @@
 
 import { signIn, getProviders } from "next-auth/react"
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { Github, Chrome } from "lucide-react"
+import Link from "next/link"
+import { Chrome, ArrowLeft, Mail } from "lucide-react"
 
 interface Provider {
   id: string
@@ -29,50 +28,161 @@ export default function SignInPage() {
     switch (providerId) {
       case 'google':
         return <Chrome className="w-5 h-5" />
-      case 'github':
-        return <Github className="w-5 h-5" />
       default:
         return null
     }
   }
 
-  const getProviderColor = (providerId: string) => {
+  const getProviderStyle = (providerId: string) => {
     switch (providerId) {
       case 'google':
-        return 'bg-red-600 hover:bg-red-700 text-white'
-      case 'github':
-        return 'bg-gray-900 hover:bg-gray-800 text-white'
+        return 'bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
       default:
-        return 'bg-blue-600 hover:bg-blue-700 text-white'
+        return 'bg-orange-600 text-white border-2 border-orange-600 hover:bg-orange-700'
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
-          <CardDescription>
-            Connectez-vous pour accéder à vos carnets de recettes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {providers && Object.values(providers).map((provider) => (
-            <Button
-              key={provider.name}
-              onClick={() => signIn(provider.id, { callbackUrl: '/recipes' })}
-              className={`w-full flex items-center justify-center gap-2 ${getProviderColor(provider.id)}`}
-            >
-              {getProviderIcon(provider.id)}
-              Se connecter avec {provider.name}
-            </Button>
-          ))}
-          
-          <div className="text-center text-sm text-gray-600 mt-6">
-            <p>En vous connectant, vous acceptez nos conditions d'utilisation.</p>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      {/* Header simple avec retour */}
+      <header className="relative z-10">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <Link 
+            href="/"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour à l'accueil
+          </Link>
+        </div>
+      </header>
+
+      {/* Contenu principal */}
+      <div className="flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Card principale */}
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+            {/* En-tête avec style */}
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-12 text-center text-white">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">📚</span>
+              </div>
+              <h1 className="text-2xl font-bold mb-2">Bienvenue !</h1>
+              <p className="text-orange-100 text-lg">
+                Connectez-vous pour accéder à vos recettes familiales
+              </p>
+            </div>
+
+            {/* Contenu */}
+            <div className="px-8 py-8 space-y-6">
+              {/* Message d'accueil */}
+              <div className="text-center mb-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  Préservez votre patrimoine culinaire
+                </h2>
+                <p className="text-gray-600">
+                  Choisissez votre méthode de connexion pour commencer
+                </p>
+              </div>
+
+              {/* Boutons de connexion */}
+              <div className="space-y-4">
+                {/* Google */}
+                {providers && providers.google && (
+                  <button
+                    onClick={() => signIn('google', { callbackUrl: '/recipes' })}
+                    className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                  >
+                    <Chrome className="w-5 h-5" />
+                    Se connecter avec Google
+                  </button>
+                )}
+
+                {/* Email (à venir) */}
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold bg-gray-100 text-gray-400 border-2 border-gray-100 cursor-not-allowed"
+                >
+                  <Mail className="w-5 h-5" />
+                  Se connecter avec Email (bientôt disponible)
+                </button>
+              </div>
+
+              {/* Avantages */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl mb-2">🔒</div>
+                    <p className="text-sm text-gray-600 font-medium">
+                      100% sécurisé
+                    </p>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">🆓</div>
+                    <p className="text-sm text-gray-600 font-medium">
+                      Totalement gratuit
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Note légale */}
+              <div className="text-center text-xs text-gray-500 leading-relaxed">
+                En vous connectant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité. 
+                Vos données restent privées et sécurisées.
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Message sous la card */}
+          <div className="text-center mt-8">
+            <p className="text-gray-600">
+              Première visite ? Pas de souci ! La connexion créera automatiquement votre compte.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Features en bas */}
+      <div className="max-w-4xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Pourquoi Food Memories ?
+          </h3>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-xl">🤖</span>
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-2">IA intégrée</h4>
+            <p className="text-gray-600 text-sm">
+              Analysez vos photos de plats et recettes manuscrites automatiquement
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-xl">📚</span>
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-2">Livres imprimables</h4>
+            <p className="text-gray-600 text-sm">
+              Créez de magnifiques livres PDF à imprimer et partager
+            </p>
+          </div>
+          
+          <div className="text-center">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-xl">💝</span>
+            </div>
+            <h4 className="font-semibold text-gray-900 mb-2">Patrimoine familial</h4>
+            <p className="text-gray-600 text-sm">
+              Transmettez vos recettes aux générations futures
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
