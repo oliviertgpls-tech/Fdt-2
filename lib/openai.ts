@@ -118,7 +118,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   }
 
   // 📝 ANALYSE RECETTE MANUSCRITE → RECETTE STRUCTURÉE
-  async analyzeManuscriptToRecipe(imageFile: File): Promise<{
+  async analyzeManuscriptToRecipe(imageFile: File, firstName: string): Promise<{
     title: string;
     author: string;
     prepMinutes: number;
