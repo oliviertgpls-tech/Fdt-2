@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
 
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
@@ -393,8 +394,9 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
 const openAIService = new OpenAIService();
 
 export default function AddRecipePage() {
+  const { data: session } = useSession() 
+  const firstName = session?.user?.name?.split(' ')[0] || 'Utilisateur' 
   const router = useRouter();
-  
   const [mode, setMode] = useState<'choose' | 'manual' | 'photo' | 'scan'>('choose');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -474,7 +476,7 @@ export default function AddRecipePage() {
     
     try {
       // Analyser avec l'IA d'abord
-      const aiResult = await openAIService.analyzeManuscriptToRecipe(file);
+      const aiResult = await openAIService.analyzeManuscriptToRecipe(file, firstname);
       console.log('🤖 Résultat IA manuscrit:', aiResult);
       
       // Puis uploader l'image avec optimisations
@@ -563,7 +565,7 @@ export default function AddRecipePage() {
     try {
       // Analyse IA
       console.log('🤖 Analyse IA en cours...');
-      const aiResult = await openAIService.analyzePhotoToRecipe(file);
+      const aiResult = await openAIService.analyzePhotoToRecipe(file, firstname);
       console.log('✅ IA terminée:', aiResult.title);
       
       // Remplir les champs
