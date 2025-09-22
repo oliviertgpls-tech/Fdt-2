@@ -7,8 +7,8 @@ export class OpenAIService {
   
   // Découper par phrases qui commencent par Étape ou chiffre
   return stepsText
-    .replace(/(Étape\s*\d+)/gi, '\n\n$1')
-    .replace(/([.!?])\s*(Étape|\d+\.)/g, '$1\n\n$2')
+    .replace(/(Étape\s*\d+)/gi, '\\n\\n$1')
+    .replace(/([.!?])\s*(Étape|\d+\.)/g, '$1\\n\\n$2')
     .replace(/^\n\n/, '')
     .trim();
 }
@@ -23,7 +23,7 @@ export class OpenAIService {
 
 
   // 📷 ANALYSE PHOTO DE PLAT → RECETTE
-   async analyzePhotoToRecipe(imageFile: File): Promise<{
+   async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{...
     title: string;
     author: string;
     prepMinutes: number;
