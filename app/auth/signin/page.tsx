@@ -63,7 +63,7 @@ export default function SignInPage() {
           {/* Card principale */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
-            <div className="bg-gradient-to-br from-orange-300 to-orange-500 px-8 py-8 text-center text-white">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-700 px-8 py-8 text-center text-white">
               <h1 className="text-2xl font-bold mb-2 text-orange-100 texte">Food Memories</h1>
               <p className="text-orange-100 text-lg">
                 Inscrivez-vous ou connectez-vous pour accéder à vos recettes. 
