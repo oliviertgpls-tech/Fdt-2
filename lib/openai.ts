@@ -60,7 +60,7 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Dans le champ "steps", LAISSEZ OBLIGATOIREMENT UNE LIGNE VIDE entre chaque étape
+- CRUCIAL : Dans le champ "steps", AJOUTE UN SAUT DE LIGNE entre chaque étape
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -150,7 +150,7 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Dans le champ "steps", LAISSEZ OBLIGATOIREMENT UNE LIGNE VIDE entre chaque étape
+- CRUCIAL : Dans le champ "steps", AJOUTE UN SAUT DE LIGNE entre chaque étape
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
