@@ -23,7 +23,7 @@ export class OpenAIService {
 
 
   // 📷 ANALYSE PHOTO DE PLAT → RECETTE
-  async analyzePhotoToRecipe(imageFile: File): Promise<{
+   async analyzePhotoToRecipe(imageFile: File): Promise<{
     title: string;
     author: string;
     prepMinutes: number;
@@ -57,8 +57,8 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par \\n\\n (double saut de ligne)
-- EXEMPLE steps valide : "1. Faire ceci\\n\\n2. Faire cela\\n\\n3. Finir"
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le séparateur |S|
+- EXEMPLE steps valide : "1. Faire ceci|S|2. Faire cela|S|3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -67,7 +67,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "1. Première étape\\n\\n2. Deuxième étape\\n\\n3. Troisième étape",
+  "steps": "1. Première étape|S|2. Deuxième étape|S|3. Troisième étape",
   "confidence": 85
 }`
                 },
@@ -103,7 +103,12 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const recipeData = JSON.parse(jsonMatch[0]);
+
+      // Remplacer le séparateur par des sauts de ligne
+      recipeData.steps = recipeData.steps.replace(/\|S\|/g, '\n\n');
+
+      return recipeData;
       
     } catch (error) {
       console.error('Erreur analyse photo:', error);
@@ -145,8 +150,8 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par \\n\\n (double saut de ligne)
-- EXEMPLE steps valide : "1. Faire ceci\\n\\n2. Faire cela\\n\\n3. Finir"
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le séparateur |S|
+- EXEMPLE steps valide : "1. Faire ceci|S|2. Faire cela|S|3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -155,7 +160,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "1. Première étape\\n\\n2. Deuxième étape\\n\\n3. Troisième étape",
+  "steps": "1. Première étape|S|2. Deuxième étape|S|3. Troisième étape",
   "confidence": 90
 }`
                 },
@@ -191,7 +196,12 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const recipeData = JSON.parse(jsonMatch[0]);
+
+      // Remplacer le séparateur par des sauts de ligne
+      recipeData.steps = recipeData.steps.replace(/\|S\|/g, '\n\n');
+
+      return recipeData;
       
     } catch (error) {
       console.error('Erreur analyse manuscrit:', error);
