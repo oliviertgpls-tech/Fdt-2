@@ -2,6 +2,16 @@
 export class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
+  private formatSteps(stepsText: string): string {
+  if (!stepsText) return '';
+  
+  // Découper par phrases qui commencent par Étape ou chiffre
+  return stepsText
+    .replace(/(Étape\s*\d+)/gi, '\n\n$1')
+    .replace(/([.!?])\s*(Étape|\d+\.)/g, '$1\n\n$2')
+    .replace(/^\n\n/, '')
+    .trim();
+}
   
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY || '';
