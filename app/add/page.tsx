@@ -80,11 +80,11 @@ INSTRUCTIONS :
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
   "title": "Nom du plat",
-  "author": "Recette générée par IA",
+  "author": "${firstName}",
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2"],
-  "steps": "Étape 1...\n\nÉtape 2...",
+  "steps": "Étape 1...\\n\\nÉtape 2...",
   "confidence": 85
 }`
                 },
@@ -139,7 +139,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
   async analyzeManuscriptToRecipe(imageFile: File): Promise<{
     title: string;
-    author: string;
+    author: "${firstName}";
     prepMinutes: number;
     servings: string;
     ingredients: string[];
