@@ -27,7 +27,7 @@ export default function HomePage() {
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
-              ✨ Préservez votre patrimoine culinaire familial
+              ✨ Quoi de plus précieux qu'une recette de famille
             </div>
             
             {/* Titre principal */}
