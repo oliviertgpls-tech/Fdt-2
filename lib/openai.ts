@@ -2,7 +2,17 @@
 export class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
-
+  private formatSteps(stepsText: string): string {
+  if (!stepsText) return '';
+  
+  // Découper par phrases qui commencent par Étape ou chiffre
+  return stepsText
+    .replace(/(Étape\s*\d+)/gi, '\n\n$1')
+    .replace(/([.!?])\s*(Étape|\d+\.)/g, '$1\n\n$2')
+    .replace(/^\n\n/, '')
+    .trim();
+}
+  
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY || '';
     if (!this.apiKey) {
@@ -47,8 +57,8 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Le champ "steps" doit être un tableau (array) de chaînes de caractères, où chaque chaîne est une étape.
-- EXEMPLE steps valide : ["1. Faire ceci", "2. Faire cela", "3. Finir"]
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
+- EXEMPLE steps valide : "1. Faire ceci|2. Faire cela|3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -57,7 +67,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": ["Première étape", "Deuxième étape", "Troisième étape"],
+  "steps": "Première étape|Deuxième étape|Troisième étape",
   "confidence": 85
 }`
                 },
@@ -89,9 +99,8 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
       // Parser la réponse JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('Format de réponse invalide');
-      }
+
+      recipeData.steps = recipeData.steps.split('|').join('\n\n');
 
       const recipeData = JSON.parse(jsonMatch[0]);
 
@@ -142,8 +151,8 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Le champ "steps" doit être un tableau (array) de chaînes de caractères, où chaque chaîne est une étape.
-- EXEMPLE steps valide : ["1. Faire ceci", "2. Faire cela", "3. Finir"]
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
+- EXEMPLE steps valide : "1. Faire ceci|2. Faire cela|3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -152,7 +161,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": ["Première étape", "Deuxième étape", "Troisième étape"],
+  "steps": "Première étape|Deuxième étape|Troisième étape",
   "confidence": 90
 }`
                 },
@@ -190,10 +199,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
       const recipeData = JSON.parse(jsonMatch[0]);
 
-      // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
-      if (Array.isArray(recipeData.steps)) {
-        recipeData.steps = recipeData.steps.join('\n\n');
-      }
+      recipeData.steps = recipeData.steps.split('|').join('\n\n');
 
       return recipeData;
       
