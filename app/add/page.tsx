@@ -184,7 +184,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2"],
-  "steps": "Étape 1...\n\nÉtape 2...",
+  "steps": "Étape 1...\\n\\nÉtape 2...",
   "confidence": 90
 }`
                 },
