@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
@@ -15,8 +15,8 @@ export default function HomePage() {
             {/* Titre principal */}
             <div className="space-y-6">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                Votre 
-                <span className="text-orange-600">patrimoine culinaire</span>
+                Préservez votre 
+                <span className="text-orange-600"> patrimoine culinaire</span>
               </h1>
               
               {/* Sous-titre */}
@@ -167,7 +167,7 @@ export default function HomePage() {
       </div>
 
       {/* CTA final */}
-      <div className="bg-gradient-to-r from-orange-600 to-orange-700 py-20">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-500 py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Prêt à préserver vos recettes familiales ?
