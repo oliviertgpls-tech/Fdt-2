@@ -100,9 +100,9 @@ FORMAT DE RÉPONSE (JSON uniquement) :
       // Parser la réponse JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
 
-      recipeData.steps = recipeData.steps.split('|').join('\n\n');
-
       const recipeData = JSON.parse(jsonMatch[0]);
+
+      recipeData.steps = recipeData.steps.split('|').join('\n\n');
 
       // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
       if (Array.isArray(recipeData.steps)) {
