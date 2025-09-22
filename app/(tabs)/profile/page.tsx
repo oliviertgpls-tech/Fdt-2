@@ -2,12 +2,14 @@
 
 import { useSession, signOut } from "next-auth/react"
 import { redirect } from "next/navigation"
-import { User, Mail, Calendar, LogOut } from "lucide-react"
+import { User, Mail, Calendar, LogOut, Share2 } from "lucide-react"
+import { useRecipes } from "@/contexts/RecipesProvider"
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
+  const { recipes, notebooks, loading } = useRecipes()
 
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -22,6 +24,10 @@ export default function ProfilePage() {
   const handleSignOut = () => {
     signOut({ callbackUrl: "/" })
   }
+
+  // Calcul des vraies statistiques
+  const recipeCount = recipes.length
+  const notebookCount = notebooks.length
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -74,14 +80,22 @@ export default function ProfilePage() {
 
             <div className="border-t pt-4">
               <h4 className="font-medium mb-4">Statistiques</h4>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Recettes créées</p>
-                  <p className="text-2xl font-bold text-blue-600">0</p>
+                  <p className="text-2xl font-bold text-blue-600">{recipeCount}</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">Carnets</p>
-                  <p className="text-2xl font-bold text-green-600">0</p>
+                  <p className="text-2xl font-bold text-green-600">{notebookCount}</p>
+                </div>
+                <div className="bg-gray-100 p-4 rounded-lg opacity-60 cursor-not-allowed">
+                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <Share2 className="w-3 h-3" />
+                    Partagées
+                  </p>
+                  <p className="text-2xl font-bold text-gray-400">0</p>
+                  <p className="text-xs text-gray-400 mt-1">Bientôt disponible</p>
                 </div>
               </div>
             </div>
