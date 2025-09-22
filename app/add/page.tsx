@@ -28,7 +28,7 @@ class OpenAIService {
     console.log('🔑 Début de la clé:', this.apiKey ? this.apiKey.substring(0, 7) + '...' : 'MANQUANTE');
   }
 
-  async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{...
+  async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{
     title: string;
     author: string;
     prepMinutes: number;
