@@ -68,8 +68,8 @@ export default function CarnetsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   
   // ✅ ÉTATS COMPLÈTEMENT SÉPARÉS - CHACUN SA VARIABLE
-  const [carnetTitle, setCarnetTitle] = useState('');
-  const [carnetDescription, setCarnetDescription] = useState('');
+  const [CarnetTitle, setCarnetTitle] = useState('');
+  const [carnetDescription, setcarnetDescription] = useState('');
 
   // Recettes du carnet
   const carnetRecipes = recipes;
@@ -80,16 +80,16 @@ export default function CarnetsPage() {
     
     try {
       await createNotebook(carnetTitle.trim(), carnetDescription.trim());
-      setCarnetTitle('');
-      setCarnetDescription('');
+      setcarnetTitle('');
+      setcarnetDescription('');
     } catch (error) {
       console.error('Erreur lors de la création du carnet:', error);
     }
   };
 
   const resetForm = () => {
-    setCarnetTitle('');
-    setCarnetDescription('');
+    setcarnetTitle('');
+    setcarnetDescription('');
     setShowCreateModal(false);
   };
   
@@ -134,7 +134,7 @@ export default function CarnetsPage() {
               <textarea
                 rows={3}
                 value={carnetDescription}
-                onChange={(e) => setCarnetDescription(e.target.value)}
+                onChange={(e) => setcarnetDescription(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
                 placeholder="Décrivez le thème de ce carnet..."
               />
