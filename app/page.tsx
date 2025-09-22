@@ -3,6 +3,25 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      {/* Header avec bouton Login */}
+      <header className="relative z-10">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          {/* Logo/Nom du site */}
+          <div className="font-bold text-xl text-gray-900">
+            Food Memories
+          </div>
+          
+          {/* Bouton Login */}
+          <Link
+            href="/auth/signin"
+            className="bg-white text-gray-700 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all font-medium"
+          >
+            Se connecter
+          </Link>
+        </div>
+      </header>
+
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
