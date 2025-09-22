@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-2xl mx-auto px-4 pt-20 pb-32 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center">
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
@@ -14,9 +14,9 @@ export default function HomePage() {
             
             {/* Titre principal */}
             <div className="space-y-6">
-              <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
-                Les recettes sont votre 
-                <span className="text-orange-600 block">patrimoine !</span>
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                Votre 
+                <span className="text-orange-600">patrimoine culinaire</span>
               </h1>
               
               {/* Sous-titre */}
@@ -184,4 +184,3 @@ export default function HomePage() {
     </div>
   );
 }
-
