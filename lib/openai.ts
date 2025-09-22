@@ -57,8 +57,8 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le séparateur |S|
-- EXEMPLE steps valide : "1. Faire ceci|S|2. Faire cela|S|3. Finir"
+- CRUCIAL : Le champ "steps" doit être un tableau (array) de chaînes de caractères, où chaque chaîne est une étape.
+- EXEMPLE steps valide : ["1. Faire ceci", "2. Faire cela", "3. Finir"]
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -67,7 +67,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "1. Première étape|S|2. Deuxième étape|S|3. Troisième étape",
+  "steps": ["Première étape", "Deuxième étape", "Troisième étape"],
   "confidence": 85
 }`
                 },
@@ -105,8 +105,10 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
       const recipeData = JSON.parse(jsonMatch[0]);
 
-      // Remplacer le séparateur par des sauts de ligne
-      recipeData.steps = recipeData.steps.replace(/\|S\|/g, '\n\n');
+      // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
+      if (Array.isArray(recipeData.steps)) {
+        recipeData.steps = recipeData.steps.join('\n\n');
+      }
 
       return recipeData;
       
@@ -150,8 +152,8 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le séparateur |S|
-- EXEMPLE steps valide : "1. Faire ceci|S|2. Faire cela|S|3. Finir"
+- CRUCIAL : Le champ "steps" doit être un tableau (array) de chaînes de caractères, où chaque chaîne est une étape.
+- EXEMPLE steps valide : ["1. Faire ceci", "2. Faire cela", "3. Finir"]
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -160,7 +162,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "1. Première étape|S|2. Deuxième étape|S|3. Troisième étape",
+  "steps": ["Première étape", "Deuxième étape", "Troisième étape"],
   "confidence": 90
 }`
                 },
@@ -198,8 +200,10 @@ FORMAT DE RÉPONSE (JSON uniquement) :
 
       const recipeData = JSON.parse(jsonMatch[0]);
 
-      // Remplacer le séparateur par des sauts de ligne
-      recipeData.steps = recipeData.steps.replace(/\|S\|/g, '\n\n');
+      // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
+      if (Array.isArray(recipeData.steps)) {
+        recipeData.steps = recipeData.steps.join('\n\n');
+      }
 
       return recipeData;
       
