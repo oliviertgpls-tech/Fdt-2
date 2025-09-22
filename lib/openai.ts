@@ -2,17 +2,24 @@
 export class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
-    // 🛠️ HELPER : Formater les étapes automatiquement
+  // 🛠️ HELPER : Formater les étapes automatiquement
   private formatSteps(stepsText: string): string {
     if (!stepsText) return '';
-      // Nettoyer le texte
+    
+    // Nettoyer le texte
     let cleaned = stepsText.trim();
-    // Remplacer les numérotations existantes par des sauts de ligne
+    
+    // Remplacer TOUS les formats d'étapes par des sauts de ligne
+    cleaned = cleaned.replace(/(Étape\s*\d+\s*[:.]?\s*)/gi, '\n\n$1');
     cleaned = cleaned.replace(/(\d+\.?\s*)/g, '\n\n$1');
+    cleaned = cleaned.replace(/(\d+\)\s*)/g, '\n\n$1'); // Pour "1) "
+    
     // Nettoyer les multiples sauts de ligne
     cleaned = cleaned.replace(/\n\n+/g, '\n\n');
-    // Enlever le saut de ligne du début si il y en a un
+    
+    // Enlever le saut de ligne du début
     cleaned = cleaned.replace(/^\n\n/, '');
+    
     return cleaned;
   }
 
