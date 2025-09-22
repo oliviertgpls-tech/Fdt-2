@@ -321,7 +321,7 @@ export default function CarnetsPage() {
                       {carnet.title}
                     </h3>
                     <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                      {carnet.description || "Aucune description"}
+                      {carnetDescription || "Aucune description"}
                     </p>
                     
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
