@@ -227,7 +227,7 @@ export default function CarnetEditPage() {
             </div>
           ) : (
             <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[60px]">
-              {actualCarnet.description || (
+              {Carnet.description || (
                 <span className="text-gray-400 italic">Aucune description</span>
               )}
             </div>
