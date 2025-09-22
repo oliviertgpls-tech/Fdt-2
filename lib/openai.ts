@@ -47,7 +47,8 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Dans le champ "steps", AJOUTE UN SAUT DE LIGNE entre chaque étape
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par \\n\\n (double saut de ligne)
+- EXEMPLE steps valide : "1. Faire ceci\\n\\n2. Faire cela\\n\\n3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -56,7 +57,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "1... 2... 3...",
+  "steps": "1. Première étape\\n\\n2. Deuxième étape\\n\\n3. Troisième étape",
   "confidence": 85
 }`
                 },
@@ -134,7 +135,8 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Dans le champ "steps", AJOUTE UN SAUT DE LIGNE entre chaque étape
+- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par \\n\\n (double saut de ligne)
+- EXEMPLE steps valide : "1. Faire ceci\\n\\n2. Faire cela\\n\\n3. Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -143,7 +145,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\\n\\n\\nÉtape 2...\\n\\n\\nÉtape 3...",
+  "steps": "1. Première étape\\n\\n2. Deuxième étape\\n\\n3. Troisième étape",
   "confidence": 90
 }`
                 },
