@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-16 text-center">
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
@@ -44,7 +44,7 @@ export default function HomePage() {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-6xl mx-auto px-4 py-20">
+      <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Comment ça marche ?
@@ -98,7 +98,7 @@ export default function HomePage() {
       </div>
 
       {/* Fonctionnalités avancées */}
-      <div className="bg-white py-20">
+      <div className="bg-white py-10">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -155,7 +155,7 @@ export default function HomePage() {
       </div>
 
       {/* CTA final */}
-      <div className="bg-gradient-to-r from-orange-200 to-orange-300 py-20">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-500 py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Prêt à préserver vos recettes familiales ?
