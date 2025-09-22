@@ -476,7 +476,7 @@ export default function AddRecipePage() {
     
     try {
       // Analyser avec l'IA d'abord
-      const aiResult = await openAIService.analyzeManuscriptToRecipe(file, firstname);
+      const aiResult = await openAIService.analyzeManuscriptToRecipe(file, firstName);
       console.log('🤖 Résultat IA manuscrit:', aiResult);
       
       // Puis uploader l'image avec optimisations
@@ -565,7 +565,7 @@ export default function AddRecipePage() {
     try {
       // Analyse IA
       console.log('🤖 Analyse IA en cours...');
-      const aiResult = await openAIService.analyzePhotoToRecipe(file, firstname);
+      const aiResult = await openAIService.analyzePhotoToRecipe(file, firstName);
       console.log('✅ IA terminée:', aiResult.title);
       
       // Remplir les champs
