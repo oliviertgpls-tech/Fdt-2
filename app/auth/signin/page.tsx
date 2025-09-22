@@ -64,7 +64,6 @@ export default function SignInPage() {
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
             <div className="bg-gradient-to-br from-orange-400 to-orange-600 px-8 py-8 text-center text-white">
-              <h1 className="text-2xl font-bold mb-2 text-white">Food Memories</h1>
               <p className="text-orange-100 text-lg">
                 Inscrivez-vous ou connectez-vous pour accéder à vos recettes. 
               </p>
