@@ -77,7 +77,7 @@ export default function HomePage() {
               1. Ajoutez vos recettes
             </h3>
             <p className="text-gray-600 leading-relaxed">
-              Saisissez manuellement ou utilisez notre <strong>IA OpenAI</strong> pour analyser des photos de plats ou recettes manuscrites
+              Saisissez manuellement ou utilisez <strong>notre IA</strong> pour analyser des photos de plats ou recettes manuscrites
             </p>
           </div>
 
@@ -119,7 +119,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {/* IA OpenAI */}
+            {/* IA inside */}
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
               <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-2xl">🤖</span>
