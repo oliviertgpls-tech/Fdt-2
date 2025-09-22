@@ -20,8 +20,7 @@ export default function HomePage() {
           </Link>
         </div>
       </header>
-
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
