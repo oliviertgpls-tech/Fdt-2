@@ -36,7 +36,7 @@ export default function SignInPage() {
   const getProviderStyle = (providerId: string) => {
     switch (providerId) {
       case 'google':
-        return 'bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+        return 'bg-blue-600 text-white border-2 border-gray-200 hover:border-gray-300 hover:bg-blue-70'
       default:
         return 'bg-orange-600 text-white border-2 border-orange-600 hover:bg-orange-700'
     }
@@ -63,10 +63,7 @@ export default function SignInPage() {
           {/* Card principale */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-12 text-center text-white">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📚</span>
-              </div>
+            <div className="bg-gradient-to-r from-orange-200 to-orange-300 px-8 py-12 text-center text-white">
               <h1 className="text-2xl font-bold mb-2">Bienvenue !</h1>
               <p className="text-orange-100 text-lg">
                 Connectez-vous pour accéder à vos recettes familiales
@@ -77,11 +74,7 @@ export default function SignInPage() {
             <div className="px-8 py-8 space-y-6">
               {/* Message d'accueil */}
               <div className="text-center mb-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  Préservez votre patrimoine culinaire
-                </h2>
                 <p className="text-gray-600">
-                  Choisissez votre méthode de connexion pour commencer
                 </p>
               </div>
 
@@ -168,7 +161,7 @@ export default function SignInPage() {
             </div>
             <h4 className="font-semibold text-gray-900 mb-2">Livres imprimables</h4>
             <p className="text-gray-600 text-sm">
-              Créez de magnifiques livres PDF à imprimer et partager
+              Créez de magnifiques livres à imprimer et partager
             </p>
           </div>
           
@@ -178,7 +171,7 @@ export default function SignInPage() {
             </div>
             <h4 className="font-semibold text-gray-900 mb-2">Patrimoine familial</h4>
             <p className="text-gray-600 text-sm">
-              Transmettez vos recettes aux générations futures
+              Transmettez vos recettes à vos enfants et petits-enfants
             </p>
           </div>
         </div>
