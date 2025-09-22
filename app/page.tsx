@@ -167,18 +167,18 @@ export default function HomePage() {
       </div>
 
       {/* CTA final */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-500 py-20">
+      <div className="bg-gradient-to-r from-orange-100 to-orange-200 py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
             Prêt à préserver vos recettes familiales ?
           </h2>
-          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-800 mb-8 max-w-2xl mx-auto">
             Rejoignez les familles qui ont déjà commencé à créer leur patrimoine culinaire numérique
           </p>
           
           <Link
             href="/auth/signin"
-            className="inline-block bg-white text-orange-600 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
+            className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
           >
             ✨ Créer mon premier carnet
           </Link>
