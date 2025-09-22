@@ -58,15 +58,15 @@ export default function SignInPage() {
       </header>
 
       {/* Contenu principal */}
-      <div className="flex items-center justify-center px-4 py-8">
+      <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Card principale */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
-            <div className="bg-gradient-to-r from-orange-400 to-orange-500 px-8 py-8 text-center text-white">
+            <div className="bg-gradient-to-br from-orange-400 to-orange-500 px-8 py-8 text-center text-white">
               <h1 className="text-2xl font-bold mb-2">Food Memories</h1>
               <p className="text-orange-100 text-lg">
-                Connectez-vous pour accéder à vos recettes. <br> Première visite ? Pas de souci ! La connexion créera automatiquement votre compte.</br> 
+                Connectez-vous pour accéder à vos recettes. <br/> Première visite ? Pas de souci ! La connexion créera automatiquement votre compte. 
               </p>
             </div>
 
@@ -134,48 +134,7 @@ export default function SignInPage() {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Features en bas */}
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Pourquoi Food Memories ?
-          </h3>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-xl">🤖</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">IA intégrée</h4>
-            <p className="text-gray-600 text-sm">
-              Analysez vos photos de plats et recettes manuscrites automatiquement
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-xl">📚</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">Livres imprimables</h4>
-            <p className="text-gray-600 text-sm">
-              Créez de magnifiques livres à imprimer et partager
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-xl">💝</span>
-            </div>
-            <h4 className="font-semibold text-gray-900 mb-2">Patrimoine familial</h4>
-            <p className="text-gray-600 text-sm">
-              Transmettez vos recettes à vos enfants et petits-enfants
-            </p>
-          </div>
-        </div>
-      </div>
+      </div>  
     </div>
   )
 }
