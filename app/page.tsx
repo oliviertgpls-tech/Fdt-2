@@ -142,7 +142,7 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center mb-4">
                 <span className="text-2xl">🤖</span>
               </div>
-              <h3 className="font-bold text-gray-900 mb-2">IA OpenAI</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Assistée par IA</h3>
               <p className="text-sm text-gray-600">
                 Analysez des photos de plats ou recettes manuscrites automatiquement
               </p>
