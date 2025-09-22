@@ -2,6 +2,19 @@
 export class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
+    // 🛠️ HELPER : Formater les étapes automatiquement
+  private formatSteps(stepsText: string): string {
+    if (!stepsText) return '';
+      // Nettoyer le texte
+    let cleaned = stepsText.trim();
+    // Remplacer les numérotations existantes par des sauts de ligne
+    cleaned = cleaned.replace(/(\d+\.?\s*)/g, '\n\n$1');
+    // Nettoyer les multiples sauts de ligne
+    cleaned = cleaned.replace(/\n\n+/g, '\n\n');
+    // Enlever le saut de ligne du début si il y en a un
+    cleaned = cleaned.replace(/^\n\n/, '');
+    return cleaned;
+  }
 
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY || '';
@@ -9,6 +22,8 @@ export class OpenAIService {
       throw new Error('OPENAI_API_KEY manquante dans les variables d\'environnement');
     }
   }
+
+
 
   // 📷 ANALYSE PHOTO DE PLAT → RECETTE
   async analyzePhotoToRecipe(imageFile: File): Promise<{
@@ -53,7 +68,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
-  "steps": "Étape 1...\\n\\n Étape 2...\\n\\n nÉtape 3...",
+  "steps": "Étape 1...\\n\\n\\nÉtape 2...\\n\\n\\nÉtape 3...",
   "confidence": 85
 }`
                 },
@@ -89,7 +104,10 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      // ✅ Forcer le formatage des étapes
+      result.steps = this.formatSteps(result.steps);
+      return result;
       
     } catch (error) {
       console.error('Erreur analyse photo:', error);
@@ -175,7 +193,10 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const result = JSON.parse(jsonMatch[0]);
+      // ✅ Forcer le formatage des étapes
+      result.steps = this.formatSteps(result.steps);
+      return result;
       
     } catch (error) {
       console.error('Erreur analyse manuscrit:', error);
