@@ -23,7 +23,7 @@ export class OpenAIService {
 
 
   // 📷 ANALYSE PHOTO DE PLAT → RECETTE
-   async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{...
+   async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{
     title: string;
     author: string;
     prepMinutes: number;
