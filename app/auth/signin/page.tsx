@@ -63,8 +63,8 @@ export default function SignInPage() {
           {/* Card principale */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
-            <div className="bg-gradient-to-br from-blue-300 to-blue-500 px-8 py-8 text-center text-white">
-              <h1 className="text-2xl font-bold mb-2">Food Memories</h1>
+            <div className="bg-gradient-to-br from-orange-300 to-orange-500 px-8 py-8 text-center text-white">
+              <h1 className="text-2xl text-white font-bold mb-2">Food Memories</h1>
               <p className="text-orange-100 text-lg">
                 Inscrivez-vous ou connectez-vous pour accéder à vos recettes. 
               </p>
@@ -94,10 +94,10 @@ export default function SignInPage() {
                 {/* Email (à venir) */}
                 <button
                   disabled
-                  className="w-full flex items-center justify-center gap-3 px-6 py8 rounded-xl font-semibold bg-gray-100 text-gray-400 border-2 border-gray-100 cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-8 rounded-xl font-semibold bg-gray-100 text-gray-400 border-2 border-gray-100 cursor-not-allowed"
                 >
                   <Mail className="w-5 h-5" />
-                  Se connecter avec Email (bientôt disponible)
+                  Se connecter avec Email <br/>(bientôt disponible)
                 </button>
               </div>
 
