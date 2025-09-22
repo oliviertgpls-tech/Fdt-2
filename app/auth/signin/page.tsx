@@ -58,12 +58,12 @@ export default function SignInPage() {
       </header>
 
       {/* Contenu principal */}
-      <div className="flex items-center justify-center px-4 py-8">
+      <div className="flex items-center justify-center px-4 py-4">
         <div className="w-full max-w-md">
           {/* Card principale */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
             {/* En-tête avec style */}
-            <div className="bg-gradient-to-br from-orange-400 to-orange-600 px-8 py-8 text-center text-white">
+            <div className="bg-gradient-to-br from-orange-400 to-orange-600 px-8 py-8 text-center">
               <h1 className="text-2xl font-bold mb-2 text-orange-100">Food Memories</h1>
               <p className="text-orange-100 text-lg">
                 Inscrivez-vous ou connectez-vous pour accéder à vos recettes. 
