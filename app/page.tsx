@@ -23,11 +23,11 @@ export default function HomePage() {
       
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4 pt-20 pb-24 text-center">
+        <div className="max-w-6xl mx-auto px-4 pt-10 pb-24 text-center">
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
-              ✨ Quoi de plus précieux qu'une recette de famille
+              ✨ Les recettes sont votre histoire
             </div>
             
             {/* Titre principal */}
