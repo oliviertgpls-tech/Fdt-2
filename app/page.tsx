@@ -2,88 +2,186 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
       {/* Hero Section */}
-      <div className="text-center space-y-6">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <div className="text-6xl"></div>
-          <h1 style={{ color: '#292524' }}>
-            Vos recettes font partie de votre patrimoine !
-          </h1>
+      <div className="relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-32 text-center">
+          <div className="space-y-10">
+            {/* Badge */}
+            <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
+              ✨ Préservez votre patrimoine culinaire familial
+            </div>
+            
+            {/* Titre principal */}
+            <div className="space-y-6">
+              <h1 className="text-5xl md:text-7xl font-bold text-gray-900 leading-tight">
+                Les recettes sont votre 
+                <span className="text-orange-600 block">patrimoine !</span>
+              </h1>
+              
+              {/* Sous-titre */}
+              <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+                Transformez vos <strong className="text-orange-600">recettes familiales</strong> en magnifiques livres de cuisine. 
+                Un héritage précieux à transmettre aux générations futures.
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className="space-y-4 pt-6">
+              <Link
+                href="/auth/signin"
+                className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-700 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
+              >
+                🚀 Commencer gratuitement
+              </Link>
+              
+              <p className="text-gray-500 text-lg">
+                Connexion avec Google • Gratuit • Sécurisé
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-          Préservez et transmettez votre <strong className="text-orange-600">patrimoine culinaire familial</strong>.
-          Créez votre propre livre de recettes à imprimer et partager avec ceux que vous aimez.
-        </p>
       </div>
-      
-      {/* CTA final */}
-      <div className="text-center space-y-6">
-        <h2 className="text-3xl font-bold" style={{ color: '#44403c' }}>
-          Plus qu'un carnet de recettes
-        </h2>
-        <div className="card p-8">
-          <p className="text-lg text-gray-600 leading-relaxed mb-6">
-            Créez un <span className="font-semibold text-orange-600">héritage culinaire unique</span> pour votre famille. 
-            Un cadeau inoubliable qui traverse les générations.
+
+      {/* Features Section */}
+      <div className="max-w-6xl mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Comment ça marche ?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Trois étapes simples pour créer vos livres de famille
           </p>
-          <Link 
+        </div>
+
+        {/* Étapes */}
+        <div className="grid gap-8 md:grid-cols-3">
+          {/* Étape 1 */}
+          <div className="text-center group">
+            <div className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-orange-200 transition-colors">
+              <span className="text-4xl">📝</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              1. Ajoutez vos recettes
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Saisissez manuellement ou utilisez notre <strong>IA OpenAI</strong> pour analyser des photos de plats ou recettes manuscrites
+            </p>
+          </div>
+
+          {/* Étape 2 */}
+          <div className="text-center group">
+            <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-200 transition-colors">
+              <span className="text-4xl">📚</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              2. Organisez en carnets
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Créez des carnets thématiques et organisez vos recettes par famille, occasion ou type de plat
+            </p>
+          </div>
+
+          {/* Étape 3 */}
+          <div className="text-center group">
+            <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+              <span className="text-4xl">📖</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              3. Imprimez vos livres
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              Générez de beaux livres PDF optimisés pour l'impression et partagez votre patrimoine culinaire
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Fonctionnalités avancées */}
+      <div className="bg-white py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Fonctionnalités avancées
+            </h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {/* IA OpenAI */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+              <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center mb-4">
+                <span className="text-2xl">🤖</span>
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">IA OpenAI</h3>
+              <p className="text-sm text-gray-600">
+                Analysez des photos de plats ou recettes manuscrites automatiquement
+              </p>
+            </div>
+
+            {/* Optimisation d'images */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+              <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center mb-4">
+                <span className="text-2xl">🎨</span>
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Images optimisées</h3>
+              <p className="text-sm text-gray-600">
+                Redimensionnement automatique pour différents usages et impression
+              </p>
+            </div>
+
+            {/* Organisation */}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+              <div className="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center mb-4">
+                <span className="text-2xl">📋</span>
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Organisation</h3>
+              <p className="text-sm text-gray-600">
+                Carnets thématiques, tags, temps de préparation, nombre de personnes
+              </p>
+            </div>
+
+            {/* Export PDF */}
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200">
+              <div className="w-12 h-12 bg-orange-200 rounded-xl flex items-center justify-center mb-4">
+                <span className="text-2xl">📄</span>
+              </div>
+              <h3 className="font-bold text-gray-900 mb-2">Export PDF</h3>
+              <p className="text-sm text-gray-600">
+                Livres optimisés pour l'impression avec mise en page professionnelle
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA final */}
+      <div className="bg-gradient-to-r from-orange-600 to-orange-700 py-20">
+        <div className="max-w-4xl mx-auto text-center px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Prêt à préserver vos recettes familiales ?
+          </h2>
+          <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+            Rejoignez les familles qui ont déjà commencé à créer leur patrimoine culinaire numérique
+          </p>
+          
+          <Link
             href="/auth/signin"
-            className="btn btn-primary text-lg px-8 py-4"
+            className="inline-block bg-white text-orange-600 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
           >
-            🌟 Créer mon premier carnet
+            ✨ Créer mon premier carnet
           </Link>
         </div>
       </div>
 
-       {/* Actions principales */}
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        <Link 
-          href="/auth/signin" 
-          className="card group p-8 hover:-translate-y-1 transition-all duration-200"
-        >
-          <div className="text-center space-y-4">
-            <div className="text-5xl group-hover:scale-110 transition-transform">📚</div>
-            <h3 className="text-2xl font-bold" style={{ color: '#44403c' }}>
-              Mes Carnets
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Organisez vos recettes en <strong>beaux livres</strong> à imprimer et partager avec la famille
-            </p>
-          </div>
-        </Link>
-
-        <Link 
-          href="/auth/signin" 
-          className="card group p-8 hover:-translate-y-1 transition-all duration-200"
-        >
-          <div className="text-center space-y-4">
-            <div className="text-5xl group-hover:scale-110 transition-transform">📝</div>
-            <h3 className="text-2xl font-bold" style={{ color: '#44403c' }}>
-              Mes Recettes
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Consultez, modifiez et ajoutez de <strong>nouvelles recettes</strong> à votre précieuse collection
-            </p>
-          </div>
-        </Link>
-
-        <Link 
-          href="/auth/signin" 
-          className="card group p-8 hover:-translate-y-1 transition-all duration-200 sm:col-span-2 lg:col-span-1"
-        >
-          <div className="text-center space-y-4">
-            <div className="text-5xl group-hover:scale-110 transition-transform">✨</div>
-            <h3 className="text-2xl font-bold" style={{ color: '#44403c' }}>
-              Nouvelle Recette
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              Ajoutez rapidement une <strong>première recette</strong> à votre collection
-            </p>
-          </div>
-        </Link>
+      {/* Footer simple */}
+      <div className="bg-gray-900 py-12">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <p className="text-gray-400">
+            © 2024 Food Memories - Préservez votre patrimoine culinaire familial
+          </p>
+        </div>
       </div>
     </div>
   );
 }
+
