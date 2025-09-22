@@ -46,7 +46,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 pb-16">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl">
             <img 
-              src="/famille-cuisine.jpg" 
+              src="public/famille-cuisine.jpg" 
               alt="Trois générations cuisinent ensemble - grand-mère, mère et enfant regardent un livre de recettes dans une cuisine chaleureuse"
               className="w-full h-auto"
             />
