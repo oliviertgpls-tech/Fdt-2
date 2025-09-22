@@ -157,7 +157,7 @@ INSTRUCTIONS :
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
   "title": "Titre de la recette",
-  "author": "Nom trouvé ou '${firstName}'",
+  "author": "${firstName}",
   "prepMinutes": 30,
   "servings": "4 personnes",
   "ingredients": ["ingrédient 1", "ingrédient 2", ...],
