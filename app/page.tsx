@@ -1,4 +1,4 @@
-import Link from "next/link";
+https://fdt-2.vercel.app/import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -16,7 +16,7 @@ export default function HomePage() {
             <div className="space-y-6">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
                 Votre 
-                <span className="text-orange-600">patrimoine culinaire</span>
+                <span className="text-orange-600"> patrimoine culinaire</span>
               </h1>
               
               {/* Sous-titre */}
@@ -30,7 +30,7 @@ export default function HomePage() {
             <div className="space-y-4 pt-6">
               <Link
                 href="/auth/signin"
-                className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-700 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
+                className="inline-block bg-orange-400 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-500 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               >
                 🚀 Commencer gratuitement
               </Link>
@@ -155,7 +155,7 @@ export default function HomePage() {
       </div>
 
       {/* CTA final */}
-      <div className="bg-gradient-to-r from-orange-600 to-orange-700 py-20">
+      <div className="bg-gradient-to-r from-orange-200 to-orange-300 py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Prêt à préserver vos recettes familiales ?
