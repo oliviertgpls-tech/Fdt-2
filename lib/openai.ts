@@ -2,27 +2,7 @@
 export class OpenAIService {
   private apiKey: string;
   private baseUrl = 'https://api.openai.com/v1';
-  // 🛠️ HELPER : Formater les étapes automatiquement
-  private formatSteps(stepsText: string): string {
-    if (!stepsText) return '';
-    
-    // Nettoyer le texte
-    let cleaned = stepsText.trim();
-    
-    // Remplacer TOUS les formats d'étapes par des sauts de ligne
-    cleaned = cleaned.replace(/(Étape\s*\d+\s*[:.]?\s*)/gi, '\n\n$1');
-    cleaned = cleaned.replace(/(\d+\.?\s*)/g, '\n\n$1');
-    cleaned = cleaned.replace(/(\d+\)\s*)/g, '\n\n$1'); // Pour "1) "
-    
-    // Nettoyer les multiples sauts de ligne
-    cleaned = cleaned.replace(/\n\n+/g, '\n\n');
-    
-    // Enlever le saut de ligne du début
-    cleaned = cleaned.replace(/^\n\n/, '');
-    
-    return cleaned;
-  }
-
+  
   constructor() {
     this.apiKey = process.env.OPENAI_API_KEY || '';
     if (!this.apiKey) {
@@ -112,10 +92,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      const result = JSON.parse(jsonMatch[0]);
-      // ✅ Forcer le formatage des étapes
-      result.steps = this.formatSteps(result.steps);
-      return result;
+      return JSON.parse(jsonMatch[0]);
       
     } catch (error) {
       console.error('Erreur analyse photo:', error);
@@ -202,10 +179,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
         throw new Error('Format de réponse invalide');
       }
 
-      const result = JSON.parse(jsonMatch[0]);
-      // ✅ Forcer le formatage des étapes
-      result.steps = this.formatSteps(result.steps);
-      return result;
+      return JSON.parse(jsonMatch[0]);
       
     } catch (error) {
       console.error('Erreur analyse manuscrit:', error);
