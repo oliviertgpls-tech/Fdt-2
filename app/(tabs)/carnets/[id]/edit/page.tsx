@@ -235,7 +235,7 @@ export default function CarnetEditPage() {
         </div>
       </div>
 
-{/* SECTION RECETTES - RESPONSIVE AMÉLIORÉE */}
+      {/* SECTION RECETTES - RESPONSIVE AMÉLIORÉE */}
       <div className="space-y-8">
         {/* Recettes disponibles */}
         <div>
@@ -340,58 +340,7 @@ export default function CarnetEditPage() {
           )}
         </div>
       </div>
-
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            📋 Dans le carnet ({carnetRecipes.length})
-          </h2>
-          
-          {carnetRecipes.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-3">📋</div>
-              <h4 className="font-medium text-gray-800 mb-2">Carnet vide</h4>
-              <p className="text-gray-600">Ajoutez vos premières recettes</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {carnetRecipes.map((recipe, index) => (
-                <div key={recipe.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <div className="flex gap-4">
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                        {index + 1}
-                      </span>
-                      <Move className="w-4 h-4 text-gray-400 cursor-move" />
-                    </div>
-                    
-                    <img 
-                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                      alt={recipe.title}
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                    />
-                    
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                      <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        ⏱️ {recipe.prepMinutes || '?'}min
-                      </p>
-                    </div>
-                    
-                    <button
-                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors self-start p-1"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
+      
       {/* BOUTON CRÉER UN LIVRE */}
       {carnetRecipes.length > 0 && (
         <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 text-center">
