@@ -235,7 +235,9 @@ export default function CarnetEditPage() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+{/* SECTION RECETTES - RESPONSIVE AMÉLIORÉE */}
+      <div className="space-y-8">
+        {/* Recettes disponibles */}
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
             📝 Recettes disponibles ({availableRecipes.length})
@@ -247,28 +249,33 @@ export default function CarnetEditPage() {
               <p className="text-gray-600">Toutes vos recettes sont dans ce carnet !</p>
             </div>
           ) : (
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-4">
               {availableRecipes.map((recipe) => (
                 <div key={recipe.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                  <div className="flex gap-4">
-                    <img 
-                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                      alt={recipe.title}
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">{recipe.title}</h4>
-                      <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        ⏱️ {recipe.prepMinutes || '?'}min
-                      </p>
+                  {/* LAYOUT MOBILE AMÉLIORÉ */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex gap-4 flex-1">
+                      <img 
+                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                        alt={recipe.title}
+                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
+                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ⏱️ {recipe.prepMinutes || '?'}min
+                        </p>
+                      </div>
                     </div>
+                    
+                    {/* BOUTON RESPONSIVE */}
                     <button
                       onClick={() => handleAddRecipe(actualCarnet.id, recipe.id)}
-                      className="bg-green-100 text-green-700 px-3 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium self-start flex items-center gap-1"
+                      className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium flex items-center justify-center gap-1 w-full sm:w-auto sm:self-start"
                     >
                       <Plus className="w-4 h-4" />
-                      Ajouter
+                      <span>Ajouter</span>
                     </button>
                   </div>
                 </div>
@@ -276,6 +283,63 @@ export default function CarnetEditPage() {
             </div>
           )}
         </div>
+
+        {/* Recettes dans le carnet */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            📋 Dans le carnet ({carnetRecipes.length})
+          </h2>
+          
+          {carnetRecipes.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-3">📋</div>
+              <h4 className="font-medium text-gray-800 mb-2">Carnet vide</h4>
+              <p className="text-gray-600">Ajoutez vos premières recettes</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {carnetRecipes.map((recipe, index) => (
+                <div key={recipe.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  {/* LAYOUT MOBILE AMÉLIORÉ */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex gap-4 flex-1">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                          {index + 1}
+                        </span>
+                        <Move className="w-4 h-4 text-gray-400 cursor-move" />
+                      </div>
+                      
+                      <img 
+                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                        alt={recipe.title}
+                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      />
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
+                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ⏱️ {recipe.prepMinutes || '?'}min
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* BOUTON SUPPRIMER RESPONSIVE */}
+                    <button
+                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
+                      className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50 flex items-center justify-center gap-1 w-full sm:w-auto sm:self-start"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="text-sm sm:hidden">Supprimer</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
