@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Eye, Move, Trash2, ArrowRight, ArrowLeft, Edit3, X } from 'lucide-react';
+import { Plus, Eye, Move, Trash2, ArrowLeft, Edit3, X } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
@@ -26,7 +26,7 @@ export default function CarnetEditPage() {
       setCarnetTitle(currentCarnet.title);
       setCarnetDescription(currentCarnet.description || '');
     }
-  }, [currentCarnet?.id]);
+  }, [currentCarnet]);
 
   if (!currentCarnet) {
     return (
@@ -163,37 +163,36 @@ export default function CarnetEditPage() {
                 type="text"
                 value={carnetTitle}
                 onChange={(e) => setCarnetTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none text-lg"
-                placeholder="Nom du carnet"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                placeholder="Nom du carnet..."
                 autoFocus
               />
               <div className="flex gap-2">
                 <button
                   onClick={saveTitle}
-                  disabled={!carnetTitle.trim()}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   Sauvegarder
                 </button>
                 <button
                   onClick={cancelTitleEdit}
-                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm"
                 >
                   Annuler
                 </button>
               </div>
             </div>
           ) : (
-            <div className="text-lg font-medium text-gray-900 py-2 px-3 bg-gray-50 rounded-lg">
+            <div className="text-lg font-semibold text-gray-900 py-2 px-3 bg-gray-50 rounded-lg">
               {actualCarnet.title}
             </div>
           )}
         </div>
-        
+
         {/* Description du carnet */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-semibold text-gray-700">Description (optionnel)</label>
+            <label className="text-sm font-semibold text-gray-700">Description</label>
             <button
               onClick={() => setEditingDescription(!editingDescription)}
               className="text-gray-500 hover:text-gray-700 p-1"
@@ -207,29 +206,29 @@ export default function CarnetEditPage() {
               <textarea
                 value={carnetDescription}
                 onChange={(e) => setCarnetDescription(e.target.value)}
-                className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none resize-none"
-                placeholder="Décrivez ce carnet..."
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none resize-none"
+                rows={3}
+                placeholder="Description du carnet..."
+                autoFocus
               />
               <div className="flex gap-2">
                 <button
                   onClick={saveDescription}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   Sauvegarder
                 </button>
                 <button
                   onClick={cancelDescriptionEdit}
-                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm"
                 >
                   Annuler
                 </button>
               </div>
             </div>
           ) : (
-            <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[60px]">
-              {carnetDescription || (
-                <span className="text-gray-400 italic">Aucune description</span>
-              )}
+            <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[48px] flex items-center">
+              {actualCarnet.description || "Aucune description"}
             </div>
           )}
         </div>
@@ -242,7 +241,7 @@ export default function CarnetEditPage() {
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
             📝 Recettes disponibles ({availableRecipes.length})
           </h2>
-          
+
           {availableRecipes.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-xl">
               <div className="text-4xl mb-3">🎉</div>
@@ -252,30 +251,28 @@ export default function CarnetEditPage() {
             <div className="space-y-4">
               {availableRecipes.map((recipe) => (
                 <div key={recipe.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                  {/* LAYOUT MOBILE AMÉLIORÉ */}
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex gap-4 flex-1">
-                      <img 
-                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                        alt={recipe.title}
-                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          ⏱️ {recipe.prepMinutes || '?'}min
-                        </p>
-                      </div>
+                  {/* LAYOUT SIMPLE AVEC BOUTON + */}
+                  <div className="flex gap-4 items-center">
+                    <img 
+                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                      alt={recipe.title}
+                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
+                      <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        ⏱️ {recipe.prepMinutes || '?'}min
+                      </p>
                     </div>
                     
-                    {/* BOUTON RESPONSIVE */}
+                    {/* BOUTON + COMPACT EN BOUT DE LIGNE */}
                     <button
                       onClick={() => handleAddRecipe(actualCarnet.id, recipe.id)}
-                      className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium flex items-center justify-center gap-1 w-full sm:w-auto sm:self-start"
+                      className="bg-green-500 text-white w-8 h-8 rounded-full hover:bg-green-600 transition-colors flex items-center justify-center flex-shrink-0"
+                      title="Ajouter au carnet"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Ajouter</span>
                     </button>
                   </div>
                 </div>
@@ -325,13 +322,13 @@ export default function CarnetEditPage() {
                       </div>
                     </div>
                     
-                    {/* BOUTON SUPPRIMER RESPONSIVE */}
+                    {/* BOUTON SUPPRIMER COMPACT */}
                     <button
                       onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50 flex items-center justify-center gap-1 w-full sm:w-auto sm:self-start"
+                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
+                      title="Retirer du carnet"
                     >
                       <Trash2 className="w-4 h-4" />
-                      <span className="text-sm sm:hidden">Supprimer</span>
                     </button>
                   </div>
                 </div>
@@ -340,27 +337,6 @@ export default function CarnetEditPage() {
           )}
         </div>
       </div>
-      
-      {/* BOUTON CRÉER UN LIVRE */}
-      {carnetRecipes.length > 0 && (
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 text-center">
-          <div className="max-w-md mx-auto">
-            <h3 className="text-lg font-semibold text-orange-800 mb-2">
-              📖 Créer un livre avec ces recettes
-            </h3>
-            <p className="text-sm text-orange-700 mb-4">
-              Transformez ce carnet en un beau livre à imprimer avec toutes ses recettes
-            </p>
-            <button
-              onClick={handleCreateBookFromCarnet}
-              className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
-            >
-              Créer un livre avec {carnetRecipes.length} recettes
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
