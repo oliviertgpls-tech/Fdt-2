@@ -28,6 +28,7 @@ export default function CarnetEditPage() {
     }
   }, [currentCarnet]);
 
+  // Gestion du cas où le carnet n'existe pas
   if (!currentCarnet) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
@@ -56,6 +57,7 @@ export default function CarnetEditPage() {
     !actualCarnet.recipeIds || !actualCarnet.recipeIds.includes(recipe.id)
   );
 
+  // Fonctions pour les actions
   const handleAddRecipe = (carnetId: string, recipeId: string) => {
     addRecipeToNotebook(carnetId, recipeId);
   };
@@ -141,7 +143,7 @@ export default function CarnetEditPage() {
         </Link>
       </div>
 
-      {/* 🆕 SECTION ÉDITION DU CARNET */}
+      {/* SECTION ÉDITION DU CARNET */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
         <h2 className="text-xl font-semibold text-gray-800">📝 Informations du carnet</h2>
         
@@ -206,9 +208,9 @@ export default function CarnetEditPage() {
               <textarea
                 value={carnetDescription}
                 onChange={(e) => setCarnetDescription(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none resize-none"
-                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                 placeholder="Description du carnet..."
+                rows={3}
                 autoFocus
               />
               <div className="flex gap-2">
@@ -227,166 +229,105 @@ export default function CarnetEditPage() {
               </div>
             </div>
           ) : (
-            <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[48px] flex items-center">
-              {actualCarnet.description || "Aucune description"}
+            <div className="text-gray-700 py-2 px-3 bg-gray-50 rounded-lg min-h-[50px]">
+              {actualCarnet.description || 'Aucune description'}
             </div>
           )}
         </div>
       </div>
 
-      {/* SECTION RECETTES - RESPONSIVE AMÉLIORÉE */}
-      <div className="space-y-8">
-        {/* Recettes disponibles */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            📝 Recettes disponibles ({availableRecipes.length})
-          </h2>
-          
-          {availableRecipes.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-3">🎉</div>
-              <p className="text-gray-600">Toutes vos recettes sont dans ce carnet !</p>
+      {/* SECTION GESTION DES RECETTES */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        
+        {/* Recettes dans le carnet */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-800">
+              📚 Recettes dans ce carnet ({carnetRecipes.length})
+            </h3>
+            {carnetRecipes.length > 0 && (
+              <button
+                onClick={handleCreateBookFromCarnet}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                Créer un livre
+              </button>
+            )}
+          </div>
+
+          {carnetRecipes.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-4xl mb-4">📝</div>
+              <p>Aucune recette dans ce carnet</p>
+              <p className="text-sm">Ajoutez-en depuis la liste à droite</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {availableRecipes.map((recipe) => (
-                <div key={recipe.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                  {/* LAYOUT SIMPLE AVEC BOUTON + */}
-                  <div className="flex gap-4 items-center">
-                    <img 
-                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                      alt={recipe.title}
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                    />
+            <div className="space-y-3">
+              {carnetRecipes.map((recipe) => (
+                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
-                      <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        ⏱️ {recipe.prepMinutes || '?'}min
+                      <h4 className="font-medium text-gray-900 truncate">
+                        {recipe.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        {recipe.description || 'Aucune description'}
                       </p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <span>⏱ {recipe.prepMinutes || '?'} min</span>
+                        <span>👥 {recipe.servings || '?'} pers</span>
+                      </div>
                     </div>
                     
-                    {/* BOUTON + COMPACT EN BOUT DE LIGNE */}
+                    <button
+                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
+                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
+                      title="Retirer du carnet"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recettes disponibles à ajouter */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-6">
+            ➕ Ajouter des recettes ({availableRecipes.length})
+          </h3>
+
+          {availableRecipes.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-4xl mb-4">✅</div>
+              <p>Toutes vos recettes sont déjà dans ce carnet !</p>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {availableRecipes.map((recipe) => (
+                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">
+                        {recipe.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        {recipe.description || 'Aucune description'}
+                      </p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <span>⏱ {recipe.prepMinutes || '?'} min</span>
+                        <span>👥 {recipe.servings || '?'} pers</span>
+                      </div>
+                    </div>
+                    
                     <button
                       onClick={() => handleAddRecipe(actualCarnet.id, recipe.id)}
-                      className="bg-green-500 text-white w-8 h-8 rounded-full hover:bg-green-600 transition-colors flex items-center justify-center flex-shrink-0"
+                      className="text-gray-400 hover:text-green-600 transition-colors w-8 h-8 rounded-full hover:bg-green-50 flex items-center justify-center flex-shrink-0"
                       title="Ajouter au carnet"
                     >
                       <Plus className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Recettes dans le carnet */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            📋 Dans le carnet ({carnetRecipes.length})
-          </h2>
-          
-          {carnetRecipes.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-3">📋</div>
-              <h4 className="font-medium text-gray-800 mb-2">Carnet vide</h4>
-              <p className="text-gray-600">Ajoutez vos premières recettes</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {carnetRecipes.map((recipe, index) => (
-                <div key={recipe.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  {/* LAYOUT MOBILE AMÉLIORÉ */}
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex gap-4 flex-1">
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                          {index + 1}
-                        </span>
-                        <Move className="w-4 h-4 text-gray-400 cursor-move" />
-                      </div>
-                      
-                      <img 
-                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                        alt={recipe.title}
-                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          ⏱️ {recipe.prepMinutes || '?'}min
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* BOUTON SUPPRIMER COMPACT */}
-                    <button
-                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
-                      title="Retirer du carnet"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-        {/* Recettes dans le carnet */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            📋 Dans le carnet ({carnetRecipes.length})
-          </h2>
-          
-          {carnetRecipes.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="text-4xl mb-3">📋</div>
-              <h4 className="font-medium text-gray-800 mb-2">Carnet vide</h4>
-              <p className="text-gray-600">Ajoutez vos premières recettes</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {carnetRecipes.map((recipe, index) => (
-                <div key={recipe.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  {/* LAYOUT MOBILE AMÉLIORÉ */}
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex gap-4 flex-1">
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                          {index + 1}
-                        </span>
-                        <Move className="w-4 h-4 text-gray-400 cursor-move" />
-                      </div>
-                      
-                      <img 
-                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                        alt={recipe.title}
-                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          ⏱️ {recipe.prepMinutes || '?'}min
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* BOUTON SUPPRIMER COMPACT */}
-                    <button
-                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
-                      title="Retirer du carnet"
-                    >
-                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
