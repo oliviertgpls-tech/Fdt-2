@@ -241,7 +241,7 @@ export default function CarnetEditPage() {
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
             📝 Recettes disponibles ({availableRecipes.length})
           </h2>
-
+          
           {availableRecipes.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-xl">
               <div className="text-4xl mb-3">🎉</div>
@@ -280,6 +280,64 @@ export default function CarnetEditPage() {
             </div>
           )}
         </div>
+
+        {/* Recettes dans le carnet */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            📋 Dans le carnet ({carnetRecipes.length})
+          </h2>
+          
+          {carnetRecipes.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <div className="text-4xl mb-3">📋</div>
+              <h4 className="font-medium text-gray-800 mb-2">Carnet vide</h4>
+              <p className="text-gray-600">Ajoutez vos premières recettes</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {carnetRecipes.map((recipe, index) => (
+                <div key={recipe.id} className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  {/* LAYOUT MOBILE AMÉLIORÉ */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex gap-4 flex-1">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="w-6 h-6 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                          {index + 1}
+                        </span>
+                        <Move className="w-4 h-4 text-gray-400 cursor-move" />
+                      </div>
+                      
+                      <img 
+                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                        alt={recipe.title}
+                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      />
+                      
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-gray-900 line-clamp-2">{recipe.title}</h4>
+                        <p className="text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          ⏱️ {recipe.prepMinutes || '?'}min
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* BOUTON SUPPRIMER COMPACT */}
+                    <button
+                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
+                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
+                      title="Retirer du carnet"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
         {/* Recettes dans le carnet */}
         <div>
