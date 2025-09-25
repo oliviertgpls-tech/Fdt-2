@@ -183,7 +183,7 @@ function BooksLoadingSkeleton() {
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                   
                   {/* Couverture avec image ou icône */}
-                  <div className="aspect-[2/1] relative overflow-hidden">
+                  <div className="aspect-[3/1] relative overflow-hidden">
                     {book.coverImageUrl ? (
                       // Photo de couverture personnalisée
                       <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
@@ -195,7 +195,7 @@ function BooksLoadingSkeleton() {
                       </div>
                     ) : (
                       // Icône livre par défaut
-                      <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center text-3xl md:text-4xl">
+                      <div className="w-full h-full bg-gradient-to-br from-gray-300 to-green-250 flex items-center justify-center text-3xl md:text-4xl">
                         📖
                       </div>
                     )}

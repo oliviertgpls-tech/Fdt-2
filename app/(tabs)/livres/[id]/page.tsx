@@ -46,13 +46,13 @@ export default function BookPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   
   // Initialiser les états
-  useEffect(() => {
-    if (book) {
-      setBookDescription(book.description || '');
-      setCoverImageUrl(book.coverImageUrl || '');
-      setBookTitle(book.title || '');
-    }
-  }, [book]);
+ useEffect(() => {
+  if (book) {
+    setBookDescription(book.description || '');
+    setCoverImageUrl(book.coverImageUrl || '');
+    setBookTitle(book.title || '');
+  }
+}, [book, book?.coverImageUrl]);
 
   // 🆕 FONCTION save titre
   const saveTitle = () => {
@@ -65,18 +65,22 @@ export default function BookPage() {
   // FONCTION UPLAOD COUVERTURE
   const handleCoverImageUpload = async (file: File) => {
     setIsUploadingCover(true);
+    console.log('🚀 DÉMARRAGE Upload couverture:', file.name, file.size); // ← AJOUTE ÇA
     
     try {
       console.log('🚀 Upload couverture en cours...', file.name);
       
       const formData = new FormData();
       formData.append('file', file);
+      console.log('📦 FormData créé'); // ← ET ÇA
       
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
-      
+    
+    console.log('📨 Réponse serveur:', response.status); 
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
@@ -92,6 +96,11 @@ export default function BookPage() {
           updateBook(book.id, { coverImageUrl: result.imageUrl });
         }
         console.log('📸 Photo de couverture mise à jour:', result.imageUrl);
+
+        alert('✅ Photo de couverture mise à jour avec succès !');
+
+        setEditingCover(false);
+
       } else {
         throw new Error(result.error || 'Erreur upload');
       }
@@ -101,7 +110,13 @@ export default function BookPage() {
       alert("Erreur lors de l'upload de l'image de couverture : " + error.message);
     } finally {
       setIsUploadingCover(false);
+
+        // 🆕 AJOUT : Reset l'input file pour permettre de re-sélectionner le même fichier
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
     }
+  }
   };
   
   // FONCTION SUPPRESSION LIVRE
@@ -667,7 +682,11 @@ export default function BookPage() {
                 {/* Upload + Unsplash */}
                 <div className="flex flex-wrap gap-3">
                   {/* Upload photo personnelle */}
-                  <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+               <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
+                    isUploadingCover 
+                      ? 'bg-blue-100 text-blue-700 cursor-wait' 
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  }`}>
                     <input
                       type="file"
                       accept="image/*"
@@ -678,7 +697,16 @@ export default function BookPage() {
                       className="hidden"
                       disabled={isUploadingCover}
                     />
-                    📷 {isUploadingCover ? "Upload..." : "Ma photo"}
+                    {isUploadingCover ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Upload en cours...
+                      </>
+                    ) : (
+                      <>
+                        📷 Ma photo
+                      </>
+                    )}
                   </label>
 
                   {/* Recherche Unsplash */}
@@ -700,15 +728,16 @@ export default function BookPage() {
                   />
                 </div>
                 
-                <div className="flex gap-2">
+               <div className="flex gap-2">
                   <button
                     onClick={() => {
                       updateBook(book.id, { coverImageUrl });
                       setEditingCover(false);
                     }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={isUploadingCover}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    Sauvegarder
+                    {isUploadingCover ? 'Upload...' : 'Sauvegarder'}
                   </button>
                   <button
                     onClick={() => setEditingCover(false)}
