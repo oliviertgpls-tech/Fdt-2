@@ -178,10 +178,10 @@ async function extractFromPlatform(url: string, platform: string): Promise<Extra
           source: 'auto',
           platform,
           recipe: {
-            title: basicData.title || 'Recette Pinterest',
+            title: basicData?.title || 'Recette Pinterest',
             ingredients: pinterestData.ingredients || [],
             steps: pinterestData.steps || 'Étapes extraites depuis Pinterest',
-            image: basicData.image,
+            image: basicData?.image,
             author: 'Pinterest'
           }
         };
