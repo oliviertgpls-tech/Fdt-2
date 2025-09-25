@@ -217,7 +217,7 @@ function BooksLoadingSkeleton() {
                     <div className="flex gap-2">
                       <Link
                         href={`/livres/${book.id}`}
-                        className="inline-flex-1 bg-blue-300 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium text-xs md:text-sm text-center"
+                        className="inline-flex-1 bg-blue-300 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-bleu-400 transition-colors font-medium text-xs md:text-sm text-center"
                       >
                         Modifier
                       </Link>

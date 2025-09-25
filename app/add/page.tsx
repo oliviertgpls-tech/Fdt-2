@@ -410,6 +410,8 @@ export default function AddRecipePage() {
   const [imageUrl, setImageUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
 
   // 🆕 NOUVEL ÉTAT pour les versions optimisées
   const [imageVersions, setImageVersions] = useState<UploadResult['versions'] | null>(null);
@@ -556,6 +558,49 @@ export default function AddRecipePage() {
     }
   };
 
+    // 🆕 Fonction d'extraction (ajoutez cette fonction)
+  const handleExtractFromUrl = async () => {
+    if (!linkUrl.trim()) {
+      alert('Veuillez saisir une URL');
+      return;
+    }
+
+    setIsExtracting(true);
+    try {
+      const response = await fetch('/api/recipes/extract-from-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: linkUrl.trim() })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.recipe) {
+        // Pré-remplir le formulaire avec les données extraites
+        setTitle(result.recipe.title || '');
+        setAuthor(result.recipe.author || '');
+        setIngredients(result.recipe.ingredients?.join('\n') || '');
+        setSteps(result.recipe.steps || '');
+        setImageUrl(result.recipe.image || '');
+        setPrepMinutes(result.recipe.prepMinutes?.toString() || '');
+        setServings(result.recipe.servings || '');
+        
+        // Passer en mode manuel pour éditer
+        setMode('manual');
+        alert(`Recette extraite avec succès depuis ${result.platform}!`);
+      } else {
+        // Échec - proposer saisie manuelle
+        alert(result.error || 'Impossible d\'extraire automatiquement. Voulez-vous saisir manuellement ?');
+        setMode('manual');
+      }
+    } catch (error) {
+      console.error('Erreur extraction:', error);
+      alert('Erreur lors de l\'extraction. Veuillez réessayer.');
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   // Analyse photo avec debug détaillé
   const handlePhotoUpload = async (file: File) => {
     setIsProcessing(true);
@@ -618,6 +663,8 @@ export default function AddRecipePage() {
             </label>
             <input
               type="url"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
               placeholder="https://www.pinterest.com/pin/... ou https://www.marmiton.org/..."
               className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
             />
@@ -640,12 +687,17 @@ export default function AddRecipePage() {
               Annuler
             </button>
             <button 
-              onClick={() => {
-                alert("Fonctionnalité en cours de développement !");
-              }}
-              className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              onClick={() => setMode('choose')}
+              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
-              🚀 Extraire la recette
+              Annuler
+            </button>
+            <button 
+              onClick={handleExtractFromUrl}
+              disabled={isExtracting || !linkUrl.trim()}
+              className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors"
+            >
+              {isExtracting ? "🔄 Extraction..." : "🚀 Extraire la recette"}
             </button>
           </div>
         </div>
@@ -826,7 +878,7 @@ export default function AddRecipePage() {
                   Depuis un lien
                 </h3>
                 <p className="pb-4 text-gray-600 text-xs md:text-sm leading-relaxed">
-                  Sauvegardez vos recettes préférées depuis les sites de recettes, pinterest ou insta.
+                  Sauvegardez vos recettes préférées depuis les sites de recettes.
                 </p>
               </div>
 
