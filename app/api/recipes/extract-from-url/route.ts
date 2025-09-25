@@ -191,13 +191,13 @@ async function extractFromPlatform(url: string, platform: string): Promise<Extra
     // Fallback sur extraction HTML basique
     const basicData = extractBasicHTML(html);
     
-    if (basicData.title) {
+    if (basicData?.title) {
       return {
         success: true,
         source: 'auto',
         platform,
         recipe: {
-          title: basicData.title,
+          title: basicData?.title,
           ingredients: [],
           steps: 'Recette importée - veuillez compléter les ingrédients et étapes.',
           ...basicData

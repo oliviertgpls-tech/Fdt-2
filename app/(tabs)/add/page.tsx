@@ -314,7 +314,7 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
         className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
       >
         <ImageIcon className="w-4 h-4" />
-        Chercher une image
+        Image libre de droits
       </button>
     );
   }
