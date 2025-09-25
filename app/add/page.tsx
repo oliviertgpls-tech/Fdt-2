@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
 type UploadResult = {
@@ -397,7 +397,7 @@ export default function AddRecipePage() {
   const { data: session } = useSession() 
   const firstName = session?.user?.name?.split(' ')[0] || 'Utilisateur' 
   const router = useRouter();
-  const [mode, setMode] = useState<'choose' | 'manual' | 'photo' | 'scan'>('choose');
+  const [mode, setMode] = useState<'choose' | 'manual' | 'photo' | 'scan'| 'link'>('choose');
   const [isProcessing, setIsProcessing] = useState(false);
 
   // États pour saisie manuelle
@@ -592,6 +592,67 @@ export default function AddRecipePage() {
     }
   };
 
+  // Mode "link" - Interface pour ajout par lien
+  if (mode === 'link') {
+    return (
+      <div className="max-w-3xl mx-auto space-y-8">
+        <div className="text-center space-y-4">
+          <button 
+            onClick={() => setMode('choose')}
+            className="text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-2 mx-auto"
+          >
+            ← Retour aux options
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900">
+            🔗 Ajouter depuis un lien
+          </h1>
+          <p className="text-gray-600">
+            Collez le lien d'une recette et nous essaierons de l'importer automatiquement
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Lien de la recette
+            </label>
+            <input
+              type="url"
+              placeholder="https://www.pinterest.com/pin/... ou https://www.marmiton.org/..."
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
+            />
+          </div>
+
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h4 className="font-medium text-blue-800 mb-2">Sites supportés :</h4>
+            <div className="text-sm text-blue-700 space-y-1">
+              <div>✅ <strong>Pinterest</strong> - Extraction automatique des recettes</div>
+              <div>✅ <strong>Sites de recettes</strong> - Marmiton, 750g, blogs culinaires</div>
+              <div>⚠️ <strong>Réseaux sociaux</strong> - Mode manuel assisté (Instagram, TikTok)</div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button 
+              onClick={() => setMode('choose')}
+              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Annuler
+            </button>
+            <button 
+              onClick={() => {
+                alert("Fonctionnalité en cours de développement !");
+              }}
+              className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors"
+            >
+              🚀 Extraire la recette
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   // 🎨 COMPOSANT APERÇU AMÉLIORÉ
   const PreviewSection = () => {
     if (!imageUrl && !imageVersions) return null;
@@ -667,23 +728,23 @@ export default function AddRecipePage() {
           
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
           
           {/* Mode 1 : Saisie manuelle */}
           <div 
             onClick={() => setMode('manual')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-blue-200 transition-colors">
-                <Edit3 className="w-10 h-10 text-blue-600" />
+            <div className="text-center space-y-3 md:space-y-4">
+              <div className="w-16 h-16 md:w16 md:h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-blue-200 transition-colors">
+                <Edit3 className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
               </div>
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
                   Saisie manuelle
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
                   Tapez votre recette directement. Parfait pour créer une nouvelle recette ou retranscrire fidèlement.
                 </p>
               </div>
@@ -699,18 +760,18 @@ export default function AddRecipePage() {
           {/* Mode 2 : Photo d'un plat */}
           <div 
             onClick={() => setMode('photo')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-orange-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-orange-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-orange-200 transition-colors">
+            <div className="text-center space-y-3 md:space-y-4">
+              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-orange-200 transition-colors">
                 <Camera className="w-10 h-10 text-orange-600" />
               </div>
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Photo d'un plat {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
+                  Depuis une photo de plat{!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
                   Prenez en photo votre plat terminé. Notre IA devine la recette et génère automatiquement les instructions.
                 </p>
               </div>
@@ -719,9 +780,6 @@ export default function AddRecipePage() {
                 <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
                   🤖 IA - 5 offertes
                 </div>
-                <p className="text-xs text-gray-500">
-                  {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à analyser' : 'Clé API manquante'}
-                </p>
               </div>
             </div>
           </div>
@@ -729,18 +787,18 @@ export default function AddRecipePage() {
           {/* Mode 3 : Scan recette manuscrite */}
           <div 
             onClick={() => setMode('scan')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
+            <div className="text-center space-y-3 md:space-y-4">
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
                 <PenTool className="w-10 h-10 text-green-600" />
               </div>
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Recette manuscrite {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
+                  Depuis un texte  {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
                   Photographiez une recette écrite à la main ou imprimée. Notre IA lit et structure automatiquement le texte.
                 </p>
               </div>
@@ -749,9 +807,31 @@ export default function AddRecipePage() {
                 <div className="bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
                   🤖 IA - 5 offertes
                 </div>
-                <p className="text-xs text-gray-500">
-                  {process.env.NEXT_PUBLIC_OPENAI_API_KEY ? 'Prêt à lire' : 'Clé API manquante'}
+              </div>
+            </div>
+          </div>
+
+          {/* Mode 4 : NOUVEAU - Ajout par lien */}
+          <div 
+            onClick={() => setMode('link')}
+            className="group bg-white rounded-xl border-2 border-gray-200 p-4 md:p-6 hover:border-orange-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          >
+            <div className="text-center space-y-5 md:space-y-4">
+              <div className="w-16 h-16 md:w-16 md:h-16 bg-orange-100 rounded-xl flex items-center justify-center mx-auto group-hover:bg-orange-200 transition-colors">
+                <LinkIcon className="w-8 h-8 md:w-8 md:h-8 text-orange-600" />
+              </div>
+              
+              <div>
+                <h3 className="text-xl md:text-lg font-bold text-gray-900 mb-1 md:mb-2">
+                  Depuis un lien
+                </h3>
+                <p className="pb-4 text-gray-600 text-xs md:text-sm leading-relaxed">
+                  Sauvegardez vos recettes préférées depuis les sites de recettes, pinterest ou insta.
                 </p>
+              </div>
+
+              <div className="text-xs text-purple-500 bg-gray-50 rounded-lg p-2">
+                🔗 Lien Web - 10 offerts
               </div>
             </div>
           </div>
