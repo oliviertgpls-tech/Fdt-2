@@ -172,7 +172,7 @@ async function extractFromPlatform(url: string, platform: string): Promise<Extra
       const pinterestData = extractPinterestData(html);
       const basicData = extractBasicHTML(html);
       
-      if (pinterestData.steps || pinterestData.ingredients) {
+      if (pinterestData && (pinterestData.steps || pinterestData.ingredients)) {
         return {
           success: true,
           source: 'auto',
