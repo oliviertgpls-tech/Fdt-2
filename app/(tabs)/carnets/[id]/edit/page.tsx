@@ -117,7 +117,7 @@ export default function CarnetEditPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6 md:space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -237,22 +237,14 @@ export default function CarnetEditPage() {
       </div>
 
       {/* SECTION GESTION DES RECETTES */}
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="space-y-4">
         
         {/* Recettes dans le carnet */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 md:mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
               📚 Recettes dans ce carnet ({carnetRecipes.length})
             </h3>
-            {carnetRecipes.length > 0 && (
-              <button
-                onClick={handleCreateBookFromCarnet}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                Créer un livre
-              </button>
-            )}
           </div>
 
           {carnetRecipes.length === 0 ? (
@@ -262,9 +254,9 @@ export default function CarnetEditPage() {
               <p className="text-sm">Ajoutez-en depuis la liste à droite</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 max-h-64 md:max-h-96 overflow-y-auto">
               {carnetRecipes.map((recipe) => (
-                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate">
@@ -294,8 +286,8 @@ export default function CarnetEditPage() {
         </div>
 
         {/* Recettes disponibles à ajouter */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
+          <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">
             ➕ Ajouter des recettes ({availableRecipes.length})
           </h3>
 
@@ -305,9 +297,9 @@ export default function CarnetEditPage() {
               <p>Toutes vos recettes sont déjà dans ce carnet !</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-2 max-h-64 md:max-h-80 overflow-y-auto">
               {availableRecipes.map((recipe) => (
-                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate">
@@ -324,10 +316,10 @@ export default function CarnetEditPage() {
                     
                     <button
                       onClick={() => handleAddRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-green-600 transition-colors w-8 h-8 rounded-full hover:bg-green-50 flex items-center justify-center flex-shrink-0"
+                      className="bg-green-50 text-green-600 border-2 border-green-200 hover:bg-green-100 hover:border-green-300 hover:text-green-700 transition-all duration-200 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 font-medium"
                       title="Ajouter au carnet"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-5 h-5" />
                     </button>
                   </div>
                 </div>

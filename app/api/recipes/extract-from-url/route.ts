@@ -39,7 +39,7 @@ function detectPlatform(url: string): string {
 // Extraction de métadonnées JSON-LD (format standard des recettes)
 async function extractJsonLD(html: string): Promise<any> {
   // Recherche des balises script JSON-LD
-  const jsonLdRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>(.*?)<\/script>/gis;
+  const jsonLdRegex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let match;
   
   while ((match = jsonLdRegex.exec(html)) !== null) {

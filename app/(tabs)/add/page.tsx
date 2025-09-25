@@ -848,7 +848,7 @@ export default function AddRecipePage() {
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Depuis un texte  {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
+                  Depuis une photo d'un texte  {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
                   Photographiez une recette écrite à la main ou imprimée. Notre IA lit et structure automatiquement le texte.
