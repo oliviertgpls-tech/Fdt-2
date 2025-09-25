@@ -576,12 +576,12 @@ export default function BookPage() {
     </div>
   </div>
   
-  <div className="flex items-center gap-3">
+  <div className="flex items-center gap-4">
     {/* Bouton aperçu PDF */}
     <button
       onClick={generatePreviewPDF}
       disabled={isGeneratingPreview}
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
     >
       {isGeneratingPreview ? (
         <>
@@ -591,17 +591,17 @@ export default function BookPage() {
       ) : (
         <>
           <Eye className="w-4 h-4" />
-          Aperçu PDF
+          Aperçu
         </>
       )}
     </button>
 
     <button
       onClick={handleDeleteBook}
-      className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
+      className="inline-flex bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
     >
-      <Trash2 className="w-4 h-4" />
-      Supprimer
+      <Trash2 className="w-4 h-6" />
+       Supprimer
     </button>
   </div>
 </div>

@@ -48,20 +48,22 @@ export function RecipesProvider({ children }: { children: React.ReactNode }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [recipesRes, notebooksRes] = await Promise.all([
+      const [recipesRes, notebooksRes, booksRes] = await Promise.all([
         fetch('/api/recipes'),
-        fetch('/api/notebooks')
+        fetch('/api/notebooks'),
+        fetch('/api/books')
       ]);
       
       // ✅ Vérifier les réponses avant de parser
       const recipesData = recipesRes.ok ? await recipesRes.json() : [];
       const notebooksData = notebooksRes.ok ? await notebooksRes.json() : [];
+      const booksData = booksRes.ok ? await booksRes.json() : [];
     
       
       // ✅ S'assurer que ce sont des arrays
       setRecipes(Array.isArray(recipesData) ? recipesData : []);
       setNotebooks(Array.isArray(notebooksData) ? notebooksData : []);
-      setBooks([]); // VIDE TEMPORAIREMENT
+      setBooks(Array.isArray(booksData) ? booksData : []);
       
       setError(null);
     } catch (err) {
@@ -263,6 +265,10 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
 
   const createBook = async (title: string, selectedRecipeIds: string[]) => {
     try {
+    // DEBUG
+    console.log('🔍 createBook appelé avec:', { title, selectedRecipeIds });
+    console.log('🔍 Type selectedRecipeIds:', typeof selectedRecipeIds, Array.isArray(selectedRecipeIds));
+    
       const response = await fetch('/api/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

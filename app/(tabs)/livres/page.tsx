@@ -5,87 +5,6 @@ import { Plus, Eye, Download, X, Loader } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 
-// Composant Skeleton pour les cartes de livres
-function BookCardSkeleton() {
-  return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
-      {/* Image skeleton */}
-      <div className="aspect-[2/1] bg-gray-200"></div>
-      
-      {/* Contenu skeleton */}
-      <div className="p-3 md:p-4 space-y-3">
-        {/* Titre */}
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        
-        {/* Métadonnées */}
-        <div className="space-y-1">
-          <div className="h-3 bg-gray-150 rounded w-full"></div>
-          <div className="h-3 bg-gray-150 rounded w-1/2"></div>
-          <div className="h-3 bg-gray-150 rounded w-2/3"></div>
-        </div>
-        
-        {/* Boutons */}
-        <div className="flex gap-2 pt-2">
-          <div className="flex-1 h-7 bg-gray-150 rounded-lg"></div>
-          <div className="w-7 h-7 bg-gray-150 rounded-lg"></div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Composant Skeleton pour l'état de chargement
-function BooksLoadingSkeleton() {
-  return (
-    <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
-      {/* En-tête skeleton */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-2">
-          <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
-          <div className="h-5 bg-gray-150 rounded w-80 animate-pulse"></div>
-        </div>
-      </div>
-
-      {/* Section "Mes livres en cours" skeleton */}
-      <div className="space-y-4">
-        <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {[...Array(4)].map((_, index) => (
-            <BookCardSkeleton key={index} />
-          ))}
-        </div>
-      </div>
-
-      {/* Section sélection recettes skeleton */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
-        <div className="h-6 bg-gray-200 rounded w-96 animate-pulse mb-6"></div>
-        
-        {/* Filtres skeleton */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 h-10 bg-gray-150 rounded-lg"></div>
-          <div className="w-48 h-10 bg-gray-150 rounded-lg"></div>
-        </div>
-
-        {/* Liste recettes skeleton */}
-        <div className="grid gap-3 md:gap-4">
-          {[...Array(6)].map((_, index) => (
-            <div key={index} className="border border-gray-200 rounded-xl p-3 md:p-4 animate-pulse">
-              <div className="flex gap-3 md:gap-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded-lg"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-150 rounded w-1/2"></div>
-                  <div className="h-3 bg-gray-150 rounded w-1/4"></div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function LivresPage() {
   const { notebooks, recipes, books, createBook, deleteBook, loading } = useRecipes();
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,10 +13,47 @@ export default function LivresPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBookTitle, setNewBookTitle] = useState('');
 
-  // Affichage du skeleton pendant le chargement
-  if (loading) {
-    return <BooksLoadingSkeleton />;
-  }
+// 🔧 AJOUTÉ : Composants Skeleton manquants
+function BookCardSkeleton() {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+      <div className="aspect-[2/1] bg-gray-200"></div>
+      <div className="p-3 md:p-4 space-y-3">
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="space-y-1">
+          <div className="h-3 bg-gray-150 rounded w-full"></div>
+          <div className="h-3 bg-gray-150 rounded w-1/2"></div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <div className="flex-1 h-7 bg-gray-150 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BooksLoadingSkeleton() {
+  return (
+    <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-8 bg-gray-200 rounded w-32 animate-pulse"></div>
+          <div className="h-5 bg-gray-150 rounded w-80 animate-pulse"></div>
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(4)].map((_, index) => (
+            <BookCardSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
   const toggleRecipeSelection = (recipeId: string) => {
     setSelectedRecipes(prev => 
@@ -119,6 +75,10 @@ export default function LivresPage() {
       alert("Veuillez saisir un titre et sélectionner au moins une recette !");
       return;
     }
+    
+    // 🆕 AJOUTÉ : Debug avant l'envoi
+    console.log('🔍 Debug selectedRecipes:', selectedRecipes);
+    console.log('🔍 Type:', typeof selectedRecipes, Array.isArray(selectedRecipes));
     
     createBook(newBookTitle.trim(), selectedRecipes);
     setNewBookTitle('');
@@ -148,7 +108,7 @@ export default function LivresPage() {
               }} 
               className="text-gray-400 hover:text-gray-600 p-1"
             >
-              <X className="w-5 h-5" />
+              ×
             </button>
           </div>
           
@@ -161,40 +121,31 @@ export default function LivresPage() {
                 type="text"
                 value={newBookTitle}
                 onChange={(e) => setNewBookTitle(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                placeholder="Mon livre de recettes"
-                autoFocus
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                placeholder="Mon livre de recettes familiales"
               />
             </div>
-
-            {selectedRecipes.length > 0 && (
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                <p className="text-sm text-orange-800">
-                  <strong>{selectedRecipes.length} recettes sélectionnées</strong>
-                </p>
-                <p className="text-xs text-orange-600 mt-1">
-                  Vous pourrez les réorganiser après création
-                </p>
-                <p className="text-xs text-orange-500 mt-1">
-                  Prix estimé : {Math.max(8, selectedRecipes.length * 1.5 + 6).toFixed(2)}€
-                </p>
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-4">
+            
+            <div>
+              <p className="text-sm text-gray-600">
+                <strong>{selectedRecipes.length}</strong> recettes sélectionnées
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
               <button
                 onClick={() => {
                   setShowCreateModal(false);
                   setNewBookTitle('');
                 }}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm md:text-base"
+                className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateBook}
                 disabled={!newBookTitle.trim()}
-                className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 transition-colors text-sm md:text-base"
+                className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Créer le livre
               </button>
@@ -205,7 +156,7 @@ export default function LivresPage() {
     </div>
   );
 
-  // Rendu principal du composant - UN SEUL return
+  // UN SEUL return principal
   return (
     <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
       {/* Section En-tête */}  
@@ -216,14 +167,6 @@ export default function LivresPage() {
             Créez de beaux livres à imprimer et transmettez votre patrimoine
           </p>
         </div>
-        
-        <Link 
-          href="/livres/nouveau" 
-          className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start flex items-center gap-2"
-        >
-          <span className="sm:hidden">✨Nouveau Livre</span>
-          <span className="hidden sm:inline">✨Nouveau livre</span>
-        </Link>
       </div>
 
       {/* Livres existants */}
@@ -259,7 +202,7 @@ export default function LivresPage() {
                   </div>
                   
                   <div className="p-3 md:p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm md:text-base truncate">{book.title}</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-m md:text-base truncate">{book.title}</h3>
                     <div className="text-xs md:text-sm text-gray-600 space-y-1 mb-3">
                       <p>{book.recipeIds.length} recettes • {pageCount} pages</p>
                       <p className="text-orange-600 font-medium">≈ {estimatedPrice.toFixed(2)}€</p>
@@ -274,9 +217,9 @@ export default function LivresPage() {
                     <div className="flex gap-2">
                       <Link
                         href={`/livres/${book.id}`}
-                        className="flex-1 bg-orange-100 text-orange-700 py-1.5 md:py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium text-xs md:text-sm text-center"
+                        className="inline-flex-1 bg-blue-300 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium text-xs md:text-sm text-center"
                       >
-                        Éditer
+                        Modifier
                       </Link>
                     </div>
                   </div>
