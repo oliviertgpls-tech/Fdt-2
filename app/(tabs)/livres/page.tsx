@@ -6,6 +6,8 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 import { CreateBookModal } from '@/components/CreateBookModal';
 import { useToast } from '@/components/Toast';
+import { useRef } from 'react';
+
 
 export default function LivresPage() {
   const { notebooks, recipes, books, createBook, deleteBook, loading } = useRecipes();
@@ -14,6 +16,7 @@ export default function LivresPage() {
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { showToast } = useToast();
+  const sectionRef = useRef<HTMLDivElement>(null);
 
 // 🔧 AJOUTÉ : Composants Skeleton manquants
 function BookCardSkeleton() {
@@ -110,7 +113,7 @@ function BooksLoadingSkeleton() {
 
   // UN SEUL return principal
   return (
-    <div className="space-y-6 md:space-y-8 max-w-full overflow-hidden">
+    <div className="space-y-6 md:space-y-8 max-w-full overflow-y-hidden ">
       {/* Section En-tête */}  
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -118,6 +121,21 @@ function BooksLoadingSkeleton() {
           <p className="text-gray-600 mt-1 text-sm md:text-base">
             Créez de beaux livres à imprimer et transmettez votre patrimoine
           </p>
+          <button
+          onClick={() => {
+          sectionRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start' 
+          });
+          setTimeout(() => {
+            window.scrollBy(0, -20);
+          }, 300);
+        }}
+          className="mt-3 bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start"
+        >
+          <span className="sm:hidden">✨ Nouveau Livre </span>
+          <span className="hidden sm:inline">✨ Nouveau Livre</span>
+          </button>
         </div>
       </div>
 
@@ -135,7 +153,7 @@ function BooksLoadingSkeleton() {
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                   
                   {/* Couverture avec image ou icône */}
-                  <div className="aspect-[3/1] relative overflow-hidden">
+                  <div className="aspect-[2/1] relative overflow-hidden">
                     {book.coverImageUrl ? (
                       // Photo de couverture personnalisée
                       <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
@@ -147,7 +165,7 @@ function BooksLoadingSkeleton() {
                       </div>
                     ) : (
                       // Icône livre par défaut
-                      <div className="w-full h-full bg-gradient-to-br from-gray-300 to-green-250 flex items-center justify-center text-3xl md:text-4xl">
+                      <div className="w-full h-full bg-gradient-to-br from-orange-300 to-green-250 flex items-center justify-center text-3xl md:text-4xl">
                         📖
                       </div>
                     )}
@@ -169,9 +187,9 @@ function BooksLoadingSkeleton() {
                     <div className="flex gap-2">
                       <Link
                         href={`/livres/${book.id}`}
-                        className="inline-flex-1 bg-blue-300 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-bleu-400 transition-colors font-medium text-xs md:text-sm text-center"
+                        className="inline-flex-1 bg-green-500 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-bleu-400 transition-colors font-medium text-xs md:text-sm text-center"
                       >
-                        Modifier
+                        Voir le livre
                       </Link>
                     </div>
                   </div>
@@ -183,10 +201,10 @@ function BooksLoadingSkeleton() {
       )}
 
       {/* Sélection de recettes */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 md:p-6">
+      <div ref={sectionRef} className="overflow-x-visible div bg-white rounded-xl border border-gray-200 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-lg md:text-xl font-semibold text-gray-800">
-            Sélectionnez au moins une recette pour créer un livre
+            Nouveau Livre : Sélectionnez au moins une recette
           </h2>
           {selectedRecipes.length > 0 && (
             <div className="flex items-center gap-3">
@@ -268,7 +286,7 @@ function BooksLoadingSkeleton() {
             {filteredRecipes.map((recipe) => (
               <div 
                 key={recipe.id} 
-                className={`border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
+                className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
                     ? 'border-orange-300 bg-orange-50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'

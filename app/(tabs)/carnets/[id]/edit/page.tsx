@@ -267,9 +267,9 @@ export default function CarnetEditPage() {
                       <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                         {recipe.description || 'Aucune description'}
                       </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-10 mt-2 text-xs text-gray-500">
                         <span>⏱ {recipe.prepMinutes || '?'} min</span>
-                        <span>👥 {recipe.servings || '?'} pers</span>
+                        <span>👥 {recipe.servings || '?'}</span>
                       </div>
                     </div>
                     

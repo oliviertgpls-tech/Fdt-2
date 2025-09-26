@@ -15,6 +15,7 @@ export type Recipe = {
   prepMinutes?: number;    // Temps de préparation
   servings?: string;       // "4", "6 personnes", "8-10"
   tags?: string[];         // ["dessert", "rapide", "famille"]
+  isFromExternalUrl?: boolean;
   createdAt?: number;      // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification
 };

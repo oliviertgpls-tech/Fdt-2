@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react"
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { useToast } from '@/components/Toast';
 
+
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
 type UploadResult = {
   success: boolean;
@@ -83,7 +84,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "title": "Nom du plat",
   "author": "${firstName}",
   "prepMinutes": 30,
-  "servings": "4 personnes",
+  "servings": "4",
   "ingredients": ["ingrédient 1", "ingrédient 2"],
   "steps": "Étape 1...\\n\\nÉtape 2...",
   "confidence": 85
@@ -183,7 +184,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
   "title": "Titre de la recette",
   "author": "${firstName}",
   "prepMinutes": 30,
-  "servings": "4 personnes",
+  "servings": "4",
   "ingredients": ["ingrédient 1", "ingrédient 2"],
   "steps": "Étape 1...\\n\\nÉtape 2...",
   "confidence": 90
@@ -414,6 +415,7 @@ export default function AddRecipePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
+  const [isFromExternalUrl, setIsFromExternalUrl] = useState(false);
 
   // 🆕 NOUVEL ÉTAT pour les versions optimisées
   const [imageVersions, setImageVersions] = useState<UploadResult['versions'] | null>(null);
@@ -526,13 +528,13 @@ const handleScanUpload = async (file: File) => {
         // 🆕 NOUVEAU : stocker les versions optimisées
         imageUrl: imageUrl.trim() || undefined,
         imageVersions: imageVersions || undefined,
-        isFromExternalUrl: true, // 🆕 MARQUEUR pour recettes externes
-        sourceUrl: linkUrl.trim(), // 🆕 Optionnel : garder l'URL source
         ingredients: ingredients
           .split('\n')
           .map(line => line.trim())
           .filter(line => line !== ""),
         steps: steps.trim(),
+        isFromExternalUrl: true, // 🆕 MARQUEUR pour recettes externes
+        sourceUrl: linkUrl.trim(), // 🆕 Optionnel : garder l'URL source
         updatedAt: Date.now()
       };
 
@@ -588,10 +590,11 @@ const handleScanUpload = async (file: File) => {
         setImageUrl(result.recipe.image || '');
         setPrepMinutes(result.recipe.prepMinutes?.toString() || '');
         setServings(result.recipe.servings || '');
+        setIsFromExternalUrl(true); 
         
         // Passer en mode manuel pour éditer
         setMode('manual');
-        showToast(`Recette extraite avec succès depuis ${result.platform}!`, 'error');
+        showToast(`Recette extraite avec succès depuis l'url!`, 'success');
       } else {
         // Échec - proposer saisie manuelle
         showToast('Impossible d\'extraire automatiquement. Voulez-vous saisir manuellement ?', 'error');
@@ -677,7 +680,6 @@ const handleScanUpload = async (file: File) => {
           <div className="bg-blue-50 rounded-lg p-4">
             <h4 className="font-medium text-blue-800 mb-2">Sites supportés :</h4>
             <div className="text-sm text-blue-700 space-y-1">
-              <div>✅ <strong>Pinterest</strong> - Extraction automatique des recettes</div>
               <div>✅ <strong>Sites de recettes</strong> - Marmiton, 750g, blogs culinaires</div>
               <div>⚠️ <strong>Réseaux sociaux</strong> - Mode manuel assisté (Instagram, TikTok)</div>
             </div>

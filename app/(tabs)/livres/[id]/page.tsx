@@ -752,7 +752,7 @@ export default function BookPage() {
                     <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">1</span>
                     <div>
                       <h4 className="font-medium text-gray-900">Couverture</h4>
-                      <p className="text-sm text-gray-600">{book.title}</p>
+                      <p className="text-sm text-gray-600">Titre+Image si définie+ description</p>
                     </div>
                   </div>
                 </div>
@@ -760,16 +760,6 @@ export default function BookPage() {
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-center gap-3">
                     <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">3</span>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Description</h4>
-                      <p className="text-sm text-gray-600">À propos de ce livre</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">4-5</span>
                     <div>
                       <h4 className="font-medium text-gray-900">Sommaire</h4>
                       <p className="text-sm text-gray-600">Liste des recettes</p>
@@ -831,10 +821,10 @@ export default function BookPage() {
                 {availableRecipes.map((recipe) => (
                   <div 
                     key={recipe.id} 
-                    className="border border-gray-200 rounded-lg p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
+                    className="border border-gray-200 rounded-lg p-2 sm:p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
                     onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
                   >
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3">
                       <img 
                         src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
                         alt={recipe.title}
@@ -845,7 +835,7 @@ export default function BookPage() {
                         <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
                         {recipe.isFromExternalUrl && (
                           <div className="mt-1 text-xs text-red-600 font-medium">
-                            ⚠️ Non autorisée pour impression (source externe)
+                            ⚠️ Impression indisponible (recette externe)
                           </div>
                         )}
                       </div>

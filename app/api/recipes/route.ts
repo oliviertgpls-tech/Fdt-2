@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
         prepMinutes: body.prepMinutes,
         servings: body.servings,
         tags: body.tags || [],
-        userId: user.id
+        userId: user.id,
+        isFromExternalUrl: body.isFromExternalUrl || false,
       }
     })
     

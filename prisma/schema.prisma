@@ -25,6 +25,7 @@ model Recipe {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   userId      String
+  isFromExternalUrl Boolean  @default(false) 
   
   // Relations
   notebookRecipes NotebookRecipe[]
