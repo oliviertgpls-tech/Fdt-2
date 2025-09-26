@@ -15,6 +15,7 @@ export type Recipe = {
   prepMinutes?: number;    // Temps de préparation
   servings?: string;       // "4", "6 personnes", "8-10"
   tags?: string[];         // ["dessert", "rapide", "famille"]
+  sourceUrl?: string;
   isFromExternalUrl?: boolean;
   createdAt?: number;      // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification
@@ -30,9 +31,3 @@ export type Book = {
   createdAt: number;       // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification
 };
-
-export interface Recipe {
-  // ... autres champs existants
-  isFromExternalUrl?: boolean;
-  sourceUrl?: string;
-}
