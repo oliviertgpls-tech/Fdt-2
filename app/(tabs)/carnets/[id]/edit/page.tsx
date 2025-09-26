@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useToast } from '@/components/Toast';
 
 export default function CarnetEditPage() {
+  const { showToast } = useToast(); 
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook } = useRecipes();
