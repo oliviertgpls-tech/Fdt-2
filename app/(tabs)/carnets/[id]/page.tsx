@@ -54,7 +54,7 @@ export default function CarnetPage() {
       router.push(`/livres/${newBook.id}`);
     } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
-      alert('Erreur lors de la création du livre');
+      showToast('Erreur lors de la création du livre', 'error');
     }
   };
 

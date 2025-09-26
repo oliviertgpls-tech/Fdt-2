@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ImageSearch } from "@/components/ImageSearch";
 import type { Recipe } from "@/lib/types";
+import { useToast } from '@/components/Toast';
 
 export default function EditRecipePage() {
   const { id } = useParams<{ id: string }>();

@@ -5,6 +5,7 @@ import { Plus, Eye, Move, Trash2, ArrowLeft, Edit3, X } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
+import { useToast } from '@/components/Toast';
 
 export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
@@ -79,7 +80,7 @@ export default function CarnetEditPage() {
       router.push(`/livres/${newBook.id}`);
     } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
-      alert('Erreur lors de la création du livre');
+      showToast('Erreur lors de la création du livre', 'error');
     }
   };
 
@@ -92,7 +93,7 @@ export default function CarnetEditPage() {
       setEditingTitle(false);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde du titre:', error);
-      alert('Erreur lors de la sauvegarde du titre');
+      showToast('Erreur lors de la sauvegarde du titre', 'error');
     }
   };
 
@@ -102,7 +103,7 @@ export default function CarnetEditPage() {
       setEditingDescription(false);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de la description:', error);
-      alert('Erreur lors de la sauvegarde de la description');
+      showToast('Erreur lors de la sauvegarde de la description', 'error');
     }
   };
 

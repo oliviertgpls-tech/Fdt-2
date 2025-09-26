@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { useToast } from '@/components/Toast';
 
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
 type UploadResult = {
@@ -399,6 +400,7 @@ export default function AddRecipePage() {
   const router = useRouter();
   const [mode, setMode] = useState<'choose' | 'manual' | 'photo' | 'scan'| 'link'>('choose');
   const [isProcessing, setIsProcessing] = useState(false);
+  const { showToast } = useToast();
 
   // États pour saisie manuelle
   const [title, setTitle] = useState("");
@@ -426,13 +428,12 @@ export default function AddRecipePage() {
     console.log('Unsplash:', process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? 'PRÉSENTE' : 'MANQUANTE');
   });
 
-  // 🔄 FONCTION D'UPLOAD MISE À JOUR avec optimisations
-  const handleImageUpload = async (file: File) => {
+ // 🔄 FONCTION D'UPLOAD MISE À JOUR avec optimisations
+  const handleImageUpload = async (file: File): Promise<UploadResult | null> => { // ⬅️ NOUVEAU: Retourne le résultat ou null
     setIsUploading(true);
     
     try {
       console.log('📤 Upload optimisé en cours...', file.name);
-      console.log('📏 Taille originale:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
       
       const formData = new FormData();
       formData.append('file', file);
@@ -443,64 +444,65 @@ export default function AddRecipePage() {
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        // ... gestion d'erreur ...
       }
       
       const result: UploadResult = await response.json();
-      console.log('✅ Upload optimisé réussi:', result);
       
       if (result.success) {
         // 🆕 Stocker les versions optimisées
         setImageVersions(result.versions);
         // Garder compatibilité avec l'ancien système
-        setImageUrl(result.originalUrl);
-        
-        console.log('🎯 Versions créées:');
-        console.log('  - Thumbnail (200px):', result.versions.thumbnail);
-        console.log('  - Medium (800px):', result.versions.medium);
-        console.log('  - Large (2400px):', result.versions.large);
+        setImageUrl(result.originalUrl); // ⬅️ CETTE LIGNE EST CRUCIALE POUR LE RENDU ET LA SAUVEGARDE
+
+        showToast('Photo uploadée avec succès !', 'success');
+        return result; // ⬅️ RETOURNER LE RÉSULTAT
       } else {
         throw new Error(result.message || 'Erreur upload');
       }
       
     } catch (error: any) {
-      console.error('💥 Erreur upload optimisé:', error);
-      alert("Erreur lors de l'upload optimisé : " + error.message);
+      // ... gestion d'erreur ...
+      return null; // ⬅️ RETOURNER null en cas d'échec
     } finally {
       setIsUploading(false);
     }
   };
 
-  const handleScanUpload = async (file: File) => {
+const handleScanUpload = async (file: File) => {
     setIsProcessing(true);
     console.log('📄 Début handleScanUpload');
     
     try {
-      // Analyser avec l'IA d'abord
+      // 1. Analyser avec l'IA
       const aiResult = await openAIService.analyzeManuscriptToRecipe(file, firstName);
       console.log('🤖 Résultat IA manuscrit:', aiResult);
       
-      // Puis uploader l'image avec optimisations
+      // 2. Puis uploader l'image avec optimisations
       console.log('📤 Upload du manuscrit optimisé...');
-      await handleImageUpload(file);
+      const uploadResult = await handleImageUpload(file); // ⬅️ ATTENDRE (await) l'upload
       
-      // Remplir les champs
+      if (!uploadResult) { // ⬅️ Vérifier que l'upload a réussi
+        throw new Error("L'upload de l'image a échoué.");
+      }
+      
+      // 3. Remplir les champs
       setTitle(aiResult.title);
-      setAuthor(aiResult.author);
-      setPrepMinutes(aiResult.prepMinutes.toString());
+      // ... autres setters ...
       setServings(aiResult.servings);
+      // ⚠️ setImageUrl et setImageVersions sont mis à jour DANS handleImageUpload
       setIngredients(aiResult.ingredients.join('\n'));
       setSteps(aiResult.steps);
       setAiConfidence(aiResult.confidence);
       
+      // 4. Changer de mode
       setMode('manual');
       
       console.log('🎉 handleScanUpload terminé avec succès');
       
     } catch (error: any) {
       console.error('💥 Erreur dans handleScanUpload:', error);
-      alert(`Erreur détaillée: ${error.message}`);
+      showToast(`Erreur détaillée: ${error.message}` || 'Erreur lors de l\'analyse et de l\'upload', 'error');
     } finally {
       setIsProcessing(false);
     }
@@ -509,7 +511,7 @@ export default function AddRecipePage() {
   // 🔄 FONCTION DE SAUVEGARDE MISE À JOUR
   const handleSave = async () => {
     if (!title.trim()) {
-      alert("Le titre est obligatoire !");
+      showToast('Le titre est obligatoire', 'error');
       return;
     }
 
@@ -549,10 +551,10 @@ export default function AddRecipePage() {
       console.log('✅ Recette créée avec optimisations:', newRecipe);
       
       // Rediriger vers la liste des recettes
-      router.push("/recipes");
+      window.location.href = "/recipes";
     } catch (error: any) {
       console.error('❌ Erreur sauvegarde:', error);
-      alert("Erreur lors de la sauvegarde : " + error.message);
+      showToast('Erreur lors de la sauvegarde', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -561,7 +563,7 @@ export default function AddRecipePage() {
     // 🆕 Fonction d'extraction (ajoutez cette fonction)
   const handleExtractFromUrl = async () => {
     if (!linkUrl.trim()) {
-      alert('Veuillez saisir une URL');
+      showToast('Veuillez saisir une URL', 'error');
       return;
     }
 
@@ -587,15 +589,15 @@ export default function AddRecipePage() {
         
         // Passer en mode manuel pour éditer
         setMode('manual');
-        alert(`Recette extraite avec succès depuis ${result.platform}!`);
+        showToast(`Recette extraite avec succès depuis ${result.platform}!`, 'error');
       } else {
         // Échec - proposer saisie manuelle
-        alert(result.error || 'Impossible d\'extraire automatiquement. Voulez-vous saisir manuellement ?');
+        showToast('Impossible d\'extraire automatiquement. Voulez-vous saisir manuellement ?', 'error');
         setMode('manual');
       }
     } catch (error) {
       console.error('Erreur extraction:', error);
-      alert('Erreur lors de l\'extraction. Veuillez réessayer.');
+      showToast('Erreur lors de l\'extraction. Veuillez réessayer.','error');
     } finally {
       setIsExtracting(false);
     }
@@ -631,7 +633,7 @@ export default function AddRecipePage() {
       
     } catch (error: any) {
       console.error('💥 Erreur dans handlePhotoUpload:', error);
-      alert(`Erreur détaillée: ${error.message}`);
+      showToast(`Erreur détaillée: ${error.message}`,'error');
     } finally {
       setIsProcessing(false);
     }
@@ -707,13 +709,13 @@ export default function AddRecipePage() {
   
   // 🎨 COMPOSANT APERÇU AMÉLIORÉ
   const PreviewSection = () => {
-    if (!imageUrl && !imageVersions) return null;
+    if (!imageUrl && !imageVersions) return null; // ⬅️ Check OK
 
     return (
       <div className="mt-3 relative">
         {/* 🆕 Utilise la version medium pour l'aperçu (800px au lieu de 2400px) */}
-        <img 
-          src={imageVersions ? imageVersions.medium : imageUrl} 
+         <img 
+          src={imageVersions ? imageVersions.medium : imageUrl}
           alt="Aperçu" 
           className="w-full max-w-xs h-32 object-cover rounded-lg border"
           onError={(e) => {

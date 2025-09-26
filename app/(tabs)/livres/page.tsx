@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { Plus, Eye, Download, X, Loader } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
+import { CreateBookModal } from '@/components/CreateBookModal';
+import { useToast } from '@/components/Toast';
 
 export default function LivresPage() {
   const { notebooks, recipes, books, createBook, deleteBook, loading } = useRecipes();
@@ -11,7 +13,6 @@ export default function LivresPage() {
   const [selectedNotebook, setSelectedNotebook] = useState<string>('all');
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newBookTitle, setNewBookTitle] = useState('');
 
 // 🔧 AJOUTÉ : Composants Skeleton manquants
 function BookCardSkeleton() {
@@ -72,7 +73,7 @@ function BooksLoadingSkeleton() {
 
   const handleCreateBook = () => {
     if (!newBookTitle.trim() || selectedRecipes.length === 0) {
-      alert("Veuillez saisir un titre et sélectionner au moins une recette !");
+      showToast('Veuillez saisir un titre et sélectionner au moins une recette !', 'error');
       return;
     }
     
@@ -84,7 +85,7 @@ function BooksLoadingSkeleton() {
     setNewBookTitle('');
     setSelectedRecipes([]);
     setShowCreateModal(false);
-    alert(`Livre "${newBookTitle}" créé avec ${selectedRecipes.length} recettes !`);
+    showToast(`Livre "${newBookTitle}" créé avec ${selectedRecipes.length} recettes !`, 'success');
   };
 
   const filteredRecipes = recipes.filter(recipe => {
@@ -95,66 +96,17 @@ function BooksLoadingSkeleton() {
     return matchesSearch && matchesNotebook;
   });
 
-  const CreateBookModal = () => (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl max-w-md w-full shadow-2xl mx-4">
-        <div className="p-4 md:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg md:text-xl font-bold text-gray-800">Créer un nouveau livre</h2>
-            <button 
-              onClick={() => {
-                setShowCreateModal(false);
-                setNewBookTitle('');
-              }} 
-              className="text-gray-400 hover:text-gray-600 p-1"
-            >
-              ×
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Titre du livre
-              </label>
-              <input
-                type="text"
-                value={newBookTitle}
-                onChange={(e) => setNewBookTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                placeholder="Mon livre de recettes familiales"
-              />
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-600">
-                <strong>{selectedRecipes.length}</strong> recettes sélectionnées
-              </p>
-            </div>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowCreateModal(false);
-                  setNewBookTitle('');
-                }}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleCreateBook}
-                disabled={!newBookTitle.trim()}
-                className="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Créer le livre
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  <CreateBookModal
+    isOpen={showCreateModal}
+    onClose={() => setShowCreateModal(false)}
+    onSubmit={(title) => {
+      createBook(title, selectedRecipes);
+      setSelectedRecipes([]);
+      setShowCreateModal(false);
+      showToast(`Livre "${title}" créé avec ${selectedRecipes.length} recettes !`, 'error');
+    }}
+    selectedCount={selectedRecipes.length}
+  />
 
   // UN SEUL return principal
   return (
@@ -371,7 +323,17 @@ function BooksLoadingSkeleton() {
       </div>
 
       {/* Modale de création de livre */}
-      {showCreateModal && <CreateBookModal />}
+      <CreateBookModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={(title) => {
+          createBook(title, selectedRecipes);
+          setSelectedRecipes([]);
+          setShowCreateModal(false);
+          showToast(`Livre "${title}" créé avec ${selectedRecipes.length} recettes !`, 'success');
+        }}
+        selectedCount={selectedRecipes.length}
+      />
     </div>
   );
 }

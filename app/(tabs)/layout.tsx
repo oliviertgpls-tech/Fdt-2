@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { RecipesProvider } from "@/contexts/RecipesProvider";
+import { ToastProvider } from '@/components/Toast';
 
 function ProtectedContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -34,6 +35,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
 
   // Ton layout actuel avec menu
   return (
+  <ToastProvider>
     <RecipesProvider>
       <div className="min-h-screen bg-white">
         <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
@@ -124,6 +126,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </RecipesProvider>
+  </ToastProvider>
   );
 }
 

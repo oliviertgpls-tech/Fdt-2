@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader,GripVertical } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { ImageSearch } from '@/components/ImageSearch';
+import { useToast } from '@/components/Toast';
 
 export default function BookPage() {
   const router = useRouter();
@@ -42,17 +43,16 @@ export default function BookPage() {
   );
 
   // 🆕 AJOUTE les nouveaux états
-  const [bookTitle, setBookTitle] = useState(book?.title || '');
-  const [editingTitle, setEditingTitle] = useState(false);
+const [editingTitle, setEditingTitle] = useState(false);
+const [tempTitle, setTempTitle] = useState('');
   
   // Initialiser les états
- useEffect(() => {
-  if (book) {
-    setBookDescription(book.description || '');
-    setCoverImageUrl(book.coverImageUrl || '');
-    setBookTitle(book.title || '');
-  }
-}, [book, book?.coverImageUrl]);
+  useEffect(() => {
+    if (book) {
+      setBookDescription(book.description || '');
+      setCoverImageUrl(book.coverImageUrl || '');
+    }
+  }, [book?.id, book?.coverImageUrl, editingTitle]);
 
   // 🆕 FONCTION save titre
   const saveTitle = () => {
@@ -97,7 +97,7 @@ export default function BookPage() {
         }
         console.log('📸 Photo de couverture mise à jour:', result.imageUrl);
 
-        alert('✅ Photo de couverture mise à jour avec succès !');
+        showToast('✅ Photo de couverture mise à jour avec succès !', 'success');
 
         setEditingCover(false);
 
@@ -107,7 +107,7 @@ export default function BookPage() {
       
     } catch (error: any) {
       console.error('💥 Erreur upload couverture:', error);
-      alert("Erreur lors de l'upload de l'image de couverture : " + error.message);
+      showToast("Erreur lors de l'upload de l'image de couverture : " + error.message),'error';
     } finally {
       setIsUploadingCover(false);
 
@@ -318,7 +318,7 @@ export default function BookPage() {
       const photoHeight = (A4.h * 2) / 3;
       await drawImageFitted(
         pdfDoc, cover, 
-        book.coverImageUrl || bookRecipes[0]?.imageUrl, // 🆕 Photo dédiée ou fallback
+        book.coverImageUrl,
         0, 0,  // Pas de marge = pleine largeur
         A4.w, photoHeight       // Toute la largeur
       );
@@ -485,7 +485,7 @@ export default function BookPage() {
       setShowPDFModal(true);
     } catch (error) {
       console.error('PDF error', error);
-      alert('Erreur lors de la génération du PDF');
+      showToast('Erreur lors de la génération du PDF', 'error');
     } finally {
       setIsGeneratingPreview(false);
     }
@@ -551,25 +551,28 @@ export default function BookPage() {
     <div className="flex-1">
       {editingTitle ? (
         <div className="flex items-center gap-3">
-         <input
+          <input
             type="text"
-            value={bookTitle}
-            onChange={(e) => setBookTitle(e.target.value)}
+            value={tempTitle}
+            onChange={(e) => setTempTitle(e.target.value)}
             className="text-lg md:text-xl font-semibold text-gray-800 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
+            autoFocus
           />
           <button
-            onClick={saveTitle}
-            disabled={!bookTitle.trim()}
-            className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50 min-w-[32px] flex items-center justify-center"
+            onClick={() => {
+              if (tempTitle.trim()) {
+                updateBook(book.id, { title: tempTitle.trim() });
+              }
+              setEditingTitle(false);
+            }}
+            disabled={!tempTitle.trim()}
+            className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
           >
             ✓
           </button>
           <button
-            onClick={() => {
-              setBookTitle(book.title);
-              setEditingTitle(false);
-            }}
-            className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded text-sm hover:bg-gray-200 min-w-[32px] flex items-center justify-center"
+            onClick={() => setEditingTitle(false)}
+            className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded text-sm hover:bg-gray-200"
           >
             ✕
           </button>
@@ -578,7 +581,10 @@ export default function BookPage() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
           <button
-            onClick={() => setEditingTitle(true)}
+            onClick={() => {
+              setTempTitle(book.title);
+              setEditingTitle(true);
+            }}
             className="text-gray-400 hover:text-gray-600 p-1"
           >
             <Edit3 className="w-4 h-4" />
