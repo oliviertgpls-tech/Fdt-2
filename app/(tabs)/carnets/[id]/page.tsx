@@ -5,12 +5,14 @@ import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ArrowLeft, Edit3, Plus, Trash2 } from "lucide-react";
+import { useToast } from '@/components/Toast';
 
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const { notebooks, recipes, createBook, deleteNotebook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");
+  const { showToast } = useToast();
 
   // Trouver le carnet
   const carnet = notebooks.find(n => n.id === id);
