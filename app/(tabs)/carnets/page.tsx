@@ -6,6 +6,8 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 import { useToast } from '@/components/Toast';
 
+
+
 // Composant Skeleton pour les cartes de carnets
 function NotebookCardSkeleton() {
   return (
@@ -233,6 +235,7 @@ function CreateCarnetModal({
 export default function CarnetsPage() {
   const { notebooks, createNotebook, recipes, deleteNotebook, loading } = useRecipes();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const { showToast } = useToast();
   
   // États corrigés avec noms cohérents
   const [carnetTitle, setCarnetTitle] = useState('');
