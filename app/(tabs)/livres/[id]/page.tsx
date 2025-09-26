@@ -26,7 +26,8 @@ export default function BookPage() {
   const [editingDescription, setEditingDescription] = useState(false);
   
   // 🆕 NOUVEAUX ÉTATS pour la photo de couverture
-  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [coverImageUrl, setCoverImageUrl] = useState(""); // Initialiser à vide
+  const [coverImageVersions, setCoverImageVersions] = useState<UploadResult['versions'] | null>(null); // Initialiser à null
   const [editingCover, setEditingCover] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   
@@ -37,22 +38,30 @@ export default function BookPage() {
 
   // Trouvez les données directement depuis le context
   const book = books.find(b => b.id === id);
+
   const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
   const availableRecipes = recipes.filter(recipe => 
     !book?.recipeIds?.includes(recipe.id)
   );
 
   // 🆕 AJOUTE les nouveaux états
-const [editingTitle, setEditingTitle] = useState(false);
-const [tempTitle, setTempTitle] = useState('');
-  
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [tempTitle, setTempTitle] = useState('');
+
+  const imageUrlToDisplay = coverImageVersions?.medium 
+                          || coverImageUrl           
+                          || book?.coverImageVersions?.medium 
+                          || book?.coverImageUrl;    
+
   // Initialiser les états
   useEffect(() => {
     if (book) {
       setBookDescription(book.description || '');
+      // 🚨 AJOUT DES MISES À JOUR DES IMAGES DE COUVERTURE
       setCoverImageUrl(book.coverImageUrl || '');
+      setCoverImageVersions(book.coverImageVersions || null);
     }
-  }, [book?.id, book?.coverImageUrl, editingTitle]);
+  }, [book]); // Dépendance à [book] pour se re-déclencher si les données changent
 
   // 🆕 FONCTION save titre
   const saveTitle = () => {
@@ -62,62 +71,155 @@ const [tempTitle, setTempTitle] = useState('');
       }
     };
   
-  // FONCTION UPLAOD COUVERTURE
-  const handleCoverImageUpload = async (file: File) => {
-    setIsUploadingCover(true);
-    console.log('🚀 DÉMARRAGE Upload couverture:', file.name, file.size); // ← AJOUTE ÇA
+{/* 🆕 Photo de couverture */}
+  <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-lg font-semibold text-gray-800">📸 Photo de couverture</h2>
+      <button
+        onClick={() => setEditingCover(!editingCover)}
+        className="text-gray-500 hover:text-gray-700 p-1"
+      >
+        <Edit3 className="w-4 h-4" />
+      </button>
+    </div>
     
-    try {
-      console.log('🚀 Upload couverture en cours...', file.name);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      console.log('📦 FormData créé'); // ← ET ÇA
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
+    {editingCover ? (
+      <div className="space-y-4">
+        
+        {/* 🚨 NOUVEAU BLOC D'APERÇU IMMÉDIAT DANS LE MODE ÉDITION */}
+        {imageUrlToDisplay && (
+          <div className="relative mb-4 mx-auto w-48 h-64 border rounded-lg shadow-md">
+            <img 
+              src={imageUrlToDisplay} // ⬅️ AFFICHE L'IMAGE QUI VIENT D'ÊTRE UPLOADÉE
+              alt="Nouvelle couverture" 
+              className="w-full h-full object-cover rounded-lg"
+            />
+            
+            {/* Indicateur de succès post-upload */}
+            {coverImageVersions && (
+                <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    Uploadé !
+                </div>
+            )}
+            
+            {/* Bouton pour Annuler l'upload temporaire si nécessaire */}
+          </div>
+        )}
+        
+        {/* Upload + Unsplash */}
+        <div className="flex flex-wrap gap-3">
+          {/* Upload photo personnelle */}
+        <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
+            isUploadingCover 
+              ? 'bg-blue-100 text-blue-700 cursor-wait' 
+              : 'bg-green-100 text-green-700 hover:bg-green-200'
+          }`}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleCoverImageUpload(file);
+              }}
+              className="hidden"
+              disabled={isUploadingCover}
+            />
+            {isUploadingCover ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Upload en cours...
+              </>
+            ) : (
+              <>
+                📷 Ma photo
+              </>
+            )}
+          </label>
+
+          {/* Recherche Unsplash - Assurez-vous d'utiliser setCoverImageUrl pour l'URL sélectionnée */}
+          <ImageSearch 
+            onImageSelect={(url) => {
+              setCoverImageUrl(url);
+              setEditingCover(false); // Optionnel, si vous voulez sortir du mode édition
+              // Note: la sauvegarde finale se fera via le bouton Sauvegarder
+            }}
+            initialQuery={`${book.title} family cooking`}
+          />
+          
+          {/* URL manuelle */}
+          <input
+            type="url"
+            value={coverImageUrl}
+            onChange={(e) => setCoverImageUrl(e.target.value)}
+            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
+            placeholder="Ou collez un lien d'image..."
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              // 🚨 IMPORTANT : Sauvegarder coverImageUrl et coverImageVersions
+              updateBook(book.id, { 
+                  coverImageUrl: coverImageUrl,
+                  coverImageVersions: coverImageVersions
+              });
+              setEditingCover(false);
+              router.refresh(); // Rafraîchir après la sauvegarde finale si l'upload était manuel/Unsplash
+            }}
+            disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            Sauvegarder la couverture
+          </button>
+          <button
+            onClick={() => setEditingCover(false)}
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    ) : (
+      // Mode Affichage Normal
+      <div>
+        {imageUrlToDisplay ? ( // ⬅️ UTILISER LA VARIABLE GLOBALE ICI
+          <div className="relative">
+            <img 
+              src={imageUrlToDisplay} 
+              alt="Couverture" 
+              className="w-full max-w-sm h-64 object-cover rounded-lg border"
+            />
+            <button
+              onClick={() => {
+                setCoverImageUrl("");
+                setCoverImageVersions(null); // Réinitialiser les états
+                updateBook(book.id, { coverImageUrl: "", coverImageVersions: null }); // Sauvegarder la suppression
+              }}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <div className="text-4xl mb-2">📷</div>
+            <p className="text-gray-600 mb-4">Aucune photo de couverture</p>
+            <button
+              onClick={() => setEditingCover(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Ajouter une photo
+            </button>
+          </div>
+        )}
+      </div>
+    )}
     
-    console.log('📨 Réponse serveur:', response.status); 
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      console.log('✅ Upload couverture réussi:', result);
-      
-      if (result.success) {
-        setCoverImageUrl(result.imageUrl); // URL permanente
-        // Sauvegarder immédiatement dans le livre
-        if (book) {
-          updateBook(book.id, { coverImageUrl: result.imageUrl });
-        }
-        console.log('📸 Photo de couverture mise à jour:', result.imageUrl);
-
-        showToast('✅ Photo de couverture mise à jour avec succès !', 'success');
-
-        setEditingCover(false);
-
-      } else {
-        throw new Error(result.error || 'Erreur upload');
-      }
-      
-    } catch (error: any) {
-      console.error('💥 Erreur upload couverture:', error);
-      showToast("Erreur lors de l'upload de l'image de couverture : " + error.message),'error';
-    } finally {
-      setIsUploadingCover(false);
-
-        // 🆕 AJOUT : Reset l'input file pour permettre de re-sélectionner le même fichier
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = '';
-    }
-  }
-  };
+    <p className="text-xs text-gray-500 mt-3">
+      💡 <strong>Idée :</strong> Photo de famille en cuisine, portrait de grand-mère, ou image symbolique
+    </p>
+  </div>
   
   // FONCTION SUPPRESSION LIVRE
   const handleDeleteBook = () => {
