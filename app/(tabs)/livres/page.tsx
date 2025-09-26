@@ -13,6 +13,7 @@ export default function LivresPage() {
   const [selectedNotebook, setSelectedNotebook] = useState<string>('all');
   const [selectedRecipes, setSelectedRecipes] = useState<string[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const { showToast } = useToast();
 
 // 🔧 AJOUTÉ : Composants Skeleton manquants
 function BookCardSkeleton() {
@@ -71,8 +72,8 @@ function BooksLoadingSkeleton() {
     }
   };
 
-  const handleCreateBook = () => {
-    if (!newBookTitle.trim() || selectedRecipes.length === 0) {
+  const handleCreateBook = (title: string) => {
+    if (!title.trim() || selectedRecipes.length === 0) {
       showToast('Veuillez saisir un titre et sélectionner au moins une recette !', 'error');
       return;
     }
@@ -81,11 +82,10 @@ function BooksLoadingSkeleton() {
     console.log('🔍 Debug selectedRecipes:', selectedRecipes);
     console.log('🔍 Type:', typeof selectedRecipes, Array.isArray(selectedRecipes));
     
-    createBook(newBookTitle.trim(), selectedRecipes);
-    setNewBookTitle('');
+    createBook(title.trim(), selectedRecipes);
     setSelectedRecipes([]);
     setShowCreateModal(false);
-    showToast(`Livre "${newBookTitle}" créé avec ${selectedRecipes.length} recettes !`, 'success');
+    showToast(`Livre "${title}" créé avec ${selectedRecipes.length} recettes !`, 'success');
   };
 
   const filteredRecipes = recipes.filter(recipe => {

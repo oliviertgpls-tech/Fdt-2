@@ -29,3 +29,9 @@ export type Book = {
   createdAt: number;       // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification
 };
+
+export interface Recipe {
+  // ... autres champs existants
+  isFromExternalUrl?: boolean;
+  sourceUrl?: string;
+}

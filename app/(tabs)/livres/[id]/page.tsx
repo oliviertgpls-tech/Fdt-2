@@ -2,10 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader,GripVertical } from 'lucide-react';
+import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader, GripVertical } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { ImageSearch } from '@/components/ImageSearch';
 import { useToast } from '@/components/Toast';
+
+// Type pour les versions d'images
+type UploadResult = {
+  versions: {
+    small: string;
+    medium: string;
+    large: string;
+  } | null;
+};
 
 export default function BookPage() {
   const router = useRouter();
@@ -20,14 +29,16 @@ export default function BookPage() {
     removeRecipeFromBook,
     deleteBook
   } = useRecipes();
+
+  const { showToast } = useToast();
   
   // États locaux
   const [bookDescription, setBookDescription] = useState('');
   const [editingDescription, setEditingDescription] = useState(false);
   
-  // 🆕 NOUVEAUX ÉTATS pour la photo de couverture
-  const [coverImageUrl, setCoverImageUrl] = useState(""); // Initialiser à vide
-  const [coverImageVersions, setCoverImageVersions] = useState<UploadResult['versions'] | null>(null); // Initialiser à null
+  // États pour la photo de couverture
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [coverImageVersions, setCoverImageVersions] = useState<UploadResult['versions'] | null>(null);
   const [editingCover, setEditingCover] = useState(false);
   const [isUploadingCover, setIsUploadingCover] = useState(false);
   
@@ -36,6 +47,10 @@ export default function BookPage() {
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
 
+  // États pour l'édition du titre
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [tempTitle, setTempTitle] = useState('');
+
   // Trouvez les données directement depuis le context
   const book = books.find(b => b.id === id);
 
@@ -43,10 +58,6 @@ export default function BookPage() {
   const availableRecipes = recipes.filter(recipe => 
     !book?.recipeIds?.includes(recipe.id)
   );
-
-  // 🆕 AJOUTE les nouveaux états
-  const [editingTitle, setEditingTitle] = useState(false);
-  const [tempTitle, setTempTitle] = useState('');
 
   const imageUrlToDisplay = coverImageVersions?.medium 
                           || coverImageUrl           
@@ -57,179 +68,28 @@ export default function BookPage() {
   useEffect(() => {
     if (book) {
       setBookDescription(book.description || '');
-      // 🚨 AJOUT DES MISES À JOUR DES IMAGES DE COUVERTURE
       setCoverImageUrl(book.coverImageUrl || '');
       setCoverImageVersions(book.coverImageVersions || null);
     }
-  }, [book]); // Dépendance à [book] pour se re-déclencher si les données changent
+  }, [book]);
 
-  // 🆕 FONCTION save titre
+  // Fonction save titre
   const saveTitle = () => {
-    if (book && bookTitle.trim()) {
-      updateBook(book.id, { title: bookTitle.trim() });
+    if (book && tempTitle.trim()) {
+      updateBook(book.id, { title: tempTitle.trim() });
       setEditingTitle(false);
-      }
-    };
-  
-{/* 🆕 Photo de couverture */}
-  <div className="bg-white rounded-xl border border-gray-200 p-6">
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-semibold text-gray-800">📸 Photo de couverture</h2>
-      <button
-        onClick={() => setEditingCover(!editingCover)}
-        className="text-gray-500 hover:text-gray-700 p-1"
-      >
-        <Edit3 className="w-4 h-4" />
-      </button>
-    </div>
-    
-    {editingCover ? (
-      <div className="space-y-4">
-        
-        {/* 🚨 NOUVEAU BLOC D'APERÇU IMMÉDIAT DANS LE MODE ÉDITION */}
-        {imageUrlToDisplay && (
-          <div className="relative mb-4 mx-auto w-48 h-64 border rounded-lg shadow-md">
-            <img 
-              src={imageUrlToDisplay} // ⬅️ AFFICHE L'IMAGE QUI VIENT D'ÊTRE UPLOADÉE
-              alt="Nouvelle couverture" 
-              className="w-full h-full object-cover rounded-lg"
-            />
-            
-            {/* Indicateur de succès post-upload */}
-            {coverImageVersions && (
-                <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
-                    Uploadé !
-                </div>
-            )}
-            
-            {/* Bouton pour Annuler l'upload temporaire si nécessaire */}
-          </div>
-        )}
-        
-        {/* Upload + Unsplash */}
-        <div className="flex flex-wrap gap-3">
-          {/* Upload photo personnelle */}
-        <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
-            isUploadingCover 
-              ? 'bg-blue-100 text-blue-700 cursor-wait' 
-              : 'bg-green-100 text-green-700 hover:bg-green-200'
-          }`}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleCoverImageUpload(file);
-              }}
-              className="hidden"
-              disabled={isUploadingCover}
-            />
-            {isUploadingCover ? (
-              <>
-                <Loader className="w-4 h-4 animate-spin" />
-                Upload en cours...
-              </>
-            ) : (
-              <>
-                📷 Ma photo
-              </>
-            )}
-          </label>
+    }
+  };
 
-          {/* Recherche Unsplash - Assurez-vous d'utiliser setCoverImageUrl pour l'URL sélectionnée */}
-          <ImageSearch 
-            onImageSelect={(url) => {
-              setCoverImageUrl(url);
-              setEditingCover(false); // Optionnel, si vous voulez sortir du mode édition
-              // Note: la sauvegarde finale se fera via le bouton Sauvegarder
-            }}
-            initialQuery={`${book.title} family cooking`}
-          />
-          
-          {/* URL manuelle */}
-          <input
-            type="url"
-            value={coverImageUrl}
-            onChange={(e) => setCoverImageUrl(e.target.value)}
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
-            placeholder="Ou collez un lien d'image..."
-          />
-        </div>
-        
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              // 🚨 IMPORTANT : Sauvegarder coverImageUrl et coverImageVersions
-              updateBook(book.id, { 
-                  coverImageUrl: coverImageUrl,
-                  coverImageVersions: coverImageVersions
-              });
-              setEditingCover(false);
-              router.refresh(); // Rafraîchir après la sauvegarde finale si l'upload était manuel/Unsplash
-            }}
-            disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            Sauvegarder la couverture
-          </button>
-          <button
-            onClick={() => setEditingCover(false)}
-            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Annuler
-          </button>
-        </div>
-      </div>
-    ) : (
-      // Mode Affichage Normal
-      <div>
-        {imageUrlToDisplay ? ( // ⬅️ UTILISER LA VARIABLE GLOBALE ICI
-          <div className="relative">
-            <img 
-              src={imageUrlToDisplay} 
-              alt="Couverture" 
-              className="w-full max-w-sm h-64 object-cover rounded-lg border"
-            />
-            <button
-              onClick={() => {
-                setCoverImageUrl("");
-                setCoverImageVersions(null); // Réinitialiser les états
-                updateBook(book.id, { coverImageUrl: "", coverImageVersions: null }); // Sauvegarder la suppression
-              }}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
-            >
-              ×
-            </button>
-          </div>
-        ) : (
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <div className="text-4xl mb-2">📷</div>
-            <p className="text-gray-600 mb-4">Aucune photo de couverture</p>
-            <button
-              onClick={() => setEditingCover(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Ajouter une photo
-            </button>
-          </div>
-        )}
-      </div>
-    )}
-    
-    <p className="text-xs text-gray-500 mt-3">
-      💡 <strong>Idée :</strong> Photo de famille en cuisine, portrait de grand-mère, ou image symbolique
-    </p>
-  </div>
-  
   // FONCTION SUPPRESSION LIVRE
   const handleDeleteBook = () => {
     if (window.confirm(`Supprimer le livre "${book?.title}" ?\n\nCette action est irréversible.`)) {
       deleteBook(id);
-      router.push('/livres'); // Retour à la liste
+      router.push('/livres');
     }
   };
 
-  // Actions simplifiées (pas d'async)
+  // Actions simplifiées
   const handleAddRecipeToBook = (bookId: string, recipeId: string) => {
     addRecipeToBook(bookId, recipeId);
   };
@@ -245,27 +105,79 @@ export default function BookPage() {
     }
   };
 
-  // Génération PDF aperçu avec import dynamique et débogage complet
+  // FONCTION D'UPLOAD pour les images de couverture
+  const handleCoverImageUpload = async (file: File) => {
+    setIsUploadingCover(true);
+    
+    try {
+      console.log('📤 Upload image de couverture...', file.name);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Upload couverture réussi:', result);
+      
+      if (result.success) {
+        setCoverImageUrl(result.originalUrl);
+        setCoverImageVersions(result.versions || null);
+        showToast('Image de couverture uploadée !', 'success');
+      } else {
+        throw new Error(result.message || 'Erreur upload');
+      }
+      
+    } catch (error: any) {
+      console.error('💥 Erreur upload couverture:', error);
+      showToast('Erreur lors de l\'upload de l\'image', 'error');
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  // Génération PDF
   const generatePreviewPDF = async () => {
+    console.log('🚀 generatePreviewPDF appelée !');
     if (!book) return;
 
     setIsGeneratingPreview(true);
     try {
+    console.log('📚 Livre trouvé:', book.title);
+    console.log('📖 Recettes du livre:', bookRecipes.length);
       const pdfLib = await import('pdf-lib');
+      console.log('✅ pdf-lib importé');
       const { PDFDocument, rgb, StandardFonts } = pdfLib;
 
-      // --- Helpers locaux ---
-      const A4 = { w: 595.28, h: 841.89 }; // points
-      const margin = 36; // 0.5 inch
+      const printableRecipes = bookRecipes.filter(recipe => !recipe.isFromExternalUrl);
+      console.log('🖨️ Recettes imprimables:', printableRecipes.length);
+      console.log('🔍 Détail recettes:', bookRecipes.map(r => ({ 
+          title: r.title, 
+          isExternal: r.isFromExternalUrl 
+        })));
 
-      const mm = (x: number) => x * 2.83465;
+      if (printableRecipes.length === 0) {
+        console.log('❌ Aucune recette imprimable');
+        showToast('Aucune recette imprimable dans ce livre', 'error');
+        return;
+      }
+      console.log('🎯 Création du PDF...');
 
-      const wrapText = (
-        text: string,
-        font: any,
-        size: number,
-        maxWidth: number
-      ): string[] => {
+      // Constantes
+      const A4 = { w: 595.28, h: 841.89 };
+      const margin = 60;
+      console.log('📐 Constantes définies');
+
+      // Fonctions helpers
+      const wrapText = (text: string, font: any, size: number, maxWidth: number): string[] => {
         if (!text) return [];
         const words = text.split(/\s+/);
         const lines: string[] = [];
@@ -284,17 +196,7 @@ export default function BookPage() {
         return lines;
       };
 
-      const drawParagraph = (
-        page: any,
-        text: string,
-        x: number,
-        y: number,
-        font: any,
-        size: number,
-        color: any,
-        maxWidth: number,
-        lineGap = 4
-      ) => {
+      const drawParagraph = (page: any, text: string, x: number, y: number, font: any, size: number, color: any, maxWidth: number, lineGap = 4) => {
         const lines = wrapText(text, font, size, maxWidth);
         let cursorY = y;
         for (const line of lines) {
@@ -317,31 +219,18 @@ export default function BookPage() {
         }
       };
 
-      const drawImageFitted = async (
-        pdfDoc: any,
-        page: any,
-        url: string | undefined,
-        x: number,
-        y: number,
-        boxW: number,
-        boxH: number
-      ) => {
+      const drawImageFitted = async (pdfDoc: any, page: any, url: string | undefined, x: number, y: number, boxW: number, boxH: number) => {
         const bytes = await fetchImageBytes(url);
         if (!bytes) {
-          // placeholder si pas d'image
           page.drawRectangle({
-            x, y,
-            width: boxW,
-            height: boxH,
+            x, y, width: boxW, height: boxH,
             color: rgb(0.95, 0.94, 0.92),
             borderColor: rgb(0.8, 0.8, 0.8),
             borderWidth: 1
           });
           page.drawText('Image indisponible', {
-            x: x + 12,
-            y: y + boxH / 2 - 6,
-            size: 12,
-            color: rgb(0.4, 0.35, 0.3)
+            x: x + 12, y: y + boxH / 2 - 6,
+            size: 12, color: rgb(0.4, 0.35, 0.3)
           });
           return;
         }
@@ -359,232 +248,170 @@ export default function BookPage() {
         page.drawImage(img, { x: cx, y: cy, width: w, height: h });
       };
 
-      // --- Création du doc + polices ---
+      // Création du PDF
       const pdfDoc = await PDFDocument.create();
-      const fontTitle = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
-      const fontBody = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+      console.log('📄 PDFDocument créé');
+      const fontTitle = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const fontBody = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      console.log('🔤 Polices intégrées');
       const colorTitle = rgb(0.2, 0.1, 0.05);
-      const colorBody = rgb(0.25, 0.2, 0.17);
+      const colorBody = rgb(0.3, 0.3, 0.3);
 
-      // --- 1) Couverture améliorée ---
+        // 1) Page de couverture
       const cover = pdfDoc.addPage([A4.w, A4.h]);
+      console.log('✅ Page de couverture créée');
 
-      // 📝 ZONE TITRE (1/3 supérieur) - Élégante
-      const titleZoneHeight = A4.h / 3;
-
-      // Fond titre élégant
       cover.drawRectangle({
-        x: 0, y: A4.h - titleZoneHeight,
-        width: A4.w, height: titleZoneHeight,
-        color: rgb(0.95, 0.94, 0.90) // Beige doux
+        x: 0, y: 0, width: A4.w, height: A4.h,
+        color: rgb(0.98, 0.97, 0.95)
       });
 
-      // Ligne séparatrice subtile
-      cover.drawRectangle({
-        x: 0, y: A4.h - titleZoneHeight,
-        width: A4.w, height: 2,
-        color: rgb(0.85, 0.82, 0.76) // Ligne dorée
-      });
-
-      // TITRE PRINCIPAL - Centré et lisible
-      const titleLines = wrapText(book.title, fontTitle, 32, A4.w - 80);
-      let titleY = A4.h - 60;
-
+      // Titre du livre (descendu)
+      const titleLines = wrapText(book.title, fontTitle, 28, A4.w - 200);
+      let titleY = A4.h - 250;
       titleLines.forEach(line => {
-        const textWidth = fontTitle.widthOfTextAtSize(line, 32);
+        const textWidth = fontTitle.widthOfTextAtSize(line, 28);
         cover.drawText(line, {
-          x: (A4.w - textWidth) / 2, // Centré
+          x: (A4.w - textWidth) / 2,
           y: titleY,
-          size: 32,
+          size: 28,
           font: fontTitle,
-          color: rgb(0.15, 0.10, 0.05) // Brun élégant
+          color: colorTitle
         });
-        titleY -= 40;
+        titleY -= 35;
       });
 
-      // SOUS-TITRE stylé
-      cover.drawText('Carnet de recettes familiales', {
-        x: 40, y: A4.h - titleZoneHeight + 80,
-        size: 16, font: fontBody,
-        color: rgb(0.4, 0.35, 0.30)
-      });
-
-      // NOMBRE DE RECETTES
-      cover.drawText(`${bookRecipes.length} recettes de famille`, {
-        x: 40, y: A4.h - titleZoneHeight + 50,
-        size: 14, font: fontBody,
-        color: rgb(0.5, 0.45, 0.40)
-      });
-
-      // 📸 ZONE PHOTO (2/3 inférieur) - PLEINE LARGEUR
-      const photoHeight = (A4.h * 2) / 3;
-      await drawImageFitted(
-        pdfDoc, cover, 
-        book.coverImageUrl,
-        0, 0,  // Pas de marge = pleine largeur
-        A4.w, photoHeight       // Toute la largeur
-      );
-
-      // --- 2) Sommaire ---
-      const toc = pdfDoc.addPage([A4.w, A4.h]);
-      toc.drawText('Sommaire', {
-        x: margin,
-        y: A4.h - margin - 20,
-        size: 22,
-        font: fontTitle,
-        color: colorTitle
-      });
-      let yToc = A4.h - margin - 60;
-      bookRecipes.forEach((r, i) => {
-        const line = `${(i + 1).toString().padStart(2, '0')}  ${r.title}`;
-        toc.drawText(line, {
-          x: margin,
-          y: yToc,
-          size: 12,
-          font: fontBody,
-          color: colorBody
-        });
-        yToc -= 18;
-        if (yToc < margin + 40) {
-          yToc = A4.h - margin - 20;
-        }
-      });
-
-      // --- 3) Pages par recette : 2 pages (photo + contenu) ---
-      for (const recipe of bookRecipes) {
-        // 3.1) Page Photo
-        const pPhoto = pdfDoc.addPage([A4.w, A4.h]);
-        pPhoto.drawRectangle({
-          x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
-        });
-        await drawImageFitted(
-          pdfDoc,
-          pPhoto,
-          recipe.imageUrl,
-          margin,
-          margin + mm(20),
-          A4.w - margin * 2,
-          A4.h - margin * 2 - mm(40)
-        );
-        // bandeau titre bas
-        pPhoto.drawRectangle({
-          x: 0, y: margin, width: A4.w, height: mm(18),
-          color: rgb(0.18, 0.10, 0.06)
-        });
-        pPhoto.drawText(recipe.title, {
-          x: margin,
-          y: margin + 6,
-          size: 14,
-          font: fontTitle,
-          color: rgb(1, 1, 1)
-        });
-        if (recipe.author) {
-          pPhoto.drawText(`par ${recipe.author}`, {
-            x: margin + 240,
-            y: margin + 6,
-            size: 12,
-            font: fontBody,
-            color: rgb(1, 1, 1)
+      
+      // Image de couverture centrée (si présente)
+      if (imageUrlToDisplay) {
+        const imageSize = 320;
+        const imageX = (A4.w - imageSize) / 2; // Centré horizontalement
+        const imageY = titleY - 50 - imageSize;
+        
+        await drawImageFitted(pdfDoc, cover, imageUrlToDisplay, imageX, imageY, imageSize, imageSize);
+        
+       // Description en italique centrée sous l'image (si présente)
+        if (book.description) {
+          const fontItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
+          // Centrer la description
+          const descriptionLines = wrapText(book.description, fontItalic, 14, A4.w - 120);
+          let descY = titleY - 110 - imageSize;
+          descriptionLines.forEach(line => {
+            const lineWidth = fontItalic.widthOfTextAtSize(line, 12);
+            cover.drawText(line, {
+              x: (A4.w - lineWidth) / 2, // Centré
+              y: descY,
+              size: 14,
+              font: fontItalic,
+              color: colorBody
+            });
+            descY -= 16;
           });
         }
-
-        // 3.2) Page Contenu
-        const pCont = pdfDoc.addPage([A4.w, A4.h]);
-        pCont.drawRectangle({
-          x: 0, y: 0, width: A4.w, height: A4.h, color: rgb(0.996, 0.988, 0.972)
+      }
+      // 2) Pages des recettes
+      for (const recipe of printableRecipes) {
+        const page = pdfDoc.addPage([A4.w, A4.h]);
+        
+        page.drawRectangle({
+          x: 0, y: 0, width: A4.w, height: A4.h,
+          color: rgb(0.99, 0.98, 0.96)
         });
 
-        // Header
-        pCont.drawText(recipe.title, {
-          x: margin,
-          y: A4.h - margin - 24,
-          size: 18,
-          font: fontTitle,
-          color: colorTitle
-        });
-        const meta = `${recipe.prepMinutes || 30} min • ${recipe.servings || '4'} pers.`;
-        pCont.drawText(meta, {
-          x: margin,
-          y: A4.h - margin - 42,
-          size: 12,
-          font: fontBody,
-          color: colorBody
+        let currentY = A4.h - margin;
+
+        // Titre de la recette
+        const titleLines = wrapText(recipe.title, fontTitle, 20, A4.w - 80);
+        titleLines.forEach(line => {
+          page.drawText(line, {
+            x: margin, y: currentY,
+            size: 20, font: fontTitle, color: colorTitle
+          });
+          currentY -= 25;
         });
 
-        // Colonnes
-        const colGap = 18;
-        const colW = (A4.w - margin * 2 - colGap) / 2;
-        let yLeft = A4.h - margin - 70;
-        let yRight = A4.h - margin - 70;
+        // Métadonnées
+        const metaText = [
+          recipe.author ? `par ${recipe.author}` : '',
+          recipe.prepMinutes ? `${recipe.prepMinutes} min` : '',
+          recipe.servings ? `${recipe.servings} pers.` : ''
+        ].filter(Boolean).join(' • ');
 
-        // Ingrédients (gauche)
-        pCont.drawText('Ingrédients', {
-          x: margin,
-          y: yLeft,
-          size: 14,
-          font: fontTitle,
-          color: colorTitle
-        });
-        yLeft -= 18;
-
-        const ingredients: string[] = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-        for (const ing of ingredients) {
-          // puce
-          pCont.drawCircle({ x: margin + 3, y: yLeft + 4, size: 1.5, color: colorBody });
-          yLeft = drawParagraph(pCont, ing, margin + 10, yLeft, fontBody, 11, colorBody, colW - 12, 3) - 6;
-          if (yLeft < margin + 40) break;
+        if (metaText) {
+          page.drawText(metaText, {
+            x: margin, y: currentY,
+            size: 11, font: fontBody, color: colorBody
+          });
+          currentY -= 25;
         }
 
-        // Préparation (droite)
-        pCont.drawText('Préparation', {
-          x: margin + colW + colGap,
-          y: yRight,
-          size: 14,
-          font: fontTitle,
-          color: colorTitle
-        });
-        yRight -= 18;
+        // Layout en 2 colonnes
+        const colWidth = (A4.w - margin * 3) / 2;
+        const colGap = margin;
+        const leftX = margin;
+        const rightX = margin + colWidth + colGap;
 
-        const steps: string[] =
-          typeof recipe.steps === 'string'
-            ? recipe.steps.split('\n\n').filter(s => s.trim())
-            : Array.isArray(recipe.steps)
-            ? recipe.steps
-            : [];
+        // Colonne de gauche : image + ingrédients
+        let leftY = currentY;
+
+        if (recipe.imageUrl) {
+          const imageSize = 180;
+          await drawImageFitted(pdfDoc, page, recipe.imageUrl, leftX, leftY - imageSize, colWidth, imageSize);
+          leftY -= imageSize + 25;
+        }
+
+        page.drawText('Ingrédients', {
+          x: leftX, y: leftY,
+          size: 16, font: fontTitle, color: colorTitle
+        });
+        leftY -= 20;
+
+        const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+        for (const ingredient of ingredients) {
+          if (leftY < margin + 40) break;
+          
+          page.drawCircle({ 
+            x: leftX + 4, y: leftY + 4, 
+            size: 1.5, color: colorBody 
+          });
+          
+          leftY = drawParagraph(page, ingredient, leftX + 12, leftY, fontBody, 12, colorBody, colWidth - 12, 2) - 4;
+        }
+
+        // Colonne de droite : préparation
+        let rightY = currentY;
+
+        page.drawText('Préparation', {
+          x: rightX, y: rightY,
+          size: 16, font: fontTitle, color: colorTitle
+        });
+        rightY -= 20;
+
+        const steps = typeof recipe.steps === 'string'
+          ? recipe.steps.split('\n\n').filter(s => s.trim())
+          : Array.isArray(recipe.steps) ? recipe.steps : [];
 
         steps.forEach((step, idx) => {
-          const prefix = `${idx + 1}. `;
-          const prefixWidth = fontBody.widthOfTextAtSize(prefix, 11);
-          // numéro
-          pCont.drawText(prefix, {
-            x: margin + colW + colGap,
-            y: yRight,
-            size: 11,
-            font: fontBody,
-            color: colorBody
-          });
-          // texte wrap
-          yRight = drawParagraph(
-            pCont,
-            step,
-            margin + colW + colGap + prefixWidth,
-            yRight,
-            fontBody,
-            11,
-            colorBody,
-            colW - prefixWidth - 6,
-            3
-          ) - 4;
-          if (yRight < margin + 40) return;
+          if (rightY < margin + 40) return;
+
+          const stepNum = `${idx + 1}. `;
+          const stepNumWidth = fontBody.widthOfTextAtSize(stepNum, 10);
+
+          rightY = drawParagraph(page, step, rightX, rightY, fontBody, 12, colorBody, colWidth, 2) - 12;
         });
       }
-
-      // --- Export ---
+      console.log('💾 Génération des bytes PDF...');
+      // Export du PDF
       const pdfBytes = await pdfDoc.save();
+      console.log('✅ PDF bytes généré, taille:', pdfBytes.length);
       const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
+      console.log('🔗 URL blob créée:', url);
       setPdfUrl(url);
-      setShowPDFModal(true);
+      setTimeout(() => setShowPDFModal(true), 100);
+      console.log('🔍 showPDFModal state:', showPDFModal);
+      console.log('🔍 pdfUrl state:', pdfUrl);
+
     } catch (error) {
       console.error('PDF error', error);
       showToast('Erreur lors de la génération du PDF', 'error');
@@ -640,94 +467,88 @@ export default function BookPage() {
       <div className="max-w-6xl mx-auto pt-8 px-8">
         
         {/* En-tête avec titre éditable */}
-<div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 md:mb-8">
-  <div className="flex items-center gap-4 w-full sm:w-auto">
-    <button
-      onClick={() => router.back()}
-      className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 text-sm md:text-base"
-    >
-      <ArrowLeft className="w-4 h-4" />
-      <span className="hidden sm:inline">Retour</span>
-    </button>
-    
-    <div className="flex-1">
-      {editingTitle ? (
-        <div className="flex items-center gap-3">
-          <input
-            type="text"
-            value={tempTitle}
-            onChange={(e) => setTempTitle(e.target.value)}
-            className="text-lg md:text-xl font-semibold text-gray-800 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
-            autoFocus
-          />
-          <button
-            onClick={() => {
-              if (tempTitle.trim()) {
-                updateBook(book.id, { title: tempTitle.trim() });
-              }
-              setEditingTitle(false);
-            }}
-            disabled={!tempTitle.trim()}
-            className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
-          >
-            ✓
-          </button>
-          <button
-            onClick={() => setEditingTitle(false)}
-            className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded text-sm hover:bg-gray-200"
-          >
-            ✕
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
-          <button
-            onClick={() => {
-              setTempTitle(book.title);
-              setEditingTitle(true);
-            }}
-            className="text-gray-400 hover:text-gray-600 p-1"
-          >
-            <Edit3 className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-      <p className="text-sm text-gray-600">
-        {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
-      </p>
-    </div>
-  </div>
-  
-  <div className="flex items-center gap-4">
-    {/* Bouton aperçu PDF */}
-    <button
-      onClick={generatePreviewPDF}
-      disabled={isGeneratingPreview}
-      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-    >
-      {isGeneratingPreview ? (
-        <>
-          <Loader className="w-4 h-4 animate-spin" />
-          Génération...
-        </>
-      ) : (
-        <>
-          <Eye className="w-4 h-4" />
-          Aperçu
-        </>
-      )}
-    </button>
+        <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 md:mb-8">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <button
+              onClick={() => router.back()}
+              className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 text-sm md:text-base"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Retour</span>
+            </button>
+            
+            <div className="flex-1">
+              {editingTitle ? (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={tempTitle}
+                    onChange={(e) => setTempTitle(e.target.value)}
+                    className="text-lg md:text-xl font-semibold text-gray-800 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
+                    autoFocus
+                  />
+                  <button
+                    onClick={saveTitle}
+                    disabled={!tempTitle.trim()}
+                    className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    onClick={() => setEditingTitle(false)}
+                    className="bg-gray-100 text-gray-700 px-2 md:px-3 py-1 rounded text-sm hover:bg-gray-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
+                  <button
+                    onClick={() => {
+                      setTempTitle(book.title);
+                      setEditingTitle(true);
+                    }}
+                    className="text-gray-400 hover:text-gray-600 p-1"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              <p className="text-sm text-gray-600">
+                {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <button
+              onClick={generatePreviewPDF}
+              disabled={isGeneratingPreview}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+            >
+              {isGeneratingPreview ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  Aperçu
+                </>
+              )}
+            </button>
 
-    <button
-      onClick={handleDeleteBook}
-      className="inline-flex bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
-    >
-      <Trash2 className="w-4 h-6" />
-       Supprimer
-    </button>
-  </div>
-</div>
+            <button
+              onClick={handleDeleteBook}
+              className="inline-flex bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
+            >
+              <Trash2 className="w-4 h-6" />
+              Supprimer
+            </button>
+          </div>
+        </div>
 
         <div className="space-y-6">
           
@@ -773,7 +594,7 @@ export default function BookPage() {
             )}
           </div>
 
-          {/* 🆕 Photo de couverture */}
+          {/* Photo de couverture */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">📸 Photo de couverture</h2>
@@ -784,13 +605,29 @@ export default function BookPage() {
                 <Edit3 className="w-4 h-4" />
               </button>
             </div>
-            
+
             {editingCover ? (
               <div className="space-y-4">
+                {/* Aperçu immédiat en mode édition */}
+                {imageUrlToDisplay && (
+                  <div className="relative mb-4 mx-auto w-48 h-64 border rounded-lg shadow-md">
+                    <img 
+                      src={imageUrlToDisplay}
+                      alt="Nouvelle couverture" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    
+                    {coverImageVersions && (
+                      <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                        Uploadé !
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 {/* Upload + Unsplash */}
                 <div className="flex flex-wrap gap-3">
-                  {/* Upload photo personnelle */}
-               <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
+                  <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
                     isUploadingCover 
                       ? 'bg-blue-100 text-blue-700 cursor-wait' 
                       : 'bg-green-100 text-green-700 hover:bg-green-200'
@@ -817,16 +654,14 @@ export default function BookPage() {
                     )}
                   </label>
 
-                  {/* Recherche Unsplash */}
                   <ImageSearch 
                     onImageSelect={(url) => {
                       setCoverImageUrl(url);
-                      updateBook(book.id, { coverImageUrl: url });
+                      setEditingCover(false);
                     }}
                     initialQuery={`${book.title} family cooking`}
                   />
                   
-                  {/* URL manuelle */}
                   <input
                     type="url"
                     value={coverImageUrl}
@@ -836,16 +671,20 @@ export default function BookPage() {
                   />
                 </div>
                 
-               <div className="flex gap-2">
+                <div className="flex gap-2">
                   <button
                     onClick={() => {
-                      updateBook(book.id, { coverImageUrl });
+                      updateBook(book.id, { 
+                        coverImageUrl: coverImageUrl,
+                        coverImageVersions: coverImageVersions
+                      });
                       setEditingCover(false);
+                      router.refresh();
                     }}
-                    disabled={isUploadingCover}
+                    disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
-                    {isUploadingCover ? 'Upload...' : 'Sauvegarder'}
+                    Sauvegarder la couverture
                   </button>
                   <button
                     onClick={() => setEditingCover(false)}
@@ -857,17 +696,18 @@ export default function BookPage() {
               </div>
             ) : (
               <div>
-                {coverImageUrl ? (
+                {imageUrlToDisplay ? (
                   <div className="relative">
                     <img 
-                      src={coverImageUrl} 
+                      src={imageUrlToDisplay} 
                       alt="Couverture" 
                       className="w-full max-w-sm h-64 object-cover rounded-lg border"
                     />
                     <button
                       onClick={() => {
                         setCoverImageUrl("");
-                        updateBook(book.id, { coverImageUrl: "" });
+                        setCoverImageVersions(null);
+                        updateBook(book.id, { coverImageUrl: "", coverImageVersions: null });
                       }}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
                     >
@@ -1003,8 +843,22 @@ export default function BookPage() {
                       <div className="flex-1">
                         <h5 className="font-medium text-gray-900 truncate">{recipe.title}</h5>
                         <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
+                        {recipe.isFromExternalUrl && (
+                          <div className="mt-1 text-xs text-red-600 font-medium">
+                            ⚠️ Non autorisée pour impression (source externe)
+                          </div>
+                        )}
                       </div>
-                      <Plus className="w-4 h-4 text-gray-400 self-center" />
+                      
+                      {recipe.isFromExternalUrl ? (
+                        <div className="self-center text-red-400">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.366zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <Plus className="w-4 h-4 text-gray-400 self-center" />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1016,49 +870,65 @@ export default function BookPage() {
       </div>
 
       {/* Modale PDF plein écran */}
-      {showPDFModal && pdfUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+        {showPDFModal && pdfUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-[9999] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-full flex flex-col shadow-2xl">
             
             {/* Header de la modale */}
-            <div className="bg-gray-100 px-6 py-4 border-b flex items-center justify-between rounded-t-lg">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-800">Aperçu : {book.title}</h2>
-                <p className="text-sm text-gray-600">{bookRecipes.length} recettes</p>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={downloadPDF}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Télécharger
-                </button>
-                
-                <button
-                  onClick={closePDFModal}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2"
-                >
-                  <X className="w-4 h-4" />
-                  Fermer
-                </button>
-              </div>
-            </div>
+            <div className="bg-gray-100 px-6 py-4 border-b flex items-start justify-between rounded-t-lg">
+        <div className="flex-1">
+          <h2 className="text-xl font-semibold text-gray-800">Aperçu : {book.title}</h2>
+          <p className="text-sm text-gray-600">{bookRecipes.length} recettes</p>
+        </div>
+        
+        <button
+          onClick={closePDFModal}
+          className="bg-gray-600 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-700 transition-colors ml-4"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
 
-            {/* Viewer PDF */}
-            <div className="flex-1 bg-gray-50">
-              <iframe
-                src={pdfUrl}
-                width="100%"
-                height="100%"
-                title="Aperçu PDF"
-                className="border-0 rounded-b-lg"
-              />
-            </div>
+      {/* Viewer PDF */}
+      <div className="incol-flex-1 bg-gray-50 p-6 flex flex-col">
+        <iframe
+          src={pdfUrl}
+          width="100%"
+          height="100%"
+          title="Aperçu PDF"
+          className="border-0 rounded-lg flex-1"
+        />
+
+        {/* Bouton de téléchargement large en bas */}
+        <div className="-mt-100">
+          <button
+            onClick={downloadPDF}
+            className="w-full bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center gap-3"
+          >
+            <Download className="w-10 h-10" />
+            🚀 Soon : Imprimer le livre (en attendant → Générez un PDF)
+          </button>
+        </div>
+
+        
+        
+        {/* Fallback si l'iframe ne fonctionne pas */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 opacity-0 hover:opacity-100 transition-opacity">
+          <div className="text-center p-4 bg-white rounded-lg shadow-lg">
+            <p className="text-sm text-gray-600 mb-3">Aperçu non disponible en local</p>
+            <button
+              onClick={downloadPDF}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 mx-auto"
+            >
+              <Download className="w-4 h-4" />
+              Télécharger le PDF
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

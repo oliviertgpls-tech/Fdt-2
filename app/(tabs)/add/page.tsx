@@ -526,6 +526,8 @@ const handleScanUpload = async (file: File) => {
         // 🆕 NOUVEAU : stocker les versions optimisées
         imageUrl: imageUrl.trim() || undefined,
         imageVersions: imageVersions || undefined,
+        isFromExternalUrl: true, // 🆕 MARQUEUR pour recettes externes
+        sourceUrl: linkUrl.trim(), // 🆕 Optionnel : garder l'URL source
         ingredients: ingredients
           .split('\n')
           .map(line => line.trim())
