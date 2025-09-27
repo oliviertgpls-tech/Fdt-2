@@ -12,12 +12,12 @@ declare global {
 let prisma: PrismaClient
 
 if (process.env.NODE_ENV === 'production') {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  const pool = new Pool({ connectionString: process.env.POSTGRES_PRISMA_URL })  // ✅ CHANGÉ
   const adapter = new PrismaNeon(pool)
   prisma = new PrismaClient({ adapter })
 } else {
   if (!global.prisma) {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+    const pool = new Pool({ connectionString: process.env.POSTGRES_PRISMA_URL })  // ✅ CHANGÉ
     const adapter = new PrismaNeon(pool)
     global.prisma = new PrismaClient({ adapter })
   }
