@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 
 // POST /api/notebooks/[id]/recipes - Ajouter une recette à un carnet
 export async function POST(

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/prisma'
 
 // PUT /api/notebooks/[id] - Mettre à jour un carnet
 export async function PUT(

@@ -773,7 +773,7 @@ export default function BookPage() {
                     <div className="flex gap-3 md:gap-4">
                       <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                         <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">
-                          {6 + (index * 2)}-{7 + (index * 2)}
+                          {4 + index}
                         </span>
                         <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
                           <GripVertical className="w-4 h-4 text-gray-500" />
@@ -790,7 +790,7 @@ export default function BookPage() {
                         <h4 className="font-medium text-gray-900">{recipe.title}</h4>
                         <p className="text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Double page • ⏱️ {recipe.prepMinutes || 30}min
+                          1 page • ⏱️ {recipe.prepMinutes || 30}min
                         </p>
                       </div>
                       
