@@ -4,13 +4,13 @@ import { neon, neonConfig } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 
 declare global {
-  // Hot reload fix for Next.js
+  // Hot reload fix for Next.js (évite de recréer le client à chaque refresh en dev)
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined
 }
 
-// Required for Prisma + Neon
-neonConfig.poolQueryViaSocket = true
+// ✅ Utiliser fetch comme transport pour Neon (compatible avec Prisma adapter)
+neonConfig.poolQueryViaFetch = true
 
 let prisma: PrismaClient
 
