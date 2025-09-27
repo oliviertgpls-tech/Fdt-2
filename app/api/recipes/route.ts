@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         servings: body.servings,
         tags: body.tags || [],
         userId: user.id,
-        isFromExternalUrl: body.isFromExternalUrl || false,
+        // isFromExternalUrl: body.isFromExternalUrl || false,
       }
     })
     
