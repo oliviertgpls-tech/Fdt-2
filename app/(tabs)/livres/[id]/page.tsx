@@ -890,7 +890,7 @@ export default function BookPage() {
         />
 
         {/* Bouton de téléchargement large en bas */}
-        <div className="-mt-100">
+        <div className="mb-10">
           <button
             onClick={downloadPDF}
             className="w-full bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center gap-3"
