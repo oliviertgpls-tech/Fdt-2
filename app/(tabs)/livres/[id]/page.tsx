@@ -899,22 +899,6 @@ export default function BookPage() {
             🚀 Soon : Imprimer le livre (en attendant → Générez un PDF)
           </button>
         </div>
-
-        
-        
-        {/* Fallback si l'iframe ne fonctionne pas */}
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 opacity-0 hover:opacity-100 transition-opacity">
-          <div className="text-center p-4 bg-white rounded-lg shadow-lg">
-            <p className="text-sm text-gray-600 mb-3">Aperçu non disponible en local</p>
-            <button
-              onClick={downloadPDF}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2 mx-auto"
-            >
-              <Download className="w-4 h-4" />
-              Télécharger le PDF
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
