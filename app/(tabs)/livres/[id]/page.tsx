@@ -516,7 +516,7 @@ export default function BookPage() {
                 </div>
               )}
               <p className="text-sm text-gray-600">
-                {bookRecipes.length} recettes • {pageCount} pages • ≈ {estimatedPrice.toFixed(2)}€
+                {bookRecipes.length} recettes • {pageCount/2} pages • ≈ {estimatedPrice.toFixed(2)}€
               </p>
             </div>
           </div>
@@ -880,7 +880,7 @@ export default function BookPage() {
       </div>
 
       {/* Viewer PDF */}
-      <div className="incol-flex-1 bg-gray-50 p-6 flex flex-col">
+      <div className="flex-1 bg-gray-50 p-6 flex flex-col">
         <iframe
           src={pdfUrl}
           width="100%"
@@ -890,13 +890,13 @@ export default function BookPage() {
         />
 
         {/* Bouton de téléchargement large en bas */}
-        <div className="mb-10">
+        <div className="m-10">
           <button
             onClick={downloadPDF}
             className="w-full bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center gap-3"
           >
             <Download className="w-10 h-10" />
-            🚀 Soon : Imprimer le livre (en attendant → Générez un PDF)
+            🚀 Soon : Impression du livre ! En attendant → Téléchargez le PDF
           </button>
         </div>
       </div>
