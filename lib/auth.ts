@@ -23,10 +23,7 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      console.log('🎯 SIGNIN CALLBACK', { user, account, profile })
-      return true
-    },
+    // ✅ CALLBACK CORRECT pour Database Sessions (avec PrismaAdapter)
     async session({ session, user }) {
       console.log('🔵 SESSION CALLBACK', { session, user })
       if (session?.user) {
