@@ -4,7 +4,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma), // 🔥 LA LIGNE MAGIQUE
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,17 +15,12 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   callbacks: {
-    session: async ({ session, token }) => {
-      if (session?.user && token?.sub) {
-        session.user.id = token.sub
+    // 🎯 SIMPLIFIÉ : avec l'adapter, on récupère l'user.id depuis la session database
+    session: async ({ session, user }) => {
+      if (session?.user) {
+        session.user.id = user.id
       }
       return session
-    },
-    jwt: async ({ user, token }) => {
-      if (user) {
-        token.sub = user.id
-      }
-      return token
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
