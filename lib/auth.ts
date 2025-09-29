@@ -24,8 +24,22 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
+    // 🔥 AJOUT : Gérer la redirection après connexion
+    async redirect({ url, baseUrl }) {
+      console.log('🔀 REDIRECT:', { url, baseUrl })
+      
+      // Si l'URL est relative, la préfixer avec baseUrl
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      // Si l'URL est sur le même domaine, l'utiliser
+      else if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      // Sinon, rediriger vers /recipes par défaut
+      return `${baseUrl}/recipes`
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  // 🔥 CRITIQUE : Désactiver le debug en production
   debug: false,
 }
