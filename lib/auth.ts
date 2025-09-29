@@ -15,12 +15,25 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   callbacks: {
-    // 🎯 SIMPLIFIÉ : avec l'adapter, on récupère l'user.id depuis la session database
     session: async ({ session, user }) => {
+      console.log('🔵 SESSION CALLBACK:', { session, user })
       if (session?.user) {
         session.user.id = user.id
       }
       return session
+    },
+  },
+  // 🔥 ACTIVATION DEBUG
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error('❌ NextAuth ERROR:', code, metadata)
+    },
+    warn(code) {
+      console.warn('⚠️ NextAuth WARN:', code)
+    },
+    debug(code, metadata) {
+      console.log('🐛 NextAuth DEBUG:', code, metadata)
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
