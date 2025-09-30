@@ -533,7 +533,7 @@ const handleScanUpload = async (file: File) => {
           .map(line => line.trim())
           .filter(line => line !== ""),
         steps: steps.trim(),
-        isFromExternalUrl: true, // 🆕 MARQUEUR pour recettes externes
+        isFromExternalUrl: isFromExternalUrl, // 🆕 MARQUEUR pour recettes externes
         sourceUrl: linkUrl.trim(), // 🆕 Optionnel : garder l'URL source
         updatedAt: Date.now()
       };
