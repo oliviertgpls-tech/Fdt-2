@@ -365,17 +365,10 @@ export default function RecipeDetailPage() {
           <div className="flex gap-3">
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="flex-1 bg-primary-100 text-orange-500 px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors font-medium text-center"
+              className="flex-1 bg-blue-100 text-blue-900 px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors font-medium text-center"
             >
-              ✏️ Modifier cette recette
+              ✏️ Modifier
             </Link>
-            
-            <button
-              onClick={handleAddToBook}
-              className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg hover:bg-orange-200 transition-colors font-medium flex items-center gap-2"
-            >
-              📚 Ajouter à un livre
-            </button>
             
             <button
               onClick={() => {
@@ -390,11 +383,7 @@ export default function RecipeDetailPage() {
             </button>
           </div>
           
-          <div className="text-center">
-            <p className="text-sm text-gray-500 mt-2">
-              Créez un beau livre de famille avec vos recettes préférées
-            </p>
-          </div>
+         
           
           <Link 
             href="/recipes" 
