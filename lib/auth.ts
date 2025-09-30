@@ -11,6 +11,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+  pages: {
+    signIn: '/auth/signin',  // 🔥 CETTE LIGNE MANQUAIT !
+  },
   session: {
     strategy: "database",
   },
@@ -21,20 +24,17 @@ export const authOptions: NextAuthOptions = {
         userEmail: user.email,
         provider: account?.provider
       })
-      return true // Autoriser la connexion
+      return true
     },
     async redirect({ url, baseUrl }) {
       console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
       
-      // Si URL relative, retourner avec baseUrl
       if (url.startsWith("/")) {
         return `${baseUrl}${url}`
       }
-      // Si même origine, retourner l'URL
       else if (new URL(url).origin === baseUrl) {
         return url
       }
-      // Sinon retourner baseUrl
       return baseUrl
     },
     async session({ session, user }) {
