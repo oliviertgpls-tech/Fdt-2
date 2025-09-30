@@ -11,35 +11,40 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
-  pages: {
-    signIn: '/auth/signin',
-  },
   session: {
     strategy: "database",
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log('🎯 SIGNIN CALLBACK:', {
+        userId: user.id,
+        userEmail: user.email,
+        provider: account?.provider
+      })
+      return true // Autoriser la connexion
+    },
+    async redirect({ url, baseUrl }) {
+      console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
+      
+      // Si URL relative, retourner avec baseUrl
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      // Si même origine, retourner l'URL
+      else if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      // Sinon retourner baseUrl
+      return baseUrl
+    },
     async session({ session, user }) {
+      console.log('🔵 SESSION CALLBACK')
       if (session?.user) {
         session.user.id = user.id
       }
       return session
     },
-    // 🔥 AJOUT : Gérer la redirection après connexion
-    async redirect({ url, baseUrl }) {
-      console.log('🔀 REDIRECT:', { url, baseUrl })
-      
-      // Si l'URL est relative, la préfixer avec baseUrl
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`
-      }
-      // Si l'URL est sur le même domaine, l'utiliser
-      else if (new URL(url).origin === baseUrl) {
-        return url
-      }
-      // Sinon, rediriger vers /recipes par défaut
-      return `${baseUrl}/recipes`
-    },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  debug: true,
 }
