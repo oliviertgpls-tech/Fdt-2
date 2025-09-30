@@ -6,6 +6,7 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import { OptimizedImage } from "@/components/OptimizedImage"; // 🆕 IMPORT
 import Link from "next/link";
 
+
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -172,7 +173,7 @@ export default function RecipeDetailPage() {
                 Navigation par étapes
               </h3>
               <p className="text-gray-600 text-sm">
-                Cette recette est divisée en étapes pour être plus facile à suivre. 
+                Les recettes sont structurées en étapes pour être plus facile à suivre. 
                 Un <strong>saut de ligne</strong> dans le texte = une nouvelle étape.
               </p>
               <button

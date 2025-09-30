@@ -357,7 +357,7 @@ Enfourner 25 minutes.
 Simple et naturel !"
             />
             <p className="text-xs text-gray-500 mt-1">
-              💡 Laissez une ligne vide entre chaque étape pour une navigation plus facile !
+              💡 Laissez une ligne vide entre chaque étape pour la création automatique d'étapes !
             </p>
           </div>
 

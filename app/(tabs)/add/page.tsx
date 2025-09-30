@@ -786,7 +786,7 @@ const handleScanUpload = async (file: File) => {
           
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
           
           {/* Mode 1 : Saisie manuelle */}
           <div 
@@ -794,7 +794,7 @@ const handleScanUpload = async (file: File) => {
             className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <div className="text-center space-y-3 md:space-y-4">
-              <div className="w-16 h-16 md:w16 md:h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-blue-200 transition-colors">
+              <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-blue-200 transition-colors">
                 <Edit3 className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
               </div>
               
@@ -854,7 +854,7 @@ const handleScanUpload = async (file: File) => {
               
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Depuis une photo d'un texte  {!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
+                  Depuis une photo de texte{!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
                   Photographiez une recette écrite à la main ou imprimée. Notre IA lit et structure automatiquement le texte.
@@ -1198,7 +1198,7 @@ const handleScanUpload = async (file: File) => {
             value={steps}
             onChange={(e) => setSteps(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Écrivez les étapes naturellement :
+            placeholder="Écrivez les étapes naturellement en laissant une ligne vide entre chacune  :
 
 Préchauffer le four à 180°C.
 
