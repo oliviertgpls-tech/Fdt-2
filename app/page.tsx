@@ -27,7 +27,7 @@ export default function HomePage() {
           <div className="space-y-10">
             {/* Badge */}
             <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
-              ✨ Les recettes sont votre histoire M. Soussan
+              ✨ Les recettes sont votre histoire
             </div>
             
             {/* Titre principal */}
