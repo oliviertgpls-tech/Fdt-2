@@ -45,6 +45,8 @@ export default function SignInPage() {
                 <Chrome className="w-5 h-5" />
                 Se connecter avec Google
               </button>
+              <br></br>
+              Connexion par email = Bientôt ! 
 
               <div className="mt-8 pt-6 border-t border-gray-100">
                 <div className="grid grid-cols-2 gap-4 text-center">

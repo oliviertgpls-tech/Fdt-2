@@ -770,8 +770,8 @@ export default function BookPage() {
                 {/* Recettes */}
                 {bookRecipes.map((recipe, index) => (
                   <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group">
-                    <div className="flex gap-3 md:gap-4">
-                      <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+                    <div className="inline-flex gap-3 md:gap-4">
+                      <div className="inline-flex items-center gap-1 md:gap-2 flex-shrink-0">
                         <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">
                           {4 + index}
                         </span>
@@ -786,22 +786,19 @@ export default function BookPage() {
                         className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
                       />
                       
-                      <div className="flex-1">
+                 
+                      
+                      
+                    </div>
+                         <div className="flex-1">
                         <h4 className="font-medium text-gray-900">{recipe.title}</h4>
                         <p className="text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          1 page • ⏱️ {recipe.prepMinutes || 30}min
+                        <p className="text-xs text-gray-500 mt-1">  1 page • ⏱️ {recipe.prepMinutes || 30}min
                         </p>
                       </div>
-                      
-                      <button
-                        onClick={() => handleRemoveRecipeFromBook(book.id, recipe.id)}
-                        className="opacity-50 group-hover:opacity-100 text-red-500 hover:text-red-700 p-1 hover:bg-red-100 rounded transition-all"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+  
                   </div>
+                  
                 ))}
               </div>
             )}
