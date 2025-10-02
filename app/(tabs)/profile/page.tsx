@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession, signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { User, Mail, Calendar, LogOut, Share2 } from "lucide-react"
 import { useRecipes } from "@/contexts/RecipesProvider"
@@ -21,16 +21,6 @@ export default function ProfilePage() {
     redirect("/auth/signin")
   }
 
-  const handleSignOut = async () => {
-    // Supprimer d'abord la session côté serveur
-    await fetch('/api/auth/signout', { method: 'POST' })
-    
-    // Puis rediriger vers la page de déconnexion NextAuth
-    window.location.href = '/api/auth/signout'
-  }
-}
-
-  // Calcul des vraies statistiques
   const recipeCount = recipes.length
   const notebookCount = notebooks.length
 
@@ -42,7 +32,6 @@ export default function ProfilePage() {
           <p className="text-gray-600">Gérez vos informations personnelles</p>
         </div>
 
-        {/* Card Profile */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center gap-2 mb-6">
             <User className="w-5 h-5" />
@@ -51,7 +40,6 @@ export default function ProfilePage() {
           
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              {/* Avatar */}
               <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
                 {session?.user?.image ? (
                   <img 
@@ -106,14 +94,13 @@ export default function ProfilePage() {
             </div>
 
             <div className="border-t pt-4 flex justify-end">
-              <button 
+              
                 href="/api/force-logout"
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Se déconnecter
-                </a>
-              </button>
+              </a>
             </div>
           </div>
         </div>
