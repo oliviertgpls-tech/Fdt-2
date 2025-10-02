@@ -21,8 +21,11 @@ export default function ProfilePage() {
     redirect("/auth/signin")
   }
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: "/" })
+  const handleSignOut = async () => {
+    await signOut({ 
+      callbackUrl: "/auth/signin",
+      redirect: true 
+    })
   }
 
   // Calcul des vraies statistiques

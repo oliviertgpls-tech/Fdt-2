@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-export const authOptions: NextAuthOptions = {
+eexport const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -12,37 +12,32 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/auth/signin',  // 🔥 CETTE LIGNE MANQUAIT !
+    signIn: '/auth/signin',
   },
   session: {
     strategy: "database",
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      console.log('🎯 SIGNIN CALLBACK:', {
-        userId: user.id,
-        userEmail: user.email,
-        provider: account?.provider
-      })
-      return true
-    },
-    async redirect({ url, baseUrl }) {
-      console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
-      
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`
-      }
-      else if (new URL(url).origin === baseUrl) {
-        return url
-      }
-      return baseUrl
-    },
     async session({ session, user }) {
-      console.log('🔵 SESSION CALLBACK')
-      if (session?.user) {
-        session.user.id = user.id
-      }
-      return session
+  console.log('🔵 SESSION CALLBACK:', {
+    sessionUserEmail: session?.user?.email,
+    dbUserEmail: user?.email,
+    dbUserId: user?.id
+  })
+  
+  // S'assurer que la session correspond bien au user en base
+  if (session?.user && user) {
+    session.user.id = user.id
+    session.user.email = user.email  // FORCER l'email de la BDD
+    session.user.name = user.name
+    session.user.image = user.image
+  }
+  return session
+},
+  },
+  events: {
+    async signOut({ session, token }) {
+      console.log('🚪 SIGNOUT EVENT:', { session, token })
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
