@@ -107,11 +107,12 @@ export default function ProfilePage() {
 
             <div className="border-t pt-4 flex justify-end">
               <button 
-                onClick={handleSignOut}
+                href="/api/force-logout"
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Se déconnecter
+                </a>
               </button>
             </div>
           </div>
