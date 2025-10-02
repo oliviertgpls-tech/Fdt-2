@@ -15,55 +15,29 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   session: {
-    strategy: "jwt",
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
   cookies: {
-  sessionToken: {
-    name: process.env.NODE_ENV === 'production' 
-      ? '__Secure-next-auth.session-token' 
-      : 'next-auth.session-token',
-    options: {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      secure: process.env.NODE_ENV === 'production',
-      domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
-    }
-  },
-},
-  callbacks: {
-    async signIn({ user, account, profile }) {
-      console.log('🎯 SIGNIN CALLBACK:', {
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name,
-        provider: account?.provider
-      })
-      return true
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' 
+        ? '__Secure-next-auth.session-token' 
+        : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
     },
-    //async redirect({ url, baseUrl }) {
-      //console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
-      
-      //if (url.startsWith("/")) {
-        //return `${baseUrl}${url}`
-      //}
-      //else if (new URL(url).origin === baseUrl) {
-        //return url
-      //}
-      //return baseUrl
-    //},
-      async session({ session, token }) {
-        console.log('🔵 SESSION JWT:', {
-          tokenSub: token.sub,
-          sessionEmail: session?.user?.email
-        })
-        
-        if (session?.user && token.sub) {
-          session.user.id = token.sub  // En JWT, l'ID est dans token.sub
-        }
-        
-        return session
-      },
+  },
+  callbacks: {
+    async session({ session, user }) {
+      if (session?.user) {
+        session.user.id = user.id
+      }
+      return session
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,

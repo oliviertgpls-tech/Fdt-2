@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(request: NextRequest) {  // ← Corrigé ici
+export async function GET(request: NextRequest) {  
   try {
     const session = await getServerSession(authOptions)
     
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {  // ← Corrigé ici
       })
     }
     
-    const response = NextResponse.redirect(new URL('/', request.url))  // ← Et ici (request minuscule)
+    const response = NextResponse.redirect(new URL('/', request.url))
     
     response.cookies.delete('next-auth.session-token')
     response.cookies.delete('__Secure-next-auth.session-token')
