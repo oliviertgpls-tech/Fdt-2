@@ -22,11 +22,13 @@ export default function ProfilePage() {
   }
 
   const handleSignOut = async () => {
-    await signOut({ 
-      callbackUrl: "/auth/signin",
-      redirect: true 
-    })
+    // Supprimer d'abord la session côté serveur
+    await fetch('/api/auth/signout', { method: 'POST' })
+    
+    // Puis rediriger vers la page de déconnexion NextAuth
+    window.location.href = '/api/auth/signout'
   }
+}
 
   // Calcul des vraies statistiques
   const recipeCount = recipes.length
