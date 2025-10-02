@@ -41,17 +41,17 @@ export const authOptions: NextAuthOptions = {
       })
       return true
     },
-    async redirect({ url, baseUrl }) {
-      console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
+    //async redirect({ url, baseUrl }) {
+      //console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
       
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`
-      }
-      else if (new URL(url).origin === baseUrl) {
-        return url
-      }
-      return baseUrl
-    },
+      //if (url.startsWith("/")) {
+        //return `${baseUrl}${url}`
+      //}
+      //else if (new URL(url).origin === baseUrl) {
+        //return url
+      //}
+      //return baseUrl
+    //},
       async session({ session, token }) {
         console.log('🔵 SESSION JWT:', {
           tokenSub: token.sub,
