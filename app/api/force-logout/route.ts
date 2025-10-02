@@ -16,7 +16,7 @@ export async function GET() {
     }
     
     // Créer une réponse de redirection
-    const response = NextResponse.redirect(new URL('/auth/signin', process.env.NEXTAUTH_URL || 'https://fdt-2.vercel.app'))
+    const response = NextResponse.redirect(new URL('/', request.url))  
     
     // Supprimer tous les cookies NextAuth
     response.cookies.delete('next-auth.session-token')
