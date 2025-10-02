@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-eexport const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -18,26 +18,43 @@ eexport const authOptions: NextAuthOptions = {
     strategy: "database",
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log('🎯 SIGNIN CALLBACK:', {
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.name,
+        provider: account?.provider
+      })
+      return true
+    },
+    async redirect({ url, baseUrl }) {
+      console.log('🔀 REDIRECT CALLBACK:', { url, baseUrl })
+      
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`
+      }
+      else if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      return baseUrl
+    },
     async session({ session, user }) {
-  console.log('🔵 SESSION CALLBACK:', {
-    sessionUserEmail: session?.user?.email,
-    dbUserEmail: user?.email,
-    dbUserId: user?.id
-  })
-  
-  // S'assurer que la session correspond bien au user en base
-  if (session?.user && user) {
-    session.user.id = user.id
-    session.user.email = user.email  // FORCER l'email de la BDD
-    session.user.name = user.name
-    session.user.image = user.image
-  }
-  return session
-},
-  },
-  events: {
-    async signOut({ session, token }) {
-      console.log('🚪 SIGNOUT EVENT:', { session, token })
+      console.log('🔵 SESSION CALLBACK DÉTAILS:', {
+        sessionEmail: session?.user?.email,
+        sessionName: session?.user?.name,
+        dbUserId: user?.id,
+        dbUserEmail: user?.email,
+        dbUserName: user?.name
+      })
+      
+      if (session?.user && user) {
+        session.user.id = user.id
+        session.user.email = user.email
+        session.user.name = user.name
+        session.user.image = user.image
+      }
+      
+      return session
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
