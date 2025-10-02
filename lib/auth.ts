@@ -4,7 +4,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  //adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
   cookies: {
   sessionToken: {
@@ -52,24 +52,18 @@ export const authOptions: NextAuthOptions = {
       }
       return baseUrl
     },
-    async session({ session, user }) {
-      console.log('🔵 SESSION CALLBACK DÉTAILS:', {
-        sessionEmail: session?.user?.email,
-        sessionName: session?.user?.name,
-        dbUserId: user?.id,
-        dbUserEmail: user?.email,
-        dbUserName: user?.name
-      })
-      
-      if (session?.user && user) {
-        session.user.id = user.id
-        session.user.email = user.email
-        session.user.name = user.name
-        session.user.image = user.image
-      }
-      
-      return session
-    },
+      async session({ session, token }) {
+        console.log('🔵 SESSION JWT:', {
+          tokenSub: token.sub,
+          sessionEmail: session?.user?.email
+        })
+        
+        if (session?.user && token.sub) {
+          session.user.id = token.sub  // En JWT, l'ID est dans token.sub
+        }
+        
+        return session
+      },
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,
