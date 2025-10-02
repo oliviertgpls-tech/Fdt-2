@@ -1,13 +1,18 @@
 'use client'
 
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { redirect } from "next/navigation"
 import { User, Mail, Calendar, LogOut, Share2 } from "lucide-react"
 import { useRecipes } from "@/contexts/RecipesProvider"
 
+
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const { recipes, notebooks, loading } = useRecipes()
+
+const handleLogout = async () => {
+  await signOut({ callbackUrl: '/', redirect: true })
+}
 
   if (status === "loading" || loading) {
     return (
@@ -95,12 +100,13 @@ export default function ProfilePage() {
 
             <div className="border-t pt-4 flex justify-end">
               
-                <a href="/api/force-logout"
+             <button
+                onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
+                >
                 <LogOut className="w-4 h-4" />
                 Se déconnecter
-                </a>
+            </button>
             </div>
           </div>
         </div>
