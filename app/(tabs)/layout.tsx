@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, SessionProvider } from "next-auth/react";
 import { RecipesProvider } from "@/contexts/RecipesProvider";
 import { ToastProvider } from '@/components/Toast';
 
@@ -100,8 +100,13 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
 
 export default function TabsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ProtectedContent>
-      {children}
-    </ProtectedContent>
-  );
-}
+      <SessionProvider 
+        refetchInterval={0}
+        refetchOnWindowFocus={false}
+      >
+        <ProtectedContent>
+          {children}
+        </ProtectedContent>
+      </SessionProvider>
+    );
+  }

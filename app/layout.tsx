@@ -14,9 +14,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-white text-gray-900">
-        <Providers>
-          {children}
-        </Providers>
+        {children}
       </body>
     </html>
   )
