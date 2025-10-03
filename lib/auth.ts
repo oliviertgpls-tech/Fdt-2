@@ -9,26 +9,35 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account", // 👈 évite les connexions automatiques Google
+        },
+      },
     }),
   ],
   pages: {
-    signIn: '/auth/signin',
+    signIn: "/auth/signin",
   },
   session: {
-    strategy: "database",
+    // ⚠️ RECO VERCEL : utilise plutôt jwt si tu n’as pas absolument besoin du DB session
+    strategy: process.env.NEXTAUTH_STRATEGY === "database" ? "database" : "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' 
-        ? '__Secure-next-auth.session-token' 
-        : 'next-auth.session-token',
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        domain: process.env.COOKIE_DOMAIN || undefined, 
+        // 👈 Mets ".tondomaine.com" dans l'env en prod
+      },
     },
   },
   callbacks: {
@@ -40,5 +49,5 @@ export const authOptions: NextAuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
+  debug: process.env.NODE_ENV !== "production",
 }

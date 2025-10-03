@@ -7,8 +7,9 @@ import { Chrome, ArrowLeft } from "lucide-react"
 export default function SignInPage() {
   const handleSignIn = () => {
     // Connexion avec redirection explicite
-    signIn('google', { 
-      callbackUrl: '/recipes',
+    signIn("google", { 
+      prompt: "select_account",
+      callbackUrl: "/recipes",
       redirect: true 
     })
   }
