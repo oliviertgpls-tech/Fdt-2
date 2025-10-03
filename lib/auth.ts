@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "select_account", // 👈 évite les connexions automatiques Google
+          prompt: "select_account",
         },
       },
     }),
@@ -20,8 +20,7 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
   },
   session: {
-    // ⚠️ RECO VERCEL : utilise plutôt jwt si tu n’as pas absolument besoin du DB session
-    strategy: process.env.NEXTAUTH_STRATEGY === "database" ? "database" : "jwt",
+    strategy: "database", // ✅ Fixé en database (tu veux rester en database)
     maxAge: 30 * 24 * 60 * 60, // 30 jours
   },
   cookies: {
@@ -35,16 +34,25 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        domain: process.env.COOKIE_DOMAIN || undefined, 
-        // 👈 Mets ".tondomaine.com" dans l'env en prod
+        // ✅ Pas de domain = le cookie s'attache automatiquement au bon domaine
       },
     },
   },
   callbacks: {
     async session({ session, user }) {
+      // ✅ Sécurisé : en mode database, 'user' vient de la BDD
+      if (!user) {
+        console.error("❌ SESSION: user introuvable en BDD")
+        throw new Error("Session invalide: user non trouvé")
+      }
+      
       if (session?.user) {
         session.user.id = user.id
+        session.user.email = user.email ?? session.user.email
+        session.user.name = user.name ?? session.user.name
+        session.user.image = user.image ?? session.user.image
       }
+      
       return session
     },
   },
