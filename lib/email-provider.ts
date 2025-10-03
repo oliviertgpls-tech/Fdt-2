@@ -8,8 +8,9 @@ export function ResendProvider(options: Partial<EmailConfig>): EmailConfig {
     id: 'email',
     type: 'email',
     name: 'Email',
+    server: { host: 'resend', port: 465, auth: { user: '', pass: '' } }, // ← Ajout (factice, non utilisé)
     from: options.from || process.env.EMAIL_FROM!,
-    maxAge: 24 * 60 * 60, // 24h
+    maxAge: 24 * 60 * 60,
     async sendVerificationRequest({ identifier: email, url, provider }) {
       try {
         console.log('📧 Envoi magic link à:', email)
@@ -65,5 +66,5 @@ export function ResendProvider(options: Partial<EmailConfig>): EmailConfig {
       }
     },
     options
-  }
+  } as EmailConfig // ← Force le type pour éviter les erreurs TS
 }
