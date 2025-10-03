@@ -3,12 +3,13 @@
 import { signIn } from "next-auth/react"
 import { useState } from "react"
 import Link from "next/link"
-import { Chrome, ArrowLeft, Mail, Loader2 } from "lucide-react"
+import { Chrome, ArrowLeft, Mail, Loader2, AlertCircle } from "lucide-react"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const [error, setError] = useState("")
 
   const handleGoogleSignIn = () => {
     signIn('google', { 
@@ -21,19 +22,40 @@ export default function SignInPage() {
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
     
     try {
+      // 1️⃣ Vérifier si l'email existe déjà avec Google
+      const checkResponse = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase() })
+      })
+
+      const checkData = await checkResponse.json()
+
+      // 2️⃣ Si l'utilisateur doit utiliser Google, on bloque
+      if (checkData.hasGoogleAccount) {
+        setError(checkData.message)
+        setIsLoading(false)
+        return
+      }
+
+      // 3️⃣ Sinon, on envoie le magic link
       const result = await signIn('email', { 
-        email,
+        email: email.toLowerCase(),
         callbackUrl: '/recipes',
         redirect: false
       })
       
       if (result?.ok) {
         setEmailSent(true)
+      } else {
+        setError("Erreur lors de l'envoi de l'email. Réessayez.")
       }
     } catch (error) {
       console.error("Erreur connexion email:", error)
+      setError("Une erreur est survenue. Réessayez.")
     } finally {
       setIsLoading(false)
     }
@@ -130,13 +152,35 @@ export default function SignInPage() {
                     id="email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setError("") // Reset error quand on tape
+                    }}
                     placeholder="votre@email.com"
                     required
                     disabled={isLoading}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed"
                   />
                 </div>
+
+                {/* Message d'erreur */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-red-900 font-medium mb-2">
+                        {error}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleGoogleSignIn}
+                        className="text-sm text-red-700 underline hover:text-red-800 font-medium"
+                      >
+                        → Cliquez ici pour vous connecter avec Google
+                      </button>
+                    </div>
+                  </div>
+                )}
                 
                 <button
                   type="submit"
@@ -146,7 +190,7 @@ export default function SignInPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Envoi en cours...
+                      Vérification...
                     </>
                   ) : (
                     <>
