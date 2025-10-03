@@ -1,8 +1,8 @@
 import { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
+import { ResendProvider } from "./email-provider"  // ← Nouveau
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -16,15 +16,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
-    EmailProvider({
-      server: {
-        host: "smtp.resend.com",
-        port: 465,
-        auth: {
-          user: "resend",
-          pass: process.env.RESEND_API_KEY!
-        }
-      },
+    ResendProvider({  // ← Utilise le custom provider
       from: process.env.EMAIL_FROM!
     }),
   ],
