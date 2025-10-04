@@ -41,7 +41,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6 py-3">
               <Link href="/recipes" className="font-semibold text-base md:text-lg">
-                FOOD MEMORIES
+                FOOD LEGEND
               </Link>
               
               <div className="hidden md:flex items-center gap-6 text-sm">

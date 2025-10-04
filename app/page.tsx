@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo/Nom du site */}
           <div className="font-bold text-xl text-gray-900">
-            Food Memories
+            Food Legend
           </div>
           
           {/* Bouton Login */}

@@ -185,7 +185,7 @@ export default function SignInPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-green-600 text-white text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? (
                     <>
@@ -241,7 +241,7 @@ export default function SignInPage() {
 
           <div className="text-center mt-8">
             <p className="text-gray-400">
-              Food Memories - 2025
+              Food Legend - 2025
             </p>
           </div>
         </div>

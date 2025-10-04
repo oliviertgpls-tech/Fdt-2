@@ -2,7 +2,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata = {
-  title: 'Food Memories',
+  title: 'Food Legend',
   description: 'Préservez votre patrimoine culinaire',
 }
 
