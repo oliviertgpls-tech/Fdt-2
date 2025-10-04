@@ -185,16 +185,16 @@ export default function SignInPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-orange-600 text-white hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <Loader2 className="w-4 h-4 md:w-5 h-5 animate-spin" />
                       Vérification...
                     </>
                   ) : (
                     <>
-                      <Mail className="w-5 h-5" />
+                      <Mail className="w-4 h-4 md:w-5 h-5" />
                       Recevoir un lien de connexion
                     </>
                   )}
@@ -214,7 +214,7 @@ export default function SignInPage() {
               {/* Bouton Google */}
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               >
                 <Chrome className="w-5 h-5" />
                 Se connecter avec Google
