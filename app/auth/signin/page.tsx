@@ -244,7 +244,7 @@ export default function SignInPage() {
 
           <div className="text-center mt-8">
             <p className="text-gray-400">
-              Food Legend - 2025
+              Ricipiz - 2025
             </p>
           </div>
         </div>

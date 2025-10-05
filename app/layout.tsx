@@ -2,7 +2,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata = {
-  title: 'Food Legend',
+  title: 'Ricipiz',
   description: 'Préservez votre patrimoine culinaire',
 }
 

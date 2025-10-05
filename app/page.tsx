@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo/Nom du site */}
           <div className="font-bold text-xl text-gray-900">
-            Food Legend
+            Ricipiz
           </div>
           
           {/* Bouton Login */}
@@ -207,7 +207,7 @@ export default function HomePage() {
       <div className="bg-gray-900 py-12">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-gray-400">
-            © 2024 Food Memories - Préservez votre patrimoine culinaire familial
+            © 2025 Ricipiz - Préservez votre patrimoine culinaire familial
           </p>
         </div>
       </div>

@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
           const result = await resend.emails.send({
             from: provider.from as string,
             to: email,
-            subject: 'Connexion à Food Legend',
+            subject: 'Connexion à Ricipiz',
             html: `
               <!DOCTYPE html>
               <html>
@@ -45,14 +45,14 @@ export const authOptions: NextAuthOptions = {
                 </head>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
                   <div style="background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                    <h1 style="color: white; margin: 0;">🍳 Food Legend</h1>
+                    <h1 style="color: white; margin: 0;">🍳 Ricipiz</h1>
                   </div>
                   
                   <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
                     <h2 style="color: #1f2937; margin-top: 0;">Connexion à votre compte</h2>
                     
                     <p style="font-size: 16px; color: #4b5563;">
-                      Cliquez sur le bouton ci-dessous pour vous connecter à votre compte Food Legend :
+                      Cliquez sur le bouton ci-dessous pour vous connecter à votre compte Ricipiz :
                     </p>
                     
                     <div style="text-align: center; margin: 30px 0;">
