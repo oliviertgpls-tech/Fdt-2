@@ -141,12 +141,31 @@ export default function SignInPage() {
               </p>
             </div>
 
+            {/* Bouton Google */}
             <div className="px-8 py-8 space-y-6">
+              <button
+                onClick={handleGoogleSignIn}
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+              >
+                <Chrome className="w-5 h-5" />
+                Se connecter avec Google
+              </button>
+
+            {/* Séparateur */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500">ou</span>
+                </div>
+              </div>
+            
               {/* Formulaire Email */}
               <form onSubmit={handleEmailSignIn} className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Conne
+                    Connexion par email (magic link)
                   </label>
                   <input
                     id="email"
@@ -195,31 +214,15 @@ export default function SignInPage() {
                   ) : (
                     <>
                       <Mail className="w-4 h-4 md:w-5 h-5" />
-                      Recevoir un lien de connexion
+                      Recevoir un lien par email
                     </>
                   )}
                 </button>
               </form>
 
-              {/* Séparateur */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white text-gray-500">ou</span>
-                </div>
-              </div>
+        
 
-              {/* Bouton Google */}
-              <button
-                onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              >
-                <Chrome className="w-5 h-5" />
-                Se connecter avec Google
-              </button>
-
+              
               <div className="mt-8 pt-6 border-t border-gray-100">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
