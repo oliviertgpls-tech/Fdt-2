@@ -788,33 +788,7 @@ const handleScanUpload = async (file: File) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
           
-          {/* Mode 1 : Saisie manuelle */}
-          <div 
-            onClick={() => setMode('manual')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
-          >
-            <div className="text-center space-y-3 md:space-y-4">
-              <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-blue-200 transition-colors">
-                <Edit3 className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
-              </div>
-              
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Saisie manuelle
-                </h3>
-                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
-                  Tapez votre recette directement. Parfait pour créer une nouvelle recette ou retranscrire fidèlement.
-                </p>
-              </div>
-              
-              <div className="pt-4">
-                <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
-                  🆓 Gratuit
-                </div>
-              </div>
-            </div>
-          </div>
-
+          
           {/* Mode 2 : Photo d'un plat */}
           <div 
             onClick={() => setMode('photo')}
@@ -869,30 +843,31 @@ const handleScanUpload = async (file: File) => {
             </div>
           </div>
 
-          {/* Mode 4 : NOUVEAU - Ajout par lien */}
+          {/* Mode 1 : Saisie manuelle */}
           <div 
-            onClick={() => setMode('link')}
-            className="group bg-white rounded-xl border-2 border-gray-200 p-4 md:p-6 hover:border-orange-500 hover:shadow-lg transition-all duration-300 cursor-pointer"
+            onClick={() => setMode('manual')}
+            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
-            <div className="text-center space-y-5 md:space-y-4">
-              <div className="w-16 h-16 md:w-16 md:h-16 bg-orange-100 rounded-xl flex items-center justify-center mx-auto group-hover:bg-orange-200 transition-colors">
-                <LinkIcon className="w-8 h-8 md:w-8 md:h-8 text-orange-600" />
-              </div>
+            <div className="text-center space-y-3 md:space-y-4">
+              
               
               <div>
-                <h3 className="text-xl md:text-lg font-bold text-gray-900 mb-1 md:mb-2">
-                  Depuis un lien
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  Saisie manuelle
                 </h3>
-                <p className="pb-4 text-gray-600 text-xs md:text-sm leading-relaxed">
-                  Sauvegardez vos recettes préférées depuis les sites de recettes.
+                <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
+                  Entrez votre recette directement. Parfait pour créer une nouvelle recette ou retranscrire fidèlement.
                 </p>
               </div>
-
-              <div className="text-xs text-purple-500 bg-gray-50 rounded-lg p-2">
-                🔗 Lien Web - 10 offerts
+              
+              <div className="pt-4">
+                <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
+                  🆓 Gratuit
+                </div>
               </div>
             </div>
           </div>
+
         </div>
 
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
