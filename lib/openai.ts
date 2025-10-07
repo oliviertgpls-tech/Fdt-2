@@ -57,8 +57,8 @@ INSTRUCTIONS :
 - Estimez les ingrédients probables
 - Proposez une méthode de préparation réaliste
 - Donnez un niveau de confiance (0-100)
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
-- EXEMPLE steps valide : "1. Faire ceci|2. Faire cela|3. Finir"
+- CRUCIAL : Dans le champ "steps",  NE PAS numéroter les étapes, séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
+- EXEMPLE steps valide : "Faire ceci|Faire cela|Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
@@ -151,8 +151,8 @@ INSTRUCTIONS :
 - Extrayez et structurez les informations
 - Corrigez l'orthographe si nécessaire
 - Estimez temps et portions si non mentionnés
-- CRUCIAL : Dans le champ "steps", séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
-- EXEMPLE steps valide : "1. Faire ceci|2. Faire cela|3. Finir"
+- CRUCIAL : Dans le champ "steps",  NE PAS numéroter les étapes, séparez OBLIGATOIREMENT chaque étape par le caractère de séparation |
+- EXEMPLE steps valide : "Faire ceci|Faire cela|Finir"
 
 FORMAT DE RÉPONSE (JSON uniquement) :
 {
