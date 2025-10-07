@@ -555,9 +555,6 @@ const handleMultipleScanUpload = async () => {
         })
         .filter((s: string) => s !== '')
         .join('\n\n');
-      })
-      .filter(s => s !== '')
-      .join('\n\n');
     
     // Combiner tous les tags (dédupliqués)
     const allTags = new Set<string>();
