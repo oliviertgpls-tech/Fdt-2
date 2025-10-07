@@ -539,19 +539,22 @@ const handleMultipleScanUpload = async () => {
       (r.ingredients || []).forEach((ing: string) => allIngredients.add(ing));
     });
     
-    // Combiner toutes les étapes dans l'ordre (SANS numérotation)
-    const allSteps = results
-      .map(r => {
-        const steps = r.steps || '';
-        if (!steps.trim()) return '';
-        
-        // Retirer les numéros existants si l'IA en a ajouté
-        return steps
-          .split(/\n\n+/)
-          .map(step => step.trim())
-          .filter(step => step !== '')
-          .map(step => step.replace(/^(Étape\s+)?\d+[\.)]\s*:?\s*/i, ''))
-          .join('\n\n');
+  // Combiner toutes les étapes dans l'ordre (SANS numérotation)
+      const allSteps = results
+        .map((r: any) => {
+          const steps = r.steps || '';
+          if (!steps.trim()) return '';
+          
+          // Retirer les numéros existants si l'IA en a ajouté
+          return steps
+            .split(/\n\n+/)
+            .map((step: string) => step.trim())
+            .filter((step: string) => step !== '')
+            .map((step: string) => step.replace(/^(Étape\s+)?\d+[\.)]\s*:?\s*/i, ''))
+            .join('\n\n');
+        })
+        .filter((s: string) => s !== '')
+        .join('\n\n');
       })
       .filter(s => s !== '')
       .join('\n\n');
