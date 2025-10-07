@@ -122,7 +122,7 @@ export default function RecipesPage() {
         <input
           type="text"
           className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          placeholder="Rechercher une recette (titre, ingrédients, auteur...)"
+          placeholder="Rechercher (titre, ingrédients, auteur, tags...)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -218,11 +218,10 @@ export default function RecipesPage() {
                 {recipe.tags && recipe.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {recipe.tags.slice(0, 3).map((tag) => (
-                      <span 
-                        key={tag}
-                        className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs"
+                      <span
+                        className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs"
                       >
-                        {tag}
+                        #{tag}
                       </span>
                     ))}
                     {recipe.tags.length > 3 && (

@@ -98,14 +98,13 @@ export default function CarnetPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
               📚 {carnet.title}
             </h1>
-            <p className="text-gray-600 text-sm md:text-base mt-1">
-              {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
-            </p>
             {carnet.description && (
-              <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+        
+              <p className="text-gray-600 pt-2 text-sm md:text-base mt-1d">
                 {carnet.description}
               </p>
             )}
+            
           </div>
         </div>
         
@@ -146,6 +145,10 @@ export default function CarnetPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       )}
+
+       <p className="text-gray-500 text-sm mt-2 leading-relaxed">
+              {carnetRecipes.length} recette{carnetRecipes.length !== 1 ? 's' : ''} dans ce carnet
+            </p>
 
       {/* Liste des recettes */}
       {filteredRecipes.length === 0 ? (
@@ -241,9 +244,9 @@ export default function CarnetPage() {
                       {recipe.tags.slice(0, 3).map((tag) => (
                         <span 
                           key={tag}
-                          className="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs"
+                          className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs"
                         >
-                          {tag}
+                          #{tag}
                         </span>
                       ))}
                       {recipe.tags.length > 3 && (

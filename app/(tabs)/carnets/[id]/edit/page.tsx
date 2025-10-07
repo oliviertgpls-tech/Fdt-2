@@ -16,6 +16,7 @@ export default function CarnetEditPage() {
   // États pour l'édition du carnet
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // 🆕 Recherche recettes disponibles
   const [carnetTitle, setCarnetTitle] = useState('');
   const [carnetDescription, setCarnetDescription] = useState('');
   
@@ -55,9 +56,28 @@ export default function CarnetEditPage() {
   const carnetRecipes = recipes.filter(recipe => 
     actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
   );
-  const availableRecipes = recipes.filter(recipe => 
-    !actualCarnet.recipeIds || !actualCarnet.recipeIds.includes(recipe.id)
-  );
+  const availableRecipes = recipes.filter(recipe => {
+    // D'abord exclure celles déjà dans le carnet
+    if (actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)) {
+      return false;
+    }
+    
+    // Si pas de recherche, afficher toutes les recettes disponibles
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    
+    // Recherche dans titre, tags, ingrédients, auteur
+    const searchText = [
+      recipe.title || "",
+      ...(recipe.tags || []),
+      ...(recipe.ingredients || []),
+      recipe.author || "",
+    ]
+      .join(" ")
+      .toLowerCase();
+    
+    return searchText.includes(query);
+  });
 
   // Fonctions pour les actions
   const handleAddRecipe = (carnetId: string, recipeId: string) => {
@@ -253,12 +273,12 @@ export default function CarnetEditPage() {
             <div className="text-center py-12 text-gray-500">
               <div className="text-4xl mb-4">📝</div>
               <p>Aucune recette dans ce carnet</p>
-              <p className="text-sm">Ajoutez-en depuis la liste à droite</p>
+              <p className="text-sm">Ajoutez-en depuis la liste des recettes disponibles</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-64 md:max-h-96 overflow-y-auto">
               {carnetRecipes.map((recipe) => (
-                <div key={recipe.id} className="group bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                <div key={recipe.id} className="group bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate">
@@ -269,7 +289,12 @@ export default function CarnetEditPage() {
                       </p>
                       <div className="flex items-center gap-10 mt-2 text-xs text-gray-500">
                         <span>⏱ {recipe.prepMinutes || '?'} min</span>
-                        <span>👥 {recipe.servings || '?'}</span>
+                        <span>
+                          {recipe.tags && recipe.tags.length > 0 
+                            ? recipe.tags.map(tag => `#${tag}`).join(' ')
+                            : ''
+                          }
+                        </span>
                       </div>
                     </div>
                     
@@ -292,6 +317,22 @@ export default function CarnetEditPage() {
           <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">
             ➕ Ajouter des recettes ({availableRecipes.length})
           </h3>
+          
+        {/* 🆕 BARRE DE RECHERCHE */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none text-sm"
+            placeholder="Rechercher par nom, tags, ingrédients..."
+          />
+          {searchQuery && (
+            <p className="text-xs text-gray-500 mt-1">
+              {availableRecipes.length} recette{availableRecipes.length !== 1 ? 's' : ''} trouvée{availableRecipes.length !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
 
           {availableRecipes.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
@@ -312,7 +353,12 @@ export default function CarnetEditPage() {
                       </p>
                       <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                         <span>⏱ {recipe.prepMinutes || '?'} min</span>
-                        <span>👥 {recipe.servings || '?'} pers</span>
+                         <span>
+                          {recipe.tags && recipe.tags.length > 0 
+                            ? recipe.tags.map(tag => `#${tag}`).join(' ')
+                            : ''
+                          }
+                          </span>
                       </div>
                     </div>
                     
