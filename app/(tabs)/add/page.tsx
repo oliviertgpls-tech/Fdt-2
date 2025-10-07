@@ -948,22 +948,6 @@ const handleMultipleScanUpload = async () => {
               </div>
             </div>
           </div>
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="text-3xl">🤖</div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-2">
-                Powered by IA
-              </h4>
-              <ul className="text-sm text-gray-700 space-y-1">
-                <li>• <strong>Analyse intelligente</strong> : Reconnaît les plats et ingrédients</li>
-                <li>• <strong>OCR avancé</strong> : Lit même l'écriture manuscrite</li>
-                <li>• <strong>Coût transparent</strong> : 10 premières analyses offertes</li>
-                <li>• <strong>Éditable</strong> : Vous pouvez corriger le résultat</li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
