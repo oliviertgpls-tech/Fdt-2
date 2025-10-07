@@ -422,6 +422,7 @@ export default function AddRecipePage() {
 
   // État pour IA
   const [aiConfidence, setAiConfidence] = useState<number | null>(null);
+  const [tags, setTags] = useState(""); // 🆕 Tags séparés par virgules
 
   // Debug des variables d'environnement au chargement
   useState(() => {
@@ -532,6 +533,10 @@ const handleScanUpload = async (file: File) => {
           .split('\n')
           .map(line => line.trim())
           .filter(line => line !== ""),
+          tags: tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag !== ""),
         steps: steps.trim(),
         isFromExternalUrl: isFromExternalUrl, // 🆕 MARQUEUR pour recettes externes
         sourceUrl: linkUrl.trim(), // 🆕 Optionnel : garder l'URL source
@@ -1162,6 +1167,24 @@ const handleScanUpload = async (file: File) => {
 100ml de lait"
           />
         </div>
+
+        {/* 🆕 TAGS */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            🏷️ Tags
+          </label>
+          <input
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+            placeholder="Ex: dessert, rapide, végétarien"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Séparez les tags par des virgules
+          </p>
+        </div>
+
 
         {/* Étapes */}
         <div>
