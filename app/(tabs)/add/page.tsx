@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { useToast } from '@/components/Toast';
 
 
