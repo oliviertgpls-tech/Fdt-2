@@ -310,16 +310,18 @@ function BooksLoadingSkeleton() {
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">{recipe.title}</h4>
                     <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Anonyme'}{" / "}⏱️ {recipe.prepMinutes || '?'}min</p>
-                    <p className="flex flex-wrap gap-2">
-                      {recipe.tags.map((tag) => (
-                        <span 
-                          key={tag}
-                          className="text-gray-500 bg-green-100 px-0 py-1 rounded-4 text-xs"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </p>
+                   {recipe.tags && recipe.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {recipe.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-green-100 text-gray-500 px-2 py-0.5 rounded-xl text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                     
                     {notebooks.some(n => n.recipeIds.includes(recipe.id)) && (
                       <div className="flex flex-wrap gap-1 mt-2">
