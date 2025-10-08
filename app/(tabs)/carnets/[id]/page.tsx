@@ -91,6 +91,12 @@ export default function CarnetPage() {
     <div className="space-y-6">
       {/* En-tête amélioré pour mobile */}
       <div className="space-y-4">
+        <button
+            onClick={() => router.push('/carnets')}
+            className="text-orange-600 hover:text-gray-800 underline transition-colors mt-1 flex-shrink-0"
+          >
+            ← Retour aux carnets
+          </button>
         {/* Ligne 1: Bouton retour + Titre */}
         <div className="flex items-start gap-3">
           
@@ -106,32 +112,6 @@ export default function CarnetPage() {
             )}
             
           </div>
-        </div>
-        
-        {/* Ligne 2: Boutons d'actions - Responsive */}
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/carnets/${id}/edit`}
-            className="bg-blue-400 text-white px-4 py-2.5 rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2 text-sm"
-          >
-            <Edit3 className="w-4 h-4" />
-            Modifier
-          </Link>
-          
-          <button
-            onClick={handleDeleteCarnet}
-            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Supprimer</span>
-          </button>
-          
-          <button
-            onClick={() => router.push('/carnets')}
-            className="text-gray-600 hover:text-gray-800 transition-colors mt-1 flex-shrink-0"
-          >
-            Voir tous les carnets
-          </button>
         </div>
       </div>
 
@@ -260,6 +240,25 @@ export default function CarnetPage() {
               </Link>
             ))}
           </div>
+
+            {/* Ligne 2: Boutons d'actions - Responsive */}
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/carnets/${id}/edit`}
+            className="bg-blue-400 text-white px-4 py-2.5 rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2 text-sm"
+          >
+            <Edit3 className="w-4 h-4" />
+            Modifier ce carnet
+          </Link>
+    
+          <button
+            onClick={handleDeleteCarnet}
+            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Supprimer</span>
+          </button>
+        </div>
 
           {/* Section "Créer un livre" en bas - Nouveau design */}
           <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-6 text-center">

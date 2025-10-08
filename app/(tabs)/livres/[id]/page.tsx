@@ -441,7 +441,7 @@ export default function BookPage() {
 
   // Calculs
   const pageCount = 6 + (bookRecipes.length * 2);
-  const estimatedPrice = pageCount * 0.15 + 3;
+  const estimatedPrice = pageCount * 0.30 + 3;
 
   // Si le livre n'existe pas
   if (!book) {
@@ -516,7 +516,7 @@ export default function BookPage() {
                 </div>
               )}
               <p className="text-sm text-gray-600">
-                {bookRecipes.length} recettes • {pageCount/2} pages • ≈ {estimatedPrice.toFixed(2)}€
+                {bookRecipes.length} recettes • {pageCount/2} pages • ≈ {estimatedPrice}€
               </p>
             </div>
           </div>

@@ -313,10 +313,10 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-200 transition-colors"
       >
         <ImageIcon className="w-4 h-4" />
-        Choisir une image libre de droits
+        Ou choisir une image libre de droits
       </button>
     );
   }
@@ -328,7 +328,7 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-gray-900">
-              🖼️ Choisir une image
+              🖼️ Bibliothèque Unsplash. (Libre de droits)
             </h3>
             <button
               onClick={() => setIsOpen(false)}
@@ -343,7 +343,7 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ex: pizza, gâteau au chocolat, salade..."
+              placeholder="Essayez en FR sinon en EN"
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
               autoFocus
             />
@@ -1338,7 +1338,7 @@ Enfourner 25 minutes."
             onClick={() => setMode('choose')}
             className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
-            Changer de mode
+            Annuler
           </button>
           <button
             type="button"

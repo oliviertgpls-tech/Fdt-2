@@ -23,7 +23,8 @@ export default function EditRecipePage() {
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [tags, setTags] = useState(""); // 🆕 Tags
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +47,7 @@ export default function EditRecipePage() {
       setPrepMinutes(recipe.prepMinutes?.toString() || "");
       setServings(recipe.servings || "");
       setIngredients(recipe.ingredients.join("\n"));
+      setTags(recipe.tags || []); 
       setSteps(recipe.steps || "");
       setImageUrl(recipe.imageUrl || "");
       setIsLoading(false);
@@ -92,6 +94,31 @@ export default function EditRecipePage() {
     }
   };
 
+  // Ajouter un tag
+  const handleAddTag = () => {
+    const newTag = tagInput.trim().toLowerCase();
+    if (newTag && !tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+      setTagInput('');
+    }
+  };
+
+  // Supprimer un tag
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  // Gérer la touche Entrée dans l'input
+  const handleTagInputKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    } else if (e.key === ',' || e.key === ';') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
+
   const handleSave = async () => {
     if (!title.trim()) {
       alert("Le titre est obligatoire !");
@@ -113,10 +140,7 @@ export default function EditRecipePage() {
           .split('\n')
           .map(line => line.trim())
           .filter(line => line !== ""),
-        tags: tags
-          .split(',')
-          .map(tag => tag.trim())
-          .filter(tag => tag !== ""),
+        tags: tags,
         steps: steps.trim(),
         updatedAt: Date.now()
       };
@@ -296,7 +320,7 @@ export default function EditRecipePage() {
                     className="hidden"
                     disabled={isUploading}
                   />
-                  📷 {isUploading ? "Upload..." : "Ma photo"}
+                  📷 {isUploading ? "Upload..." : "Ajouter ma photo"}
                 </label>
 
                 {/* Recherche Unsplash */}
@@ -354,22 +378,49 @@ export default function EditRecipePage() {
             </p>
           </div>
 
-            {/* 🆕 TAGS */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                🏷️ Tags
-              </label>
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                placeholder="Ex: dessert, rapide, végétarien"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Séparez les tags par des virgules
-              </p>
-            </div>
+          {/* 🆕 TAGS INTERACTIFS */}
+<div>
+  <label className="block text-sm font-semibold text-gray-700 mb-2">
+    🏷️ Tags
+  </label>
+  
+  {/* Conteneur des tags + input */}
+  <div className="w-full rounded-lg border border-gray-300 px-3 py-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 min-h-[48px] flex flex-wrap gap-2 items-center">
+    
+    {/* Tags existants */}
+    {tags.map((tag) => (
+      <span
+        key={tag}
+        className="group inline-flex items-center gap-1 bg-green-100 text-green-600 px-3 py-1 rounded-mid text-sm font-medium hover:bg-blue-200 transition-colors"
+      >
+        #{tag}
+        <button
+          type="button"
+          onClick={() => handleRemoveTag(tag)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-800 ml-1"
+          aria-label={`Supprimer ${tag}`}
+        >
+          ×
+        </button>
+      </span>
+    ))}
+    
+    {/* Input pour ajouter un tag */}
+    <input
+      type="text"
+      value={tagInput}
+      onChange={(e) => setTagInput(e.target.value)}
+      onKeyDown={handleTagInputKeyDown}
+      onBlur={handleAddTag}
+      className="flex-1 min-w-[150px] outline-none bg-transparent text-sm"
+      placeholder={tags.length === 0 ? "Ex: dessert, rapide, végétarien" : "Ajouter un tag..."}
+    />
+  </div>
+  
+  <p className="text-xs text-gray-500 mt-1">
+    Appuyez sur Entrée ou virgule pour ajouter • Survolez pour supprimer
+  </p>
+</div>
 
           {/* Étapes - SIMPLE textarea */}
           <div>
@@ -411,7 +462,7 @@ Simple et naturel !"
               type="button"
               onClick={handleSave}
               disabled={isSaving || !title.trim() || isUploading}
-              className="flex-1 bg-primary-500 text-white py-3 rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
+              className="flex-1 bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-900 disabled:opacity-50 transition-colors"
             >
               {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "💾 Sauvegarder"}
             </button>

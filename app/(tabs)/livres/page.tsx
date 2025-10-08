@@ -147,7 +147,7 @@ function BooksLoadingSkeleton() {
             {books.map((book) => {
               const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));
               const pageCount = 1 + (book.recipeIds.length * 2);
-              const estimatedPrice = Math.max(8, book.recipeIds.length * 1.5 + 6);
+              //const estimatedPrice = Math.max(8, book.recipeIds.length * 1.5 + 6); supprimée je garde la formule au cas où
               
               return (
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -165,7 +165,7 @@ function BooksLoadingSkeleton() {
                       </div>
                     ) : (
                       // Icône livre par défaut
-                      <div className="w-full h-full bg-gradient-to-br from-orange-300 to-green-250 flex items-center justify-center text-3xl md:text-4xl">
+                      <div className="w-full h-full bg-gradient-to-br from-orange-100 to-white flex items-center justify-center text-3xl md:text-4xl">
                         📖
                       </div>
                     )}
@@ -175,7 +175,6 @@ function BooksLoadingSkeleton() {
                     <h3 className="font-semibold text-gray-900 mb-2 text-m md:text-base truncate">{book.title}</h3>
                     <div className="text-xs md:text-sm text-gray-600 space-y-1 mb-3">
                       <p>{book.recipeIds.length} recettes • {pageCount} pages</p>
-                      <p className="text-orange-600 font-medium">≈ {estimatedPrice.toFixed(2)}€</p>
                       <p className="text-xs text-gray-500">
                         {book.status === 'draft' && '📝 Brouillon'}
                         {book.status === 'ready' && '✅ Prêt'}
@@ -213,7 +212,7 @@ function BooksLoadingSkeleton() {
               </span>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-orange-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-orange-700 transition-colors text-xs md:text-sm"
+                className="bg-blue-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-orange-700 transition-colors text-xs md:text-sm"
               >
                 Créer le livre
               </button>
@@ -309,8 +308,17 @@ function BooksLoadingSkeleton() {
                   
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">{recipe.title}</h4>
-                    <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Anonyme'}</p>
-                    <p className="text-xs text-gray-500 mt-1">⏱️ {recipe.prepMinutes || '?'}min</p>
+                    <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Anonyme'}{" / "}⏱️ {recipe.prepMinutes || '?'}min</p>
+                    <p className="flex flex-wrap gap-2">
+                      {recipe.tags.map((tag) => (
+                        <span 
+                          key={tag}
+                          className="text-gray-500 bg-green-100 px-0 py-1 rounded-4 text-xs"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </p>
                     
                     {notebooks.some(n => n.recipeIds.includes(recipe.id)) && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -320,7 +328,7 @@ function BooksLoadingSkeleton() {
                           .map(notebook => (
                           <span 
                             key={notebook.id}
-                            className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded"
+                            className="bg-blue-50 text-blue-800 text-xs px-2 py-0.5 rounded"
                           >
                             {notebook.title}
                           </span>

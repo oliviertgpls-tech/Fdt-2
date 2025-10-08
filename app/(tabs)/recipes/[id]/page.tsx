@@ -162,6 +162,12 @@ export default function RecipeDetailPage() {
 
   return (
     <div>
+    <Link 
+    href="/recipes" 
+    className="block text. pb-4 text-primary-400 underline hover:text-primary-700"
+    >
+      ← Retour à la liste des recettes
+    </Link>
       <article className="space-y-6 max-w-4xl">
         
         {/* 🚀 IMAGE PRINCIPALE OPTIMISÉE - Version LARGE pour le détail (2400px) */}
@@ -205,9 +211,9 @@ export default function RecipeDetailPage() {
             {recipe.tags.map((tag) => (
               <span 
                 key={tag}
-                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                className="bg-green-100 text-gray-700 px-3 py-1 rounded-mid text-sm"
               >
-                {tag}
+                #{tag}
               </span>
             ))}
           </div>
@@ -283,7 +289,7 @@ export default function RecipeDetailPage() {
                   {currentStep < steps.length - 1 ? (
                     <button
                       onClick={nextStep}
-                      className="bg-primary-100 text-primary-700 px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors text-sm"
+                      className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm"
                     >
                       Suivante →
                     </button>
@@ -310,14 +316,14 @@ export default function RecipeDetailPage() {
                         <li 
                           key={index} 
                           className={`flex items-start gap-3 p-2 rounded ${
-                            index === currentStep ? 'bg-primary-50 border border-primary-200' : ''
+                            index === currentStep ? 'bg-primary-50 border border-green-200' : ''
                           }`}
                         >
                           <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
                             index < currentStep 
-                              ? 'bg-secondary-100 text-secondary-600' 
+                              ? 'bg-green-100 text-secondary-600' 
                               : index === currentStep 
-                                ? 'bg-primary-100 text-primary-600'
+                                ? 'bg-primary-500 text-white'
                                 : 'bg-gray-100 text-gray-600'
                           }`}>
                             {index < currentStep ? '✓' : index + 1}
@@ -340,9 +346,9 @@ export default function RecipeDetailPage() {
           <div className="flex gap-3">
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="flex-1 bg-blue-100 text-blue-900 px-4 py-2 rounded-lg hover:bg-primary-200 transition-colors font-medium text-center"
+              className="inline-flex-1 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-00 transition-colors font-medium text-center"
             >
-              ✏️ Modifier
+              ✏️ Modifier la recette
             </Link>
             
             <button
@@ -357,15 +363,6 @@ export default function RecipeDetailPage() {
               🗑️
             </button>
           </div>
-          
-         
-          
-          <Link 
-            href="/recipes" 
-            className="block text-center text-primary-600 underline hover:text-primary-700"
-          >
-            ← Retour à la liste des recettes
-          </Link>
         </div>
       </article>
 
