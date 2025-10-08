@@ -12,15 +12,15 @@ export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook } = useRecipes();
-  const [tags, setTags] = useState('');
-
+  
   // États pour l'édition du carnet
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(""); // 🆕 Recherche recettes disponibles
+  const [searchQuery, setSearchQuery] = useState("");
   const [carnetTitle, setCarnetTitle] = useState('');
   const [carnetDescription, setCarnetDescription] = useState('');
-
+  
+  // État pour la sélection multiple de recettes
   const [selectedRecipesToAdd, setSelectedRecipesToAdd] = useState<string[]>([]);
   
   // Trouver le carnet actuel
@@ -88,6 +88,32 @@ export default function CarnetEditPage() {
     }
   };
 
+// Toggle sélection d'une recette à ajouter
+  const toggleRecipeSelection = (recipeId: string) => {
+    setSelectedRecipesToAdd(prev =>
+      prev.includes(recipeId)
+        ? prev.filter(id => id !== recipeId)
+        : [...prev, recipeId]
+    );
+  };
+
+  // Ajouter toutes les recettes sélectionnées
+  const handleAddSelectedRecipes = async () => {
+    if (selectedRecipesToAdd.length === 0) return;
+    
+    try {
+      for (const recipeId of selectedRecipesToAdd) {
+        await addRecipeToNotebook(actualCarnet.id, recipeId);
+      }
+      
+      setSelectedRecipesToAdd([]);
+      showToast(`${selectedRecipesToAdd.length} recette${selectedRecipesToAdd.length > 1 ? 's' : ''} ajoutée${selectedRecipesToAdd.length > 1 ? 's' : ''} au carnet !`, 'success');
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout des recettes:', error);
+      showToast('Erreur lors de l\'ajout des recettes', 'error');
+    }
+  };
+
   // Fonction pour supprimer une recette du carnet
   const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
     removeRecipeFromNotebook(carnetId, recipeId);
@@ -102,8 +128,6 @@ export default function CarnetEditPage() {
       const recipeIds = carnetRecipes.map(r => r.id);
       
       const newBook = await createBook(bookTitle, recipeIds);
-      
-      // Rediriger vers la page du livre créé
       router.push(`/livres/${newBook.id}`);
     } catch (error) {
       console.error('Erreur lors de la création du livre:', error);
