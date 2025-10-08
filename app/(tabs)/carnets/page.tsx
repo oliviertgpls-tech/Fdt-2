@@ -349,9 +349,9 @@ export default function CarnetsPage() {
                     </p>
                     
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span>{carnetRecipeCount} recettes dans ce carnet</span>
+                      <span>{carnetRecipeCount} recette(s) dans ce carnet</span>
                     </div>
-                      <div className="inline-flex bg-green-500 text-sm text-bold text-green-100 rounded-lg text-sm px-3 py-2">
+                      <div className="inline-flex bg-green-600 text-sm text-bold text-green-100 rounded-lg text-sm px-3 py-2">
                       <button>
                       Voir le carnet</button>
                       </div>

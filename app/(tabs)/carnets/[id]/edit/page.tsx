@@ -59,63 +59,41 @@ export default function CarnetEditPage() {
   const carnetRecipes = recipes.filter(recipe => 
     actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
   );
-  const availableRecipes = recipes.filter(recipe => {
-    // D'abord exclure celles déjà dans le carnet
-    if (actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)) {
-      return false;
+// Fonctions pour les actions
+  // Toggle sélection d'une recette à ajouter
+  const toggleRecipeSelection = (recipeId: string) => {
+    setSelectedRecipesToAdd(prev =>
+      prev.includes(recipeId)
+        ? prev.filter(id => id !== recipeId)
+        : [...prev, recipeId]
+    );
+  };
+
+  // Ajouter toutes les recettes sélectionnées
+  const handleAddSelectedRecipes = async () => {
+    if (selectedRecipesToAdd.length === 0) return;
+    
+    try {
+      // Ajouter toutes les recettes sélectionnées
+      for (const recipeId of selectedRecipesToAdd) {
+        await addRecipeToNotebook(actualCarnet.id, recipeId);
+      }
+      
+      // Réinitialiser la sélection
+      setSelectedRecipesToAdd([]);
+      showToast(`${selectedRecipesToAdd.length} recette${selectedRecipesToAdd.length > 1 ? 's' : ''} ajoutée${selectedRecipesToAdd.length > 1 ? 's' : ''} au carnet !`, 'success');
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout des recettes:', error);
+      showToast('Erreur lors de l\'ajout des recettes', 'error');
     }
-    
-    // Si pas de recherche, afficher toutes les recettes disponibles
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return true;
-    
-    // Recherche dans titre, tags, ingrédients, auteur
-    const searchText = [
-      recipe.title || "",
-      ...(recipe.tags || []),
-      ...(recipe.ingredients || []),
-      recipe.author || "",
-    ]
-      .join(" ")
-      .toLowerCase();
-    
-    return searchText.includes(query);
-  });
+  };
 
-  // Fonctions pour les actions
-// Toggle sélection d'une recette
-const toggleRecipeSelection = (recipeId: string) => {
-  setSelectedRecipesToAdd(prev =>
-    prev.includes(recipeId)
-      ? prev.filter(id => id !== recipeId)
-      : [...prev, recipeId]
-  );
-};
+  // Fonction pour supprimer une recette du carnet
+  const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
+    removeRecipeFromNotebook(carnetId, recipeId);
+  };
 
-// Ajouter toutes les recettes sélectionnées
-const handleAddSelectedRecipes = async () => {
-  if (selectedRecipesToAdd.length === 0) return;
-  
-  try {
-    // Ajouter toutes les recettes sélectionnées
-    for (const recipeId of selectedRecipesToAdd) {
-      await addRecipeToNotebook(actualCarnet.id, recipeId);
-    }
-    
-    // Réinitialiser la sélection
-    setSelectedRecipesToAdd([]);
-    showToast(`${selectedRecipesToAdd.length} recette${selectedRecipesToAdd.length > 1 ? 's' : ''} ajoutée${selectedRecipesToAdd.length > 1 ? 's' : ''} au carnet !`, 'success');
-  } catch (error) {
-    console.error('Erreur lors de l\'ajout des recettes:', error);
-    showToast('Erreur lors de l\'ajout des recettes', 'error');
-  }
-};
-
-// Fonction pour supprimer une recette du carnet
-const handleRemoveRecipe = (carnetId: string, recipeId: string) => {
-  removeRecipeFromNotebook(carnetId, recipeId);
-};
-
+  // Créer un livre à partir du carnet
   const handleCreateBookFromCarnet = async () => {
     if (!actualCarnet || !carnetRecipes.length) return;
     
