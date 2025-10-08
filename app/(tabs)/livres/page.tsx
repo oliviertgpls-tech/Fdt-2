@@ -17,6 +17,7 @@ export default function LivresPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { showToast } = useToast();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [tags, setTags] = useState('');
 
 // 🔧 AJOUTÉ : Composants Skeleton manquants
 function BookCardSkeleton() {

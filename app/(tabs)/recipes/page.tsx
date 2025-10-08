@@ -70,6 +70,8 @@ function RecipesLoadingSkeleton() {
   );
 }
 
+const [tags, setTags] = useState('');
+
 export default function RecipesPage() {
   const { recipes, loading } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");

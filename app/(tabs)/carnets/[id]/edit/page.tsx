@@ -12,6 +12,7 @@ export default function CarnetEditPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook } = useRecipes();
+  const [tags, setTags] = useState('');
   
   // États pour l'édition du carnet
   const [editingTitle, setEditingTitle] = useState(false);
