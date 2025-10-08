@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Eye, Move, Trash2, ArrowLeft, Edit3, X } from 'lucide-react';
+import { Plus, Eye, Trash2, ArrowLeft, Edit3 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
@@ -56,39 +56,36 @@ export default function CarnetEditPage() {
   // Rechercher le carnet mis à jour dans le state
   const actualCarnet = notebooks.find(n => n.id === currentCarnet.id) || currentCarnet;
   
+  // Recettes dans le carnet
   const carnetRecipes = recipes.filter(recipe => 
     actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
   );
-// Fonctions pour les actions
-  // Toggle sélection d'une recette à ajouter
-  const toggleRecipeSelection = (recipeId: string) => {
-    setSelectedRecipesToAdd(prev =>
-      prev.includes(recipeId)
-        ? prev.filter(id => id !== recipeId)
-        : [...prev, recipeId]
-    );
-  };
-
-  // Ajouter toutes les recettes sélectionnées
-  const handleAddSelectedRecipes = async () => {
-    if (selectedRecipesToAdd.length === 0) return;
-    
-    try {
-      // Ajouter toutes les recettes sélectionnées
-      for (const recipeId of selectedRecipesToAdd) {
-        await addRecipeToNotebook(actualCarnet.id, recipeId);
-      }
-      
-      // Réinitialiser la sélection
-      setSelectedRecipesToAdd([]);
-      showToast(`${selectedRecipesToAdd.length} recette${selectedRecipesToAdd.length > 1 ? 's' : ''} ajoutée${selectedRecipesToAdd.length > 1 ? 's' : ''} au carnet !`, 'success');
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout des recettes:', error);
-      showToast('Erreur lors de l\'ajout des recettes', 'error');
+  
+  // Recettes disponibles (pas encore dans le carnet)
+  const availableRecipes = recipes.filter(recipe => {
+    // Exclure celles déjà dans le carnet
+    if (actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)) {
+      return false;
     }
-  };
+    
+    // Si pas de recherche, afficher toutes
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    
+    // Recherche dans titre, tags, ingrédients, auteur
+    const searchText = [
+      recipe.title || "",
+      ...(recipe.tags || []),
+      ...(recipe.ingredients || []),
+      recipe.author || "",
+    ]
+      .join(" ")
+      .toLowerCase();
+    
+    return searchText.includes(query);
+  });
 
-// Toggle sélection d'une recette à ajouter
+  // Toggle sélection d'une recette à ajouter
   const toggleRecipeSelection = (recipeId: string) => {
     setSelectedRecipesToAdd(prev =>
       prev.includes(recipeId)
@@ -170,6 +167,7 @@ export default function CarnetEditPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6 md:space-y-8">
+      {/* EN-TÊTE */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -179,7 +177,7 @@ export default function CarnetEditPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Edition </h1>
+            <h1 className="text-xl font-bold text-gray-900">✏️ Édition</h1>
             <p className="text-gray-600">
               {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans le carnet
             </p>
@@ -197,7 +195,7 @@ export default function CarnetEditPage() {
 
       {/* SECTION ÉDITION DU CARNET */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-        <h2 className="text-xl font-semibold text-gray-800">Informations du carnet</h2>
+        <h2 className="text-xl font-semibold text-gray-800">📝 Informations du carnet</h2>
         
         {/* Titre du carnet */}
         <div>
@@ -295,142 +293,186 @@ export default function CarnetEditPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 md:mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              Recettes dans ce carnet ({carnetRecipes.length})
+              📚 Recettes dans ce carnet ({carnetRecipes.length})
             </h3>
           </div>
 
-      {/* Recettes disponibles à ajouter - SYSTÈME DE SÉLECTION MULTIPLE */}
-      <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
-          <h3 className="text-base md:text-lg font-semibold text-gray-800">
-            ➕ Ajouter des recettes ({availableRecipes.length})
-          </h3>
-          
-          {/* Bouton d'ajout groupé */}
-          {selectedRecipesToAdd.length > 0 && (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">
-                {selectedRecipesToAdd.length} sélectionnée{selectedRecipesToAdd.length > 1 ? 's' : ''}
-              </span>
-              <button
-                onClick={handleAddSelectedRecipes}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-              >
-                Ajouter au carnet
-              </button>
+          {carnetRecipes.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-4xl mb-4">📝</div>
+              <p>Aucune recette dans ce carnet</p>
+              <p className="text-sm">Ajoutez-en depuis la liste des recettes disponibles</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-64 md:max-h-96 overflow-y-auto">
+              {carnetRecipes.map((recipe) => (
+                <div key={recipe.id} className="group bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">
+                        {recipe.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                        {recipe.description || 'Aucune description'}
+                      </p>
+                      <div className="flex items-center gap-10 mt-2 text-xs text-gray-500">
+                        <span>⏱ {recipe.prepMinutes || '?'} min</span>
+                        <span>
+                          {recipe.tags && recipe.tags.length > 0 
+                            ? recipe.tags.map(tag => `#${tag}`).join(' ')
+                            : ''
+                          }
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
+                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
+                      title="Retirer du carnet"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
-        
-        {/* Barre de recherche */}
-        <div className="mb-4">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none text-sm"
-            placeholder="Rechercher par nom, tags, ingrédients..."
-          />
-          {searchQuery && (
-            <p className="text-xs text-gray-500 mt-1">
-              {availableRecipes.length} recette{availableRecipes.length !== 1 ? 's' : ''} trouvée{availableRecipes.length !== 1 ? 's' : ''}
-            </p>
-          )}
-        </div>
 
-        {/* Actions rapides */}
-        {availableRecipes.length > 0 && (
-          <div className="flex gap-2 mb-4">
-            {selectedRecipesToAdd.length < availableRecipes.length ? (
-              <button
-                onClick={() => setSelectedRecipesToAdd(availableRecipes.map(r => r.id))}
-                className="text-xs text-blue-600 hover:text-blue-700 underline"
-              >
-                Tout sélectionner
-              </button>
-            ) : (
-              <button
-                onClick={() => setSelectedRecipesToAdd([])}
-                className="text-xs text-gray-600 hover:text-gray-700 underline"
-              >
-                Tout désélectionner
-              </button>
+        {/* Recettes disponibles à ajouter - SYSTÈME DE SÉLECTION MULTIPLE */}
+        <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 md:mb-4">
+            <h3 className="text-base md:text-lg font-semibold text-gray-800">
+              ➕ Ajouter des recettes ({availableRecipes.length})
+            </h3>
+            
+            {/* Bouton d'ajout groupé */}
+            {selectedRecipesToAdd.length > 0 && (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-600">
+                  {selectedRecipesToAdd.length} sélectionnée{selectedRecipesToAdd.length > 1 ? 's' : ''}
+                </span>
+                <button
+                  onClick={handleAddSelectedRecipes}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                >
+                  Ajouter au carnet
+                </button>
+              </div>
             )}
           </div>
-        )}
-
-        {availableRecipes.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-4xl mb-4">✅</div>
-            <p>Toutes vos recettes sont déjà dans ce carnet !</p>
+          
+          {/* Barre de recherche */}
+          <div className="mb-4">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:border-green-500 focus:ring-2 focus:ring-green-200 focus:outline-none text-sm"
+              placeholder="Rechercher par nom, tags, ingrédients..."
+            />
+            {searchQuery && (
+              <p className="text-xs text-gray-500 mt-1">
+                {availableRecipes.length} recette{availableRecipes.length !== 1 ? 's' : ''} trouvée{availableRecipes.length !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
-        ) : (
-          <div className="grid gap-3 md:gap-4 max-h-[600px] overflow-y-auto">
-            {availableRecipes.map((recipe) => (
-              <div 
-                key={recipe.id} 
-                onClick={() => toggleRecipeSelection(recipe.id)}
-                className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
-                  selectedRecipesToAdd.includes(recipe.id)
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50'
-                }`}
-              >
-                <div className="flex gap-3">
-                  {/* Checkbox visuel */}
-                  <div className="flex items-start pt-1">
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                      selectedRecipesToAdd.includes(recipe.id)
-                        ? 'bg-green-600 border-green-600'
-                        : 'border-gray-300 bg-white'
-                    }`}>
-                      {selectedRecipesToAdd.includes(recipe.id) && (
-                        <svg className="w-3 h-3 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
-                          <path d="M5 13l4 4L19 7"></path>
-                        </svg>
+
+          {/* Actions rapides */}
+          {availableRecipes.length > 0 && (
+            <div className="flex gap-2 mb-4">
+              {selectedRecipesToAdd.length < availableRecipes.length ? (
+                <button
+                  onClick={() => setSelectedRecipesToAdd(availableRecipes.map(r => r.id))}
+                  className="text-xs text-blue-600 hover:text-blue-700 underline"
+                >
+                  Tout sélectionner
+                </button>
+              ) : (
+                <button
+                  onClick={() => setSelectedRecipesToAdd([])}
+                  className="text-xs text-gray-600 hover:text-gray-700 underline"
+                >
+                  Tout désélectionner
+                </button>
+              )}
+            </div>
+          )}
+
+          {availableRecipes.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="text-4xl mb-4">✅</div>
+              <p>Toutes vos recettes sont déjà dans ce carnet !</p>
+            </div>
+          ) : (
+            <div className="grid gap-3 md:gap-4 max-h-[600px] overflow-y-auto">
+              {availableRecipes.map((recipe) => (
+                <div 
+                  key={recipe.id} 
+                  onClick={() => toggleRecipeSelection(recipe.id)}
+                  className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
+                    selectedRecipesToAdd.includes(recipe.id)
+                      ? 'border-green-500 bg-green-50'
+                      : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50'
+                  }`}
+                >
+                  <div className="flex gap-3">
+                    {/* Checkbox visuel */}
+                    <div className="flex items-start pt-1">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        selectedRecipesToAdd.includes(recipe.id)
+                          ? 'bg-green-600 border-green-600'
+                          : 'border-gray-300 bg-white'
+                      }`}>
+                        {selectedRecipesToAdd.includes(recipe.id) && (
+                          <svg className="w-3 h-3 text-white" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Image */}
+                    {recipe.imageUrl && (
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                        <img 
+                          src={recipe.imageUrl}
+                          alt={recipe.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Contenu */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">
+                        {recipe.title}
+                      </h4>
+                      <p className="text-xs md:text-sm text-gray-600">
+                        par {recipe.author || 'Anonyme'} • ⏱️ {recipe.prepMinutes || '?'}min
+                      </p>
+                      
+                      {/* Tags avec # et background */}
+                      {recipe.tags && recipe.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {recipe.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
-                  
-                  {/* Image */}
-                  {recipe.imageUrl && (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                      <img 
-                        src={recipe.imageUrl}
-                        alt={recipe.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Contenu */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">
-                      {recipe.title}
-                    </h4>
-                    <p className="text-xs md:text-sm text-gray-600">
-                      par {recipe.author || 'Anonyme'} • ⏱️ {recipe.prepMinutes || '?'}min
-                    </p>
-                    
-                    {/* Tags avec # et background */}
-                    {recipe.tags && recipe.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {recipe.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
