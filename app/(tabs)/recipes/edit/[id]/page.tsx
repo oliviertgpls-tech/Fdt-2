@@ -27,7 +27,15 @@ export default function EditRecipePage() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showHelpModal, setShowHelpModal] = useState(true);
+ // Vérifier si l'utilisateur a déjà vu la modale d'édition
+  const [showHelpModal, setShowHelpModal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hasSeenModal = localStorage.getItem('hasSeenEditStepsModal');
+      return !hasSeenModal; // true si jamais vue, false si déjà vue
+    }
+    return true;
+  });
+
   const [isUploading, setIsUploading] = useState(false);
 
   // Pré-remplir le formulaire avec les données existantes
@@ -172,8 +180,13 @@ export default function EditRecipePage() {
                   Étape 2 : Mélanger les ingrédients...
                 </code>
               </p>
-              <button
-                onClick={() => setShowHelpModal(false)}
+            <button
+                onClick={() => {
+                  // Enregistrer dans localStorage
+                  localStorage.setItem('hasSeenEditStepsModal', 'true');
+                  // Fermer la modale
+                  setShowHelpModal(false);
+                }}
                 className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors font-medium"
               >
                 J'ai compris

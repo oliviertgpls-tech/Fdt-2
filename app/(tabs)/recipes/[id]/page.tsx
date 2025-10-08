@@ -15,7 +15,6 @@ export default function RecipeDetailPage() {
 
   // État pour gérer l'étape courante
   const [currentStep, setCurrentStep] = useState(0);
-  const [showHelpModal, setShowHelpModal] = useState(true);
 
   // États pour l'ajout au livre
   const [showBookModal, setShowBookModal] = useState(false);
@@ -163,30 +162,6 @@ export default function RecipeDetailPage() {
 
   return (
     <div>
-      {/* Mini-modale d'explication */}
-      {showHelpModal && hasMultipleSteps && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
-            <div className="text-center space-y-4">
-              <div className="text-3xl">💡</div>
-              <h3 className="text-lg font-semibold text-gray-800">
-                Navigation par étapes
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Les recettes sont structurées en étapes pour être plus facile à suivre. 
-                Un <strong>saut de ligne</strong> dans le texte = une nouvelle étape.
-              </p>
-              <button
-                onClick={() => setShowHelpModal(false)}
-                className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors font-medium"
-              >
-                J'ai compris
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <article className="space-y-6 max-w-4xl">
         
         {/* 🚀 IMAGE PRINCIPALE OPTIMISÉE - Version LARGE pour le détail (2400px) */}

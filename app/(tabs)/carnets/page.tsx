@@ -43,6 +43,29 @@ function NotebookCardSkeleton() {
   );
 }
 
+// ➕ AJOUTE CE NOUVEAU COMPOSANT
+function CarnetsLoadingSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* En-tête skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-8 bg-gray-200 rounded w-48 animate-pulse"></div>
+          <div className="h-5 bg-gray-150 rounded w-64 animate-pulse"></div>
+        </div>
+        <div className="h-10 bg-gray-200 rounded w-40 animate-pulse"></div>
+      </div>
+
+      {/* Grille de cartes skeleton - UTILISE ton NotebookCardSkeleton 6 fois */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, index) => (
+          <NotebookCardSkeleton key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Composant pour afficher les vignettes des recettes du carnet
 function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: any[] }) {
   // Récupérer les recettes du carnet avec des images
@@ -240,6 +263,10 @@ export default function CarnetsPage() {
   // États corrigés avec noms cohérents
   const [carnetTitle, setCarnetTitle] = useState('');
   const [carnetDescription, setCarnetDescription] = useState('');
+
+  if (loading) {
+  return <CarnetsLoadingSkeleton />;
+  }
 
   // Fonction de création du carnet
   const handleCreateCarnet = async () => {
