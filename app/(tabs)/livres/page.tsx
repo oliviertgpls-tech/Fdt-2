@@ -238,7 +238,7 @@ function BooksLoadingSkeleton() {
             onChange={(e) => setSelectedNotebook(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 text-sm md:text-base"
           >
-            <option value="all">Tous les carnets</option>
+            <option value="all">Filtrer par carnets (tous)</option>
             {notebooks.map((notebook) => (
               <option key={notebook.id} value={notebook.id}>
                 {notebook.title} ({notebook.recipeIds.length})

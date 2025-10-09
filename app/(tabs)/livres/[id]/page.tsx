@@ -7,6 +7,24 @@ import { useRecipes } from '@/contexts/RecipesProvider';
 import { ImageSearch } from '@/components/ImageSearch';
 import { useToast } from '@/components/Toast';
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 // Type pour les versions d'images
 type UploadResult = {
   versions: {
@@ -16,15 +34,107 @@ type UploadResult = {
   } | null;
 };
 
+// Composant pour une recette draggable
+function SortableRecipeItem({ 
+  recipe, 
+  index, 
+  onRemove 
+}: { 
+  recipe: any; 
+  index: number; 
+  onRemove: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: recipe.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  // Haptique mobile
+  const triggerHaptic = () => {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(10); // Vibration de 10ms
+    }
+  };
+
+    return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-green-50 border border-green-200 rounded-lg p-3"
+    >
+      <div className="flex items-center gap-3">
+        {/* Handle de drag EN PREMIER */}
+        <button
+          {...listeners}
+          {...attributes}
+          onMouseDown={triggerHaptic}
+          onTouchStart={triggerHaptic}
+          className="cursor-move p-1 hover:bg-green-200 rounded transition-all flex-shrink-0"
+          title="Glisser pour réorganiser"
+        >
+          <GripVertical className="w-4 h-4 text-gray-500" />
+        </button>
+
+        {/* Numéro de page */}
+        <div className="w-7 h-7 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
+          p.{4 + index}
+        </div>
+
+        {/* Contenu texte */}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-sm text-gray-900 whitespace-normal break-words">
+            {recipe.title}
+          </h4>
+          <p className="text-xs text-gray-600">
+            par {recipe.author || 'Famille'}
+          </p>
+        </div>
+
+        {/* Bouton suppression EN DERNIER */}
+        <button
+          onClick={() => {
+            if (confirm(`Retirer "${recipe.title}" de ce livre ?`)) {
+              onRemove(recipe.id);
+            }
+          }}
+          className="p-1 hover:bg-red-100 rounded transition-colors flex-shrink-0 text-red-600"
+          title="Retirer du livre"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function BookPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
+  // Sensors pour le drag & drop
+const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8, // Évite les clics accidentels
+    },
+  })
+);
   
   // Utilisez le context RecipesProvider
   const { 
     books, 
     recipes, 
     updateBook,
+    reorderBookRecipes,
     addRecipeToBook,
     removeRecipeFromBook,
     deleteBook
@@ -51,10 +161,27 @@ export default function BookPage() {
   const [editingTitle, setEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState('');
 
+  // State local pour l'ordre des recettes (pour mise à jour immédiate)
+  const [localRecipeIds, setLocalRecipeIds] = useState<string[]>([]);
+  // Flag pour éviter que useEffect écrase pendant un drag
+  const [isDragging, setIsDragging] = useState(false);
+
   // Trouvez les données directement depuis le context
   const book = books.find(b => b.id === id);
 
-  const bookRecipes = book ? recipes.filter(r => book.recipeIds.includes(r.id)) : [];
+  useEffect(() => {
+    if (book?.recipeIds && localRecipeIds.length === 0) {
+      console.log('🎬 INITIAL LOAD - setting localRecipeIds');
+      setLocalRecipeIds(book.recipeIds);
+    }
+  }, [book?.recipeIds]);
+
+    const bookRecipes = localRecipeIds.length > 0
+      ? localRecipeIds
+          .map(id => recipes.find(r => r.id === id))
+          .filter((r): r is any => r !== undefined)
+      : [];
+
   const availableRecipes = recipes.filter(recipe => 
     !book?.recipeIds?.includes(recipe.id)
   );
@@ -90,9 +217,21 @@ export default function BookPage() {
   };
 
   // Actions simplifiées
-  const handleAddRecipeToBook = (bookId: string, recipeId: string) => {
-    addRecipeToBook(bookId, recipeId);
-  };
+ const handleAddRecipeToBook = async (bookId: string, recipeId: string) => {
+  try {
+    // Ajouter via l'API
+    await addRecipeToBook(bookId, recipeId);
+    
+    // Mettre à jour le state local immédiatement
+    // On ajoute à la fin de la liste
+    setLocalRecipeIds(prev => [...prev, recipeId]);
+    
+    showToast('Recette ajoutée au livre !', 'success');
+  } catch (error) {
+    console.error('Erreur ajout:', error);
+    showToast('Erreur lors de l\'ajout', 'error');
+  }
+};
 
   const handleRemoveRecipeFromBook = (bookId: string, recipeId: string) => {
     removeRecipeFromBook(bookId, recipeId);
@@ -441,7 +580,65 @@ export default function BookPage() {
 
   // Calculs
   const pageCount = 6 + (bookRecipes.length * 2);
-  const estimatedPrice = pageCount * 0.30 + 3;
+  const estimatedPrice = pageCount * 0.30 + 10;
+
+
+
+  // Gestion du réordonnement des recettes
+  // Log quand le drag commence
+  const handleDragStart = (event: any) => {
+  console.log('🎬 DRAG START - active.id:', event.active.id);
+  setIsDragging(true);
+  // Haptique au début du drag
+  if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
+};
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+  const { active, over } = event;
+
+  if (over && active.id !== over.id && book) {
+    const oldIndex = localRecipeIds.indexOf(active.id as string);
+    const newIndex = localRecipeIds.indexOf(over.id as string);
+
+    const newOrder = arrayMove(localRecipeIds, oldIndex, newIndex);
+    
+    // Mise à jour immédiate du state local (UI instantanée)
+    setLocalRecipeIds(newOrder);
+
+    try {
+      // Appeler l'API de réordonnement
+      await reorderBookRecipes(book.id, newOrder);
+      showToast('Ordre des recettes modifié !', 'success');
+    } catch (error) {
+      console.error('❌ Save ERROR:', error);
+      // En cas d'erreur, revenir à l'ancien ordre
+      setLocalRecipeIds(localRecipeIds);
+      showToast('Erreur lors de la sauvegarde', 'error');
+    }
+  }
+  
+  setIsDragging(false);
+};
+
+  // Fonction pour retirer une recette du livre
+    const handleRemoveRecipe = async (recipeId: string) => {
+      if (book) {
+        try {
+          // Supprimer via l'API
+          await removeRecipeFromBook(book.id, recipeId);
+          
+          // Mettre à jour le state local immédiatement
+          setLocalRecipeIds(prev => prev.filter(id => id !== recipeId));
+          
+          showToast('Recette retirée du livre', 'success');
+        } catch (error) {
+          console.error('Erreur suppression:', error);
+          showToast('Erreur lors de la suppression', 'error');
+        }
+      }
+    };
 
   // Si le livre n'existe pas
   if (!book) {
@@ -463,8 +660,8 @@ export default function BookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-4">
-      <div className="max-w-6xl mx-auto pt-8 px-8">
+    <div className="min-h-screen pb-4">
+      <div className="w-full pt-1 px-1">
         <div className="text-orange-500 underline mb-2">
         <button
               onClick={() => router.back()}
@@ -486,7 +683,7 @@ export default function BookPage() {
                     type="text"
                     value={tempTitle}
                     onChange={(e) => setTempTitle(e.target.value)}
-                    className="text-lg md:text-xl font-semibold text-gray-800 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
+                    className="text-lg md:text-xl font-semibold text-gray-700 border border-gray-300 rounded px-2 md:px-3 py-1 focus:border-orange-500 focus:outline-none w-full min-w-0"
                     autoFocus
                   />
                   <button
@@ -737,40 +934,30 @@ export default function BookPage() {
                   </div>
                 </div>
 
-                {/* Recettes */}
-                {bookRecipes.map((recipe, index) => (
-                <div
-                  key={recipe.id}
-                  className="bg-green-50 border border-green-200 rounded-lg p-3"
+              {/* Recettes avec drag & drop */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={bookRecipes.map(r => r.id)}
+                  strategy={verticalListSortingStrategy}
                 >
-                  <div className="flex items-center gap-3">
-                    {/* Index rond */}
-                    <div className="w-7 h-7 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
-                      p.{4 + index}
-                    </div>
-
-                    {/* Contenu texte */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm text-gray-900 whitespace-normal break-words">
-                        {recipe.title}
-                      </h4>
-                      <p className="text-xs text-gray-600">
-                        par {recipe.author || 'Famille'}
-                      </p>
-                    </div>
-                    {/* Handle de drag */}
-                    <div className="inline-flex items-center">
-                    <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all flex-shrink-0">
-                      
-                      <GripVertical className="w-4 h-4 text-gray-500" />
-                    </button>
-                    </div>
-
-                  </div>
-                </div>
-                ))}
+                  {bookRecipes.map((recipe, index) => (
+                    <SortableRecipeItem
+                      key={recipe.id}
+                      recipe={recipe}
+                      index={index}
+                      onRemove={handleRemoveRecipe}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
               </div>
             )}
+
           </div>
 
           {/* Ajouter des recettes */}
@@ -891,9 +1078,9 @@ export default function BookPage() {
         <div className="m-10">
           <button
             onClick={downloadPDF}
-            className="w-full bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-lg flex items-center justify-center gap-3"
+            className="flex items-center justify-center bg-green-600 text-white text-sm px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold gap-3"
           >
-            <Download className="w-10 h-10" />
+            <Download className="w-4 h-4" />
             🚀 Soon : Impression du livre ! En attendant → Téléchargez le PDF
           </button>
         </div>

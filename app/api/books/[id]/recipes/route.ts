@@ -49,19 +49,37 @@ export async function POST(
   }
 }
 
-// DELETE /api/books/[id]/recipes/[recipeId] - Supprimer une recette d'un livre
+// DELETE /api/books/[id]/recipes - Supprimer une recette d'un livre
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { searchParams } = new URL(request.url)
-    const recipeId = searchParams.get('recipeId')
+    const { searchParams } = new URL(request.url);
+    const recipeId = searchParams.get('recipeId');
     
     if (!recipeId) {
-      return NextResponse.json({ error: 'recipeId manquant' }, { status: 400 })
+      return NextResponse.json({ error: 'recipeId manquant' }, { status: 400 });
     }
     
+    // Chercher le BookRecipe
+    const bookRecipe = await prisma.bookRecipe.findUnique({
+      where: {
+        bookId_recipeId: {
+          bookId: params.id,
+          recipeId: recipeId
+        }
+      }
+    });
+    
+    if (!bookRecipe) {
+      // Pas de BookRecipe trouvé - peut-être un ancien livre
+      return NextResponse.json({ 
+        error: 'Cette recette n\'est pas dans ce livre' 
+      }, { status: 404 });
+    }
+    
+    // Supprimer la relation BookRecipe
     await prisma.bookRecipe.delete({
       where: {
         bookId_recipeId: {
@@ -69,25 +87,15 @@ export async function DELETE(
           recipeId: recipeId
         }
       }
-    })
+    });
     
-    // Réorganiser les positions (optionnel, mais plus propre)
-    const remainingRecipes = await prisma.bookRecipe.findMany({
-      where: { bookId: params.id },
-      orderBy: { position: 'asc' }
-    })
+    return NextResponse.json({ success: true });
     
-    // Mettre à jour les positions pour qu'elles soient continues
-    for (let i = 0; i < remainingRecipes.length; i++) {
-      await prisma.bookRecipe.update({
-        where: { id: remainingRecipes[i].id },
-        data: { position: i }
-      })
-    }
-    
-    return NextResponse.json({ success: true })
   } catch (error: any) {
-    console.error('❌ Erreur DELETE book recipe:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('❌ Erreur DELETE book recipe:', error);
+    return NextResponse.json(
+      { error: error.message || 'Erreur lors de la suppression' },
+      { status: 500 }
+    );
   }
 }

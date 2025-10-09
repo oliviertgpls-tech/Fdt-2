@@ -314,6 +314,28 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
       throw err;
     }
   };
+
+  // Réorganiser l'ordre des recettes dans un livre
+  const reorderBookRecipes = async (bookId: string, recipeIds: string[]) => {
+    try {
+      const response = await fetch(`/api/books/${bookId}/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeIds })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors du réordonnement');
+      }
+      
+      // Pas besoin de mettre à jour le state ici - on le fait déjà avec localRecipeIds
+    } catch (err: any) {
+      console.error('Erreur reorderBookRecipes:', err);
+      setError('Erreur lors du réordonnement des recettes');
+      throw err;
+    }
+  };
   
   const addRecipeToBook = async (bookId: string, recipeId: string) => {
     try {
@@ -345,30 +367,33 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
   };
   
   const removeRecipeFromBook = async (bookId: string, recipeId: string) => {
-    try {
-      const response = await fetch(`/api/books/${bookId}/recipes?recipeId=${recipeId}`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur lors de la suppression');
-      }
-      
-      // Mettre à jour le state local après succès de l'API
-      setBooks(prev =>
-        prev.map(book =>
-          book.id === bookId
-            ? { ...book, recipeIds: book.recipeIds.filter((id: string) => id !== recipeId) }
-            : book
-        )
-      );
-    } catch (err: any) {
-      console.error('Erreur removeRecipeFromBook:', err);
-      setError('Erreur lors de la suppression de la recette du livre');
-      throw err;
+  try {
+    const response = await fetch(`/api/books/${bookId}/recipes?recipeId=${recipeId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Erreur lors de la suppression');
     }
-  };
+    
+    // Mettre à jour le state local après succès de l'API
+    setBooks(prev =>
+      prev.map(book =>
+        book.id === bookId
+          ? { 
+              ...book, 
+              recipeIds: (book.recipeIds || []).filter((id: string) => id !== recipeId) 
+            }
+          : book
+      )
+    );
+  } catch (err: any) {
+    console.error('Erreur removeRecipeFromBook:', err);
+    setError('Erreur lors de la suppression de la recette du livre');
+    throw err;
+  }
+};
 
   // 🆕 NOUVELLE FONCTION : Supprimer un livre
   const deleteBook = async (id: string) => {
@@ -409,6 +434,7 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
         updateBook,
         addRecipeToBook,
         removeRecipeFromBook,
+        reorderBookRecipes,
         deleteBook, 
         
         // État
