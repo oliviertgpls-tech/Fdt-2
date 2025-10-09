@@ -465,17 +465,19 @@ export default function BookPage() {
   return (
     <div className="min-h-screen bg-stone-100">
       <div className="max-w-6xl mx-auto pt-8 px-8">
-        
+        <div className="text-orange-500 underline mb-2">
+        <button
+              onClick={() => router.back()}
+              className="text-orange-600 hover:text-gray-800 transition-colors flex items-center gap-2 text-sm md:text-base"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Retour aux livres</span>
+            </button>
+        </div>
+
         {/* En-tête avec titre éditable */}
         <div className="bg-white rounded-lg shadow-sm border p-3 md:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 md:mb-8">
           <div className="flex items-center gap-4 w-full sm:w-auto">
-            <button
-              onClick={() => router.back()}
-              className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 text-sm md:text-base"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Retour</span>
-            </button>
             
             <div className="flex-1">
               {editingTitle ? (
@@ -502,7 +504,7 @@ export default function BookPage() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center mx-3 gap-3">
                   <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
                   <button
                     onClick={() => {
@@ -515,17 +517,17 @@ export default function BookPage() {
                   </button>
                 </div>
               )}
-              <p className="text-sm text-gray-600">
+              <p className="mx-3 text-sm text-gray-600">
                 {bookRecipes.length} recettes • {pageCount/2} pages • ≈ {estimatedPrice}€
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <button
               onClick={generatePreviewPDF}
               disabled={isGeneratingPreview}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+              className="bg-green-600 text-white mx-3 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
             >
               {isGeneratingPreview ? (
                 <>
@@ -545,7 +547,6 @@ export default function BookPage() {
               className="inline-flex bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
             >
               <Trash2 className="w-4 h-6" />
-              Supprimer
             </button>
           </div>
         </div>
@@ -555,7 +556,7 @@ export default function BookPage() {
           {/* Description du livre */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">📝 Description du livre</h2>
+              <h2 className="text-lg font-semibold text-gray-800">Description du livre</h2>
               <button
                 onClick={() => setEditingDescription(!editingDescription)}
                 className="text-gray-500 hover:text-gray-700 p-1"
@@ -597,7 +598,7 @@ export default function BookPage() {
           {/* Photo de couverture */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">📸 Photo de couverture</h2>
+              <h2 className="text-lg font-semibold text-gray-800">Photo de couverture</h2>
               <button
                 onClick={() => setEditingCover(!editingCover)}
                 className="text-gray-500 hover:text-gray-700 p-1"
@@ -736,7 +737,7 @@ export default function BookPage() {
 
           {/* Contenu du livre */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">📖 Contenu du livre</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">Contenu du livre</h2>
             
             {bookRecipes.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
@@ -747,22 +748,22 @@ export default function BookPage() {
               <div className="space-y-3">
                 
                 {/* Pages fixes */}
-                <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">1</span>
+                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.1</div>
                     <div>
                       <h4 className="font-medium text-gray-900">Couverture</h4>
-                      <p className="text-sm text-gray-600">Titre+Image si définie+ description</p>
+                      <p className="text-xs text-gray-600">Titre+Image si définie+ description</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">3</span>
+                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.{3}</div>
                     <div>
                       <h4 className="font-medium text-gray-900">Sommaire</h4>
-                      <p className="text-sm text-gray-600">Liste des recettes</p>
+                      <p className="text-xs text-gray-600">Liste des recettes</p>
                     </div>
                   </div>
                 </div>
@@ -771,28 +772,31 @@ export default function BookPage() {
                 {bookRecipes.map((recipe, index) => (
                 <div
                   key={recipe.id}
-                  className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4"
+                  className="bg-green-50 border border-green-200 rounded-lg p-3"
                 >
-                  <div className="flex items-center gap-2 md:gap-4">
+                  <div className="flex items-center gap-3">
                     {/* Index rond */}
-                    <div className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">
-                      {4 + index}
+                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+                      p.{4 + index}
                     </div>
-
-                    {/* Handle de drag */}
-                    <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all flex-shrink-0">
-                      <GripVertical className="w-4 h-4 text-gray-500" />
-                    </button>
 
                     {/* Contenu texte */}
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 whitespace-normal break-words">
                         {recipe.title}
                       </h4>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-xs text-gray-600">
                         par {recipe.author || 'Famille'}
                       </p>
                     </div>
+                    {/* Handle de drag */}
+                    <div className="inline-flex items-center">
+                    <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all flex-shrink-0">
+                      
+                      <GripVertical className="w-4 h-4 text-gray-500" />
+                    </button>
+                    </div>
+
                   </div>
                 </div>
                 ))}

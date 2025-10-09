@@ -157,7 +157,7 @@ function BooksLoadingSkeleton() {
                   <div className="aspect-[2/1] relative overflow-hidden">
                     {book.coverImageUrl ? (
                       // Photo de couverture personnalisée
-                      <div className="w-full h-full bg-gradient-to-br from-orange-50 to-orange-100 p-4">
+                      <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-50 p-4">
                         <img 
                           src={book.coverImageUrl} 
                           alt={`Couverture - ${book.title}`}
@@ -166,7 +166,7 @@ function BooksLoadingSkeleton() {
                       </div>
                     ) : (
                       // Icône livre par défaut
-                      <div className="w-full h-full bg-gradient-to-br from-orange-100 to-white flex items-center justify-center text-3xl md:text-4xl">
+                      <div className="w-full h-full bg-gradient-to-br from-orange-200 to-orange-50 flex items-center justify-center text-3xl md:text-4xl">
                         📖
                       </div>
                     )}
@@ -229,7 +229,7 @@ function BooksLoadingSkeleton() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 text-sm md:text-base"
-              placeholder="Rechercher une recette..."
+              placeholder="Rechercher une recette par nom"
             />
           </div>
           
@@ -238,7 +238,7 @@ function BooksLoadingSkeleton() {
             onChange={(e) => setSelectedNotebook(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 text-sm md:text-base"
           >
-            <option value="all">Toutes les recettes</option>
+            <option value="all">Tous les carnets</option>
             {notebooks.map((notebook) => (
               <option key={notebook.id} value={notebook.id}>
                 {notebook.title} ({notebook.recipeIds.length})
@@ -270,13 +270,13 @@ function BooksLoadingSkeleton() {
           <div className="text-center py-12">
             <div className="text-4xl mb-3">🔍</div>
             <p className="text-gray-600">Aucune recette trouvée</p>
-            {notebooks.length === 0 && (
+            {filteredRecipes.length === 0 && (
               <div className="mt-4">
                 <Link 
-                  href="/carnets" 
+                  href="/recipes" 
                   className="text-orange-600 hover:text-orange-700 underline text-sm"
                 >
-                  Créer votre premier carnet de recettes
+                  Créer votre première recette
                 </Link>
               </div>
             )}
@@ -288,12 +288,12 @@ function BooksLoadingSkeleton() {
                 key={recipe.id} 
                 className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
-                    ? 'border-orange-300 bg-orange-50'
+                    ? 'border-green-300 bg-green-50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
                 onClick={() => toggleRecipeSelection(recipe.id)}
               >
-                <div className="flex gap-3 md:gap-4">
+                <div className="items-center flex gap-3 md:gap-4">
                   <div className="relative">
                     <img 
                       src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
@@ -301,7 +301,7 @@ function BooksLoadingSkeleton() {
                       className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
                     />
                     {selectedRecipes.includes(recipe.id) && (
-                      <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                      <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
                         ✓
                       </div>
                     )}
@@ -317,7 +317,7 @@ function BooksLoadingSkeleton() {
                         key={tag}
                         className="bg-green-100 text-gray-500 px-2 py-0.5 rounded-xl text-xs"
                       >
-                        {tag}
+                        #{tag}
                       </span>
                     ))}
                   </div>

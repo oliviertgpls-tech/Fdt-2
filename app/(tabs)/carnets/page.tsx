@@ -76,7 +76,7 @@ function CarnetThumbnails({ carnetId, recipes }: { carnetId: string, recipes: an
   if (carnetRecipes.length === 0) {
     // Fallback vers l'icône si aucune image
     return (
-      <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-6xl">
+      <div className="aspect-[4/3] bg-gradient-to-br from-blue-200 to-blue-50 flex items-center justify-center text-6xl">
         📋
       </div>
     );
@@ -348,10 +348,10 @@ export default function CarnetsPage() {
                       {carnet.description || "Aucune description"}
                     </p>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="items-center justify-between text-sm text-gray-500 mb-4">
                       <span>{carnetRecipeCount} recette(s) dans ce carnet</span>
                     </div>
-                      <div className="inline-flex bg-green-600 text-sm text-bold text-green-100 rounded-lg text-sm px-3 py-2">
+                      <div className="inline-block justify-end w-auto bg-green-600 text-sm text-bold text-green-100 rounded-lg text-sm px-3 py-2">
                       <button>
                       Voir le carnet</button>
                       </div>
