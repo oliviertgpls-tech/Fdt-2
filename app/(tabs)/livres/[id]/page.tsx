@@ -752,7 +752,7 @@ export default function BookPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.1</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Couverture</h4>
+                      <h4 className="font-medium text-sm text-gray-900">Couverture</h4>
                       <p className="text-xs text-gray-600">Titre+Image si définie+ description</p>
                     </div>
                   </div>
@@ -762,7 +762,7 @@ export default function BookPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.{3}</div>
                     <div>
-                      <h4 className="font-medium text-gray-900">Sommaire</h4>
+                      <h4 className="text-sm font-medium text-gray-900">Sommaire</h4>
                       <p className="text-xs text-gray-600">Liste des recettes</p>
                     </div>
                   </div>
@@ -776,13 +776,13 @@ export default function BookPage() {
                 >
                   <div className="flex items-center gap-3">
                     {/* Index rond */}
-                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
+                    <div className="w-7 h-7 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-medium">
                       p.{4 + index}
                     </div>
 
                     {/* Contenu texte */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 whitespace-normal break-words">
+                      <h4 className="font-medium text-sm text-gray-900 whitespace-normal break-words">
                         {recipe.title}
                       </h4>
                       <p className="text-xs text-gray-600">
