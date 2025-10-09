@@ -177,9 +177,9 @@ export default function CarnetEditPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-gray-900">✏️ Édition</h1>
+            <h1 className="text-xl font-bold text-gray-900">Édition du carnet</h1>
             <p className="text-gray-600">
-              {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recettes dans le carnet
+              {actualCarnet.recipeIds ? actualCarnet.recipeIds.length : 0} recette(s) dans le carnet
             </p>
           </div>
         </div>
@@ -195,8 +195,7 @@ export default function CarnetEditPage() {
 
       {/* SECTION ÉDITION DU CARNET */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
-        <h2 className="text-xl font-semibold text-gray-800">📝 Informations du carnet</h2>
-        
+      
         {/* Titre du carnet */}
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -293,7 +292,7 @@ export default function CarnetEditPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-3 md:p-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 md:mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
-              📚 Recettes dans ce carnet ({carnetRecipes.length})
+              Recettes dans ce carnet ({carnetRecipes.length})
             </h3>
           </div>
 
@@ -419,7 +418,7 @@ export default function CarnetEditPage() {
                 >
                   <div className="flex gap-3">
                     {/* Checkbox visuel */}
-                    <div className="flex items-start pt-1">
+                    <div className="flex items-center pt-1">
                       <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                         selectedRecipesToAdd.includes(recipe.id)
                           ? 'bg-green-600 border-green-600'
@@ -446,7 +445,7 @@ export default function CarnetEditPage() {
                     
                     {/* Contenu */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">
+                      <h4 className="font-medium text-gray-900 text-sm md:text-base whitespace-normal break-words">
                         {recipe.title}
                       </h4>
                       <p className="text-xs md:text-sm text-gray-600">
@@ -455,7 +454,7 @@ export default function CarnetEditPage() {
                       
                       {/* Tags avec # et background */}
                       {recipe.tags && recipe.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex space-x-2 overflow-x-auto no-scrollbar py-1 whitespace-nowrap">
                           {recipe.tags.map((tag) => (
                             <span
                               key={tag}

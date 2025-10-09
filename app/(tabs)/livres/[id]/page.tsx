@@ -749,7 +749,7 @@ export default function BookPage() {
                 {/* Pages fixes */}
                 <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
                   <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">1</span>
+                    <span className="w-6 h-5 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">1</span>
                     <div>
                       <h4 className="font-medium text-gray-900">Couverture</h4>
                       <p className="text-sm text-gray-600">Titre+Image si définie+ description</p>
@@ -759,7 +759,7 @@ export default function BookPage() {
 
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">3</span>
+                    <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-medium">3</span>
                     <div>
                       <h4 className="font-medium text-gray-900">Sommaire</h4>
                       <p className="text-sm text-gray-600">Liste des recettes</p>
@@ -769,36 +769,32 @@ export default function BookPage() {
 
                 {/* Recettes */}
                 {bookRecipes.map((recipe, index) => (
-                  <div key={recipe.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4 group">
-                    <div className="inline-flex gap-3 md:gap-4">
-                      <div className="inline-flex items-center gap-1 md:gap-2 flex-shrink-0">
-                        <span className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">
-                          {4 + index}
-                        </span>
-                        <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all">
-                          <GripVertical className="w-4 h-4 text-gray-500" />
-                        </button>
-                      </div>
-                      
-                      <img 
-                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
-                        alt={recipe.title}
-                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
-                      />
-                      
-                 
-                      
-                      
+                <div
+                  key={recipe.id}
+                  className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4"
+                >
+                  <div className="flex items-center gap-2 md:gap-4">
+                    {/* Index rond */}
+                    <div className="w-6 h-6 md:w-8 md:h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">
+                      {4 + index}
                     </div>
-                         <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{recipe.title}</h4>
-                        <p className="text-sm text-gray-600">par {recipe.author || 'Famille'}</p>
-                        <p className="text-xs text-gray-500 mt-1">  1 page • ⏱️ {recipe.prepMinutes || 30}min
-                        </p>
-                      </div>
-  
+
+                    {/* Handle de drag */}
+                    <button className="opacity-50 group-hover:opacity-100 cursor-move p-1 hover:bg-purple-200 rounded transition-all flex-shrink-0">
+                      <GripVertical className="w-4 h-4 text-gray-500" />
+                    </button>
+
+                    {/* Contenu texte */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 whitespace-normal break-words">
+                        {recipe.title}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        par {recipe.author || 'Famille'}
+                      </p>
+                    </div>
                   </div>
-                  
+                </div>
                 ))}
               </div>
             )}

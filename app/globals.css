@@ -116,3 +116,12 @@ select:focus {
   border-color: #ef8b5f; /* orange au lieu de bleu */
   box-shadow: 0 0 0 3px rgba(239, 139, 95, 0.1);
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE et Edge */
+  scrollbar-width: none;     /* Firefox */
+}

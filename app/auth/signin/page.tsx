@@ -134,7 +134,7 @@ export default function SignInPage() {
       <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-br from-orange-400 to-orange-600 px-8 py-8 text-center text-white">
+            <div className="bg-gradient-to-br from-orange-400 to-orange-500 px-8 py-8 text-center text-white">
               <h1 className="text-3xl font-bold mb-2">Bienvenue !</h1>
               <p className="text-orange-100 text-lg">
                 Connectez-vous pour accéder à vos recettes
@@ -145,7 +145,7 @@ export default function SignInPage() {
             <div className="px-8 py-8 space-y-6">
               <button
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               >
                 <Chrome className="w-5 h-5" />
                 Se connecter avec Google
@@ -204,7 +204,7 @@ export default function SignInPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-green-600 text-white text-sm hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? (
                     <>
