@@ -527,7 +527,7 @@ const sensors = useSensors(
         rightY -= 20;
 
         const steps = typeof recipe.steps === 'string'
-          ? recipe.steps.split('\n\n').filter(s => s.trim())
+          ? recipe.steps.split('\n\n').filter((s: string) => s.trim())
           : Array.isArray(recipe.steps) ? recipe.steps : [];
 
         steps.forEach((step, idx) => {
