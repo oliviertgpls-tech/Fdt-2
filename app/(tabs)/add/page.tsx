@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { useToast } from '@/components/Toast';
-import heic2any from 'heic2any';
 
 
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
@@ -232,47 +231,50 @@ FORMAT DE RÉPONSE (JSON uniquement) :
     }
   }
 
- // NOUVELLE VERSION (avec gestion HEIC)
-    private async fileToBase64(file: File): Promise<string> {
-      // 🔄 Conversion HEIC → JPEG si nécessaire
-      let processedFile = file;
+ // NOUVELLE VERSION (avec import dynamique)
+private async fileToBase64(file: File): Promise<string> {
+  // 🔄 Conversion HEIC → JPEG si nécessaire
+  let processedFile = file;
+  
+  if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+    console.log('🔄 Conversion HEIC → JPEG en cours...');
+    try {
+      // ✨ IMPORT DYNAMIQUE : charge la librairie uniquement ici, côté client
+      const heic2any = (await import('heic2any')).default;
       
-      if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
-        console.log('🔄 Conversion HEIC → JPEG en cours...');
-        try {
-          const convertedBlob = await heic2any({
-            blob: file,
-            toType: 'image/jpeg',
-            quality: 0.9
-          });
-          
-          // heic2any peut retourner un tableau de Blobs, on prend le premier
-          const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-          
-          processedFile = new File(
-            [blob], 
-            file.name.replace(/\.heic$/i, '.jpg'),
-            { type: 'image/jpeg' }
-          );
-          console.log('✅ Conversion HEIC réussie');
-        } catch (error) {
-          console.error('❌ Erreur conversion HEIC:', error);
-          // On continue avec le fichier original en cas d'échec
-        }
-      }
-      
-      // 📤 Conversion en base64
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result as string;
-          const base64Data = base64.split(',')[1];
-          resolve(base64Data);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(processedFile);
+      const convertedBlob = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.9
       });
+      
+      // heic2any peut retourner un tableau de Blobs, on prend le premier
+      const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+      
+      processedFile = new File(
+        [blob], 
+        file.name.replace(/\.heic$/i, '.jpg'),
+        { type: 'image/jpeg' }
+      );
+      console.log('✅ Conversion HEIC réussie');
+    } catch (error) {
+      console.error('❌ Erreur conversion HEIC:', error);
+      // On continue avec le fichier original en cas d'échec
     }
+  }
+  
+  // 📤 Conversion en base64
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      const base64Data = base64.split(',')[1];
+      resolve(base64Data);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(processedFile);
+  });
+}
   }
 
 // Composant pour recherche d'images Unsplash simplifié
