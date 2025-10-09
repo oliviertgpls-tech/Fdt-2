@@ -463,7 +463,7 @@ export default function BookPage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-50 pb-4">
       <div className="max-w-6xl mx-auto pt-8 px-8">
         <div className="text-orange-500 underline mb-2">
         <button
@@ -481,7 +481,7 @@ export default function BookPage() {
             
             <div className="flex-1">
               {editingTitle ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between items-center gap-3">
                   <input
                     type="text"
                     value={tempTitle}
@@ -492,7 +492,7 @@ export default function BookPage() {
                   <button
                     onClick={saveTitle}
                     disabled={!tempTitle.trim()}
-                    className="bg-blue-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+                    className="bg-green-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50"
                   >
                     ✓
                   </button>
@@ -504,17 +504,18 @@ export default function BookPage() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center mx-3 gap-3">
-                  <h1 className="text-xl font-semibold text-gray-800">{book.title}</h1>
-                  <button
-                    onClick={() => {
-                      setTempTitle(book.title);
-                      setEditingTitle(true);
-                    }}
-                    className="text-gray-400 hover:text-gray-600 p-1"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
+                  
+                    <div className="flex items-center justify-between">
+                      <h1 className="text-base font-semibold text-gray-800 m-3">{book.title}</h1>
+                      <button
+                        onClick={() => {
+                          setTempTitle(book.title);
+                          setEditingTitle(true);
+                        }}
+                        className="text-gray-500 hover:text-gray-600"
+                      >
+                        <Edit3 className="w-4 h-4 mr-4" />
+                      </button>
                 </div>
               )}
               <p className="mx-3 text-sm text-gray-600">
@@ -522,33 +523,7 @@ export default function BookPage() {
               </p>
             </div>
           </div>
-          
-          <div className="flex items-center">
-            <button
-              onClick={generatePreviewPDF}
-              disabled={isGeneratingPreview}
-              className="bg-green-600 text-white mx-3 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-            >
-              {isGeneratingPreview ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Génération...
-                </>
-              ) : (
-                <>
-                  <Eye className="w-4 h-4" />
-                  Aperçu
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleDeleteBook}
-              className="inline-flex bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200"
-            >
-              <Trash2 className="w-4 h-6" />
-            </button>
-          </div>
+  
         </div>
 
         <div className="space-y-6">
@@ -556,7 +531,7 @@ export default function BookPage() {
           {/* Description du livre */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Description du livre</h2>
+              <h2 className="text-base font-semibold text-gray-800">Description du livre</h2>
               <button
                 onClick={() => setEditingDescription(!editingDescription)}
                 className="text-gray-500 hover:text-gray-700 p-1"
@@ -576,20 +551,20 @@ export default function BookPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={saveDescription}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
                   >
                     Sauvegarder
                   </button>
                   <button
                     onClick={() => setEditingDescription(false)}
-                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="bg-gray-100 text-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Annuler
                   </button>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-xs text-gray-600 leading-relaxed">
                 {bookDescription || "Aucune description pour le moment. Cliquez sur l'icône pour en ajouter une."}
               </p>
             )}
@@ -598,13 +573,7 @@ export default function BookPage() {
           {/* Photo de couverture */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Photo de couverture</h2>
-              <button
-                onClick={() => setEditingCover(!editingCover)}
-                className="text-gray-500 hover:text-gray-700 p-1"
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
+              <h2 className="text-base font-semibold text-gray-800">Photo de couverture</h2>
             </div>
 
             {editingCover ? (
@@ -683,13 +652,13 @@ export default function BookPage() {
                       router.refresh();
                     }}
                     disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-vert-700 transition-colors disabled:opacity-50"
                   >
-                    Sauvegarder la couverture
+                    Définir comme couverture
                   </button>
                   <button
                     onClick={() => setEditingCover(false)}
-                    className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="bg-gray-100 text-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Annuler
                   </button>
@@ -718,10 +687,10 @@ export default function BookPage() {
                 ) : (
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                     <div className="text-4xl mb-2">📷</div>
-                    <p className="text-gray-600 mb-4">Aucune photo de couverture</p>
+                    <p className="text-sm text-gray-600 mb-4">Aucune photo de couverture</p>
                     <button
                       onClick={() => setEditingCover(true)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      className="bg-blue-600 text-sm text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Ajouter une photo
                     </button>
@@ -730,7 +699,7 @@ export default function BookPage() {
               </div>
             )}
             
-            <p className="text-xs text-gray-500 mt-3">
+            <p className="text-xs text-center text-gray-500 mt-3">
               💡 <strong>Idée :</strong> Photo de famille en cuisine, portrait de grand-mère, ou image symbolique
             </p>
           </div>
@@ -809,10 +778,12 @@ export default function BookPage() {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">➕ Ajouter des recettes</h3>
             
             {availableRecipes.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center text-sm p-8 text-gray-500">
                 <div className="text-3xl mb-2">🎉</div>
                 <p>Toutes vos recettes sont dans ce livre !</p>
               </div>
+
+
             ) : (
               <div className="space-y-3 max-h-80 overflow-y-auto">
                 {availableRecipes.map((recipe) => (
@@ -855,6 +826,36 @@ export default function BookPage() {
 
         </div>
       </div>
+
+<div className="mb-4 border-gray-500">
+      <div className="items-center justify-center m-4 mb-4 flex items-center">
+            <button
+              onClick={generatePreviewPDF}
+              disabled={isGeneratingPreview}
+              className="bg-green-600 text-white text-sm mx-3 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+            >
+              {isGeneratingPreview ? (
+                <>
+                  <Loader className="w-4 h-4 animate-spin" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  Aperçu
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleDeleteBook}
+              className="inline-flex items-center text-sm bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
+            >
+              <Trash2 className="w-4 h-6 mx-2" />
+              Supprimer
+            </button>
+          </div>
+          </div>
 
       {/* Modale PDF plein écran */}
         {showPDFModal && pdfUrl && (

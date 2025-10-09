@@ -161,7 +161,7 @@ function BooksLoadingSkeleton() {
                         <img 
                           src={book.coverImageUrl} 
                           alt={`Couverture - ${book.title}`}
-                          className="w-full h-full object-cover rounded-lg shadow-sm"
+                          className="w-full/3 h-full/2 object-cover rounded-lg shadow-sm"
                         />
                       </div>
                     ) : (
