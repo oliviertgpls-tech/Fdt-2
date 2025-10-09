@@ -530,7 +530,7 @@ const sensors = useSensors(
           ? recipe.steps.split('\n\n').filter((s: string) => s.trim())
           : Array.isArray(recipe.steps) ? recipe.steps : [];
 
-        steps.forEach((step, idx) => {
+        steps.forEach((step: string, idx: number) => {
           if (rightY < margin + 40) return;
 
           const stepNum = `${idx + 1}. `;
