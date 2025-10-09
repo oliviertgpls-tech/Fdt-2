@@ -23,6 +23,7 @@ type RecipesContextType = {
   createBook: (title: string, selectedRecipeIds: string[]) => Promise<any>;
   updateBook: (id: string, bookData: any) => Promise<void>;
   addRecipeToBook: (bookId: string, recipeId: string) => Promise<void>;
+  reorderBookRecipes: (bookId: string, recipeIds: string[]) => Promise<void>; 
   removeRecipeFromBook: (bookId: string, recipeId: string) => Promise<void>;
   deleteBook: (id: string) => Promise<void>; // 🆕
   
