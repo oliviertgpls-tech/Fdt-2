@@ -13,6 +13,7 @@ import {
   KeyboardSensor,
   PointerSensor,
   useSensor,
+  TouchSensor,
   useSensors,
   DragEndEvent,
 } from '@dnd-kit/core';
@@ -120,14 +121,21 @@ function SortableRecipeItem({
 export default function BookPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
-  // Sensors pour le drag & drop
-const sensors = useSensors(
-  useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 8, // Évite les clics accidentels
-    },
-  })
-);
+
+  // Sensors pour le drag & drop (desktop + mobile)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Distance minimale avant d'activer le drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200, // Délai avant d'activer le drag sur mobile (pour permettre le scroll)
+        tolerance: 8,
+      },
+    })
+  );
   
   // Utilisez le context RecipesProvider
   const { 
