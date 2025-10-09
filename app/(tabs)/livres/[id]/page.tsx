@@ -605,21 +605,30 @@ export default function BookPage() {
   }
 };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+const handleDragEnd = async (event: DragEndEvent) => {
   const { active, over } = event;
+  
+  console.log('🏁 DRAG END - active:', active.id, 'over:', over?.id);
 
   if (over && active.id !== over.id && book) {
     const oldIndex = localRecipeIds.indexOf(active.id as string);
     const newIndex = localRecipeIds.indexOf(over.id as string);
 
+    console.log('📍 Indexes:', { oldIndex, newIndex });
+    
     const newOrder = arrayMove(localRecipeIds, oldIndex, newIndex);
+    
+    console.log('📦 OLD ORDER:', localRecipeIds);
+    console.log('✨ NEW ORDER:', newOrder);
     
     // Mise à jour immédiate du state local (UI instantanée)
     setLocalRecipeIds(newOrder);
+    console.log('💾 Local state updated');
 
     try {
       // Appeler l'API de réordonnement
       await reorderBookRecipes(book.id, newOrder);
+      console.log('✅ API Success');
       showToast('Ordre des recettes modifié !', 'success');
     } catch (error) {
       console.error('❌ Save ERROR:', error);
@@ -627,9 +636,12 @@ export default function BookPage() {
       setLocalRecipeIds(localRecipeIds);
       showToast('Erreur lors de la sauvegarde', 'error');
     }
+  } else {
+    console.log('⚠️ No drag happened');
   }
   
   setIsDragging(false);
+  console.log('🔓 isDragging set to false');
 };
 
   // Fonction pour retirer une recette du livre

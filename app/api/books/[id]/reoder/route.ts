@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { recipeIds } = body; // Array d'IDs dans le nouvel ordre
+    const { recipeIds } = body;
     
     if (!Array.isArray(recipeIds)) {
       return NextResponse.json({ error: 'recipeIds doit être un array' }, { status: 400 });
