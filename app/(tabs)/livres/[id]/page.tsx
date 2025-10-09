@@ -533,10 +533,12 @@ const sensors = useSensors(
         steps.forEach((step: string, idx: number) => {
           if (rightY < margin + 40) return;
 
-          const stepNum = `${idx + 1}. `;
-          const stepNumWidth = fontBody.widthOfTextAtSize(stepNum, 10);
+          // Ajouter le numéro si pas déjà présent
+          const stepWithNumber = /^\d+\.?\s/.test(step) 
+            ? step // Déjà numéroté
+            : `${idx + 1}. ${step}`; // Ajouter le numéro
 
-          rightY = drawParagraph(page, step, rightX, rightY, fontBody, 12, colorBody, colWidth, 2) - 12;
+          rightY = drawParagraph(page, stepWithNumber, rightX, rightY, fontBody, 12, colorBody, colWidth, 2) - 12;
         });
       }
       console.log('💾 Génération des bytes PDF...');
@@ -580,7 +582,7 @@ const sensors = useSensors(
 
   // Calculs
   const pageCount = 6 + (bookRecipes.length * 2);
-  const estimatedPrice = pageCount * 0.30 + 10;
+  const estimatedPrice = Math.round((pageCount * 0.30 + 15) * 1) / 1;
 
 
 
