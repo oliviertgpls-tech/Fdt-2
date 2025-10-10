@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ArrowLeft, Edit3, Plus, Trash2 } from "lucide-react";
 import { useToast } from '@/components/Toast';
+import { ConfirmModal } from '@/components/ConfirmModal';
 
 export default function CarnetPage() {
   const { id } = useParams() as { id: string };
@@ -13,6 +14,7 @@ export default function CarnetPage() {
   const { notebooks, recipes, createBook, deleteNotebook } = useRecipes();
   const [searchQuery, setSearchQuery] = useState("");
   const { showToast } = useToast();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Trouver le carnet
   const carnet = notebooks.find(n => n.id === id);
@@ -60,12 +62,16 @@ export default function CarnetPage() {
     }
   };
 
-  const handleDeleteCarnet = () => {
-    if (window.confirm(`Supprimer le carnet "${carnet?.title}" ?\n\nCette action est irréversible.`)) {
-      deleteNotebook(id);
-      router.push('/carnets');
-    }
-  };
+    const handleDeleteCarnet = async () => {
+      try {
+        await deleteNotebook(id);
+        showToast('Carnet supprimé', 'success');
+        router.push('/carnets');
+      } catch (error) {
+        console.error('Erreur suppression carnet:', error);
+        showToast('Erreur lors de la suppression', 'error');
+      }
+    };
 
   // Gestion du carnet introuvable
   if (!carnet) {
@@ -148,6 +154,15 @@ export default function CarnetPage() {
               >
                 Ajouter des recettes
               </Link>
+              <div>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Supprimer</span>
+                </button>
+                </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -281,6 +296,17 @@ export default function CarnetPage() {
           </div>
         </>
       )}
+          {/* Modale de confirmation */}
+                <ConfirmModal
+                  isOpen={showDeleteModal}
+                  onClose={() => setShowDeleteModal(false)}
+                  onConfirm={handleDeleteCarnet}
+                  title="Supprimer ce carnet ?"
+                  message={`Êtes-vous sûr de vouloir supprimer le carnet "${carnet.title}" ? Cette action est irréversible.`}
+                  confirmText="Supprimer"
+                  cancelText="Annuler"
+                  isDangerous={true}
+                />
     </div>
   );
 }

@@ -7,18 +7,135 @@ import { useParams, useRouter } from "next/navigation";
 import Link from 'next/link';
 import { useToast } from '@/components/Toast';
 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  TouchSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
+
+// Composant pour une recette draggable
+function SortableRecipeItem({ 
+  recipe, 
+  onRemove,
+  carnetId
+}: { 
+  recipe: any; 
+  onRemove: (carnetId: string, recipeId: string) => void;
+  carnetId: string;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: recipe.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  // Haptique mobile
+  const triggerHaptic = () => {
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-green-50 border border-gray-200 rounded-lg p-3 hover:border-green-500 transition-all"
+    >
+      <div className="flex items-center gap-3">
+        {/* Handle de drag */}
+        <button
+          {...listeners}
+          {...attributes}
+          onMouseDown={triggerHaptic}
+          onTouchStart={triggerHaptic}
+          className="cursor-move p-1 hover:bg-gray-100 rounded transition-all flex-shrink-0"
+          title="Glisser pour réorganiser"
+        >
+          <GripVertical className="w-4 h-4 text-gray-400" />
+        </button>
+
+        {/* Contenu */}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-sm text-gray-900 truncate">
+            {recipe.title}
+          </h4>
+          <p className="text-xs text-gray-500">
+            par {recipe.author || 'Famille'}
+          </p>
+        </div>
+
+        {/* Bouton suppression */}
+        <button
+          onClick={() => {
+            if (confirm(`Retirer "${recipe.title}" de ce carnet ?`)) {
+              onRemove(carnetId, recipe.id);
+            }
+          }}
+          className="p-1 hover:bg-red-100 rounded transition-colors flex-shrink-0 text-red-600"
+          title="Retirer du carnet"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function CarnetEditPage() {
   const { showToast } = useToast(); 
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook, deleteNotebook } = useRecipes();
+
+  // Sensors pour le drag & drop (desktop + mobile)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  );
   
+  // State local pour l'ordre des recettes
+  const [localRecipeIds, setLocalRecipeIds] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+
   // États pour l'édition du carnet
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [carnetTitle, setCarnetTitle] = useState('');
   const [carnetDescription, setCarnetDescription] = useState('');
+  
   
   // État pour la sélection multiple de recettes
   const [selectedRecipesToAdd, setSelectedRecipesToAdd] = useState<string[]>([]);
@@ -33,6 +150,13 @@ export default function CarnetEditPage() {
       setCarnetDescription(currentCarnet.description || '');
     }
   }, [currentCarnet]);
+
+  // Initialiser l'ordre local des recettes
+  React.useEffect(() => {
+    if (currentCarnet?.recipeIds && localRecipeIds.length === 0) {
+      setLocalRecipeIds(currentCarnet.recipeIds);
+    }
+  }, [currentCarnet?.recipeIds]);
 
   // Gestion du cas où le carnet n'existe pas
   if (!currentCarnet) {
@@ -55,12 +179,22 @@ export default function CarnetEditPage() {
 
   // Rechercher le carnet mis à jour dans le state
   const actualCarnet = notebooks.find(n => n.id === currentCarnet.id) || currentCarnet;
+
+  // Utiliser localRecipeIds pour l'ordre (drag & drop)
+  const carnetRecipes = localRecipeIds.length > 0
+    ? localRecipeIds
+        .map(id => recipes.find(r => r.id === id))
+        .filter((r): r is any => r !== undefined)
+    : recipes.filter(recipe => 
+        actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
+      );
   
-  // Recettes dans le carnet
-  const carnetRecipes = recipes.filter(recipe => 
-    actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
-  );
-  
+    React.useEffect(() => {
+    if (!isDragging && actualCarnet?.recipeIds) {
+      setLocalRecipeIds(actualCarnet.recipeIds);
+    }
+  }, [actualCarnet?.recipeIds, isDragging]);
+
   // Recettes disponibles (pas encore dans le carnet)
   const availableRecipes = recipes.filter(recipe => {
     // Exclure celles déjà dans le carnet
@@ -165,6 +299,53 @@ export default function CarnetEditPage() {
     setEditingDescription(false);
   };
 
+  // Gestion du drag & drop
+  const handleDragStart = () => {
+    setIsDragging(true);
+    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id && actualCarnet) {
+      const oldIndex = localRecipeIds.indexOf(active.id as string);
+      const newIndex = localRecipeIds.indexOf(over.id as string);
+      
+      const newOrder = arrayMove(localRecipeIds, oldIndex, newIndex);
+      
+      // Mise à jour immédiate du state local
+      setLocalRecipeIds(newOrder);
+
+      try {
+        await reorderNotebookRecipes(actualCarnet.id, newOrder);
+        showToast('Ordre des recettes modifié !', 'success');
+      } catch (error) {
+        console.error('❌ Save ERROR:', error);
+        showToast('Erreur lors de la sauvegarde', 'error');
+        // Rollback en cas d'erreur
+        setLocalRecipeIds(localRecipeIds);
+      }
+    }
+    
+    setIsDragging(false);
+  };
+
+  const handleDeleteCarnet = async () => {
+    if (confirm(`Supprimer le carnet "${actualCarnet.title}" ?\n\nCette action est irréversible.`)) {
+      try {
+        await deleteNotebook(actualCarnet.id);
+        showToast('Carnet supprimé', 'success');
+        router.push('/carnets');
+      } catch (error) {
+        console.error('Erreur suppression carnet:', error);
+        showToast('Erreur lors de la suppression', 'error');
+      }
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 space-y-6 md:space-y-8">
       {/* EN-TÊTE */}
@@ -192,6 +373,8 @@ export default function CarnetEditPage() {
           Voir
         </Link>
       </div>
+
+      
 
       {/* SECTION ÉDITION DU CARNET */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
@@ -304,37 +487,34 @@ export default function CarnetEditPage() {
             </div>
           ) : (
             <div className="space-y-2 max-h-64 md:max-h-96 overflow-y-auto">
-              {carnetRecipes.map((recipe) => (
-                <div key={recipe.id} className="group bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">
-                        {recipe.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                        {recipe.description || 'Aucune description'}
-                      </p>
-                      <div className="flex items-center gap-10 mt-2 text-xs text-gray-500">
-                        <span>⏱ {recipe.prepMinutes || '?'} min</span>
-                        <span>
-                          {recipe.tags && recipe.tags.length > 0 
-                            ? recipe.tags.map(tag => `#${tag}`).join(' ')
-                            : ''
-                          }
-                        </span>
-                      </div>
+              {carnetRecipes.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-8">
+                  Aucune recette dans ce carnet
+                </p>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={carnetRecipes.map(r => r.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {carnetRecipes.map((recipe) => (
+                        <SortableRecipeItem
+                          key={recipe.id}
+                          recipe={recipe}
+                          carnetId={actualCarnet.id}
+                          onRemove={handleRemoveRecipe}
+                        />
+                      ))}
                     </div>
-                    
-                    <button
-                      onClick={() => handleRemoveRecipe(actualCarnet.id, recipe.id)}
-                      className="text-gray-400 hover:text-red-600 transition-colors w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center flex-shrink-0"
-                      title="Retirer du carnet"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  </SortableContext>
+                </DndContext>
+              )}
             </div>
           )}
         </div>

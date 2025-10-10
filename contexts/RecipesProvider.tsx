@@ -338,6 +338,8 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
     }
   };
   
+
+
   const addRecipeToBook = async (bookId: string, recipeId: string) => {
     try {
       const response = await fetch(`/api/books/${bookId}/recipes`, {
@@ -363,6 +365,28 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
     } catch (err: any) {
       console.error('Erreur addRecipeToBook:', err);
       setError('Erreur lors de l\'ajout de la recette au livre');
+      throw err;
+    }
+  };
+
+  // Réorganiser l'ordre des recettes dans un carnet
+  const reorderNotebookRecipes = async (notebookId: string, recipeIds: string[]) => {
+    try {
+      const response = await fetch(`/api/notebooks/${notebookId}/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeIds })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors du réordonnancement');
+      }
+      
+      // Pas besoin de mettre à jour le state ici - on le fait déjà avec localRecipeIds
+    } catch (err: any) {
+      console.error('Erreur reorderNotebookRecipes:', err);
+      setError('Erreur lors du réordonnancement des recettes');
       throw err;
     }
   };
@@ -426,6 +450,7 @@ const removeRecipeFromNotebook = async (notebookId: string, recipeId: string) =>
         createNotebook,
         addRecipeToNotebook,
         removeRecipeFromNotebook,
+        reorderNotebookRecipes,
         deleteNotebook, 
         updateNotebook,
         
