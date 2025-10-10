@@ -755,7 +755,7 @@ const handleMultipleScanUpload = async () => {
     
     if (!uploadResult) {
       console.error('❌ Upload a échoué, mais on continue avec les données IA');
-      showToast('⚠️ Photo non uploadée, mais recette analysée', 'warning');
+      showToast('⚠️ Photo non uploadée, mais recette analysée', 'error');
     } else {
       console.log('✅ Photo uploadée avec succès:', uploadResult.originalUrl);
     }
