@@ -14,7 +14,34 @@ export async function POST(request: NextRequest) {
     // Convertir en base64
     const bytes = await file.arrayBuffer()
     const base64 = Buffer.from(bytes).toString('base64')
-    const dataURI = `data:${file.type};base64,${base64}`
+
+    // 🔧 Valider et corriger le type MIME
+    let mimeType = file.type;
+
+    // Si le type est vide ou invalide, on détecte selon l'extension du fichier
+    if (!mimeType || mimeType === 'application/octet-stream' || !mimeType.startsWith('image/')) {
+      const fileName = file.name.toLowerCase();
+      
+      if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
+        mimeType = 'image/jpeg';
+      } else if (fileName.endsWith('.png')) {
+        mimeType = 'image/png';
+      } else if (fileName.endsWith('.webp')) {
+        mimeType = 'image/webp';
+      } else if (fileName.endsWith('.gif')) {
+        mimeType = 'image/gif';
+      } else {
+        // Par défaut, on force JPEG (le plus universel)
+        mimeType = 'image/jpeg';
+      }
+      
+      console.log(`🔧 Type MIME corrigé : ${file.type} → ${mimeType}`);
+    }
+
+    const dataURI = `data:${mimeType};base64,${base64}`;
+
+    console.log('📦 Type MIME utilisé:', mimeType);
+    console.log('📦 Taille dataURI:', dataURI.length, 'caractères');
 
     console.log('☁️ Tentative upload Cloudinary')
     console.log('📋 Cloud name:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
