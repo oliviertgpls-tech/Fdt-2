@@ -15,6 +15,7 @@ type RecipesContextType = {
   createNotebook: (title: string, description?: string) => Promise<Book>;
   addRecipeToNotebook: (notebookId: string, recipeId: string) => Promise<void>;
   removeRecipeFromNotebook: (notebookId: string, recipeId: string) => Promise<void>;
+  reorderNotebookRecipes: (notebookId: string, recipeIds: string[]) => Promise<void>;
   deleteNotebook: (id: string) => Promise<void>;
   updateNotebook: (id: string, updates: { title?: string; description?: string }) => Promise<void>;
   

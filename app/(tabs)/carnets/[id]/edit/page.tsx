@@ -107,7 +107,7 @@ export default function CarnetEditPage() {
   const { showToast } = useToast(); 
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook, deleteNotebook } = useRecipes();
+  const { notebooks, recipes, addRecipeToNotebook, removeRecipeFromNotebook, createBook, updateNotebook, reorderNotebookRecipes, deleteNotebook } = useRecipes();
 
   // Sensors pour le drag & drop (desktop + mobile)
   const sensors = useSensors(
