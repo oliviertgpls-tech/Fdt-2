@@ -467,46 +467,54 @@ export default function AddRecipePage() {
     console.log('Unsplash:', process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY ? 'PRÉSENTE' : 'MANQUANTE');
   });
 
- // 🔄 FONCTION D'UPLOAD MISE À JOUR avec optimisations
-  const handleImageUpload = async (file: File): Promise<UploadResult | null> => { // ⬅️ NOUVEAU: Retourne le résultat ou null
-    setIsUploading(true);
+const handleImageUpload = async (file: File): Promise<UploadResult | null> => {
+  setIsUploading(true);
+  
+  try {
+    console.log('📤 Upload optimisé en cours...', file.name);
+    console.log('📦 Taille fichier:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+    console.log('📦 Type fichier:', file.type);
     
-    try {
-      console.log('📤 Upload optimisé en cours...', file.name);
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        // ... gestion d'erreur ...
-      }
-      
-      const result: UploadResult = await response.json();
-      
-      if (result.success) {
-        // 🆕 Stocker les versions optimisées
-        setImageVersions(result.versions);
-        // Garder compatibilité avec l'ancien système
-        setImageUrl(result.originalUrl); // ⬅️ CETTE LIGNE EST CRUCIALE POUR LE RENDU ET LA SAUVEGARDE
-
-        showToast('Photo uploadée avec succès !', 'success');
-        return result; // ⬅️ RETOURNER LE RÉSULTAT
-      } else {
-        throw new Error(result.message || 'Erreur upload');
-      }
-      
-    } catch (error: any) {
-      // ... gestion d'erreur ...
-      return null; // ⬅️ RETOURNER null en cas d'échec
-    } finally {
-      setIsUploading(false);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    console.log('📡 Réponse API upload, status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Erreur API upload:', errorData);
+      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
     }
-  };
+    
+    const result: UploadResult = await response.json();
+    console.log('✅ Résultat upload:', result);
+    
+    if (result.success) {
+      // 🆕 Stocker les versions optimisées
+      setImageVersions(result.versions);
+      // Garder compatibilité avec l'ancien système
+      setImageUrl(result.originalUrl);
+      
+      console.log('✅ Image URL sauvegardée:', result.originalUrl);
+      showToast('Photo uploadée avec succès !', 'success');
+      return result;
+    } else {
+      throw new Error(result.message || 'Erreur upload');
+    }
+    
+  } catch (error: any) {
+    console.error('💥 Erreur complète dans handleImageUpload:', error);
+    showToast(`Erreur upload : ${error.message}`, 'error');
+    return null;
+  } finally {
+    setIsUploading(false);
+  }
+};
 
 // 🆕 NOUVELLE FONCTION : Traiter plusieurs scans séquentiellement
 const handleMultipleScanUpload = async () => {
@@ -721,41 +729,49 @@ const handleMultipleScanUpload = async () => {
     }
   };
 
-  // Analyse photo avec debug détaillé
-  const handlePhotoUpload = async (file: File) => {
-    setIsProcessing(true);
-    console.log('🎬 Début handlePhotoUpload');
-    console.log('📸 Fichier:', file.name, '-', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+ const handlePhotoUpload = async (file: File) => {
+  setIsProcessing(true);
+  console.log('🎬 Début handlePhotoUpload');
+  console.log('📸 Fichier:', file.name, '-', (file.size / 1024 / 1024).toFixed(2), 'Mo');
+  
+  try {
+    // 1️⃣ Analyse IA
+    console.log('🤖 Analyse IA en cours...');
+    const aiResult = await openAIService.analyzePhotoToRecipe(file, firstName);
+    console.log('✅ IA terminée:', aiResult.title);
     
-    try {
-      // Analyse IA
-      console.log('🤖 Analyse IA en cours...');
-      const aiResult = await openAIService.analyzePhotoToRecipe(file, firstName);
-      console.log('✅ IA terminée:', aiResult.title);
-      
-      // Remplir les champs
-      setTitle(aiResult.title);
-      setAuthor(aiResult.author);
-      setPrepMinutes(aiResult.prepMinutes.toString());
-      setServings(aiResult.servings);
-      setIngredients(aiResult.ingredients.join('\n'));
-      setSteps(aiResult.steps);
-      setAiConfidence(aiResult.confidence);
-      
-      // Upload optimisé
-      console.log('📤 Upload optimisé en cours...');
-      await handleImageUpload(file);
-      console.log('🎉 Tout fini! Image optimisée et données IA prêtes');
-      
-      setMode('manual');
-      
-    } catch (error: any) {
-      console.error('💥 Erreur dans handlePhotoUpload:', error);
-      showToast(`Erreur détaillée: ${error.message}`,'error');
-    } finally {
-      setIsProcessing(false);
+    // 2️⃣ Remplir les champs
+    setTitle(aiResult.title);
+    setAuthor(aiResult.author);
+    setPrepMinutes(aiResult.prepMinutes.toString());
+    setServings(aiResult.servings);
+    setIngredients(aiResult.ingredients.join('\n'));
+    setSteps(aiResult.steps);
+    setAiConfidence(aiResult.confidence);
+    
+    // 3️⃣ Upload de la photo (AVEC VÉRIFICATION DU RÉSULTAT)
+    console.log('📤 Upload de la photo en cours...');
+    const uploadResult = await handleImageUpload(file);
+    
+    if (!uploadResult) {
+      console.error('❌ Upload a échoué, mais on continue avec les données IA');
+      showToast('⚠️ Photo non uploadée, mais recette analysée', 'warning');
+    } else {
+      console.log('✅ Photo uploadée avec succès:', uploadResult.originalUrl);
     }
-  };
+    
+    // 4️⃣ Passer en mode manuel pour éditer
+    console.log('✅ Passage en mode manuel');
+    showToast('✅ Image optimisée et données IA prêtes', 'success');
+    setMode('manual');
+    
+  } catch (error: any) {
+    console.error('💥 Erreur dans handlePhotoUpload:', error);
+    showToast(`Erreur : ${error.message}`, 'error');
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   // Mode "link" - Interface pour ajout par lien
   if (mode === 'link') {
