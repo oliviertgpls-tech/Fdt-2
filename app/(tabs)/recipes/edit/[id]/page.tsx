@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ImageSearch } from "@/components/ImageSearch";
 import type { Recipe } from "@/lib/types";
+import { Plus, Eye, Trash2, Edit3, Clock4, Utensils, Save} from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function EditRecipePage() {
@@ -462,9 +463,9 @@ Simple et naturel !"
               type="button"
               onClick={handleSave}
               disabled={isSaving || !title.trim() || isUploading}
-              className="flex-1 bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-900 disabled:opacity-50 transition-colors"
+              className="flex-1 bg-secondary-500 text-white py-3 rounded-lg font-medium hover:bg-secondary-600 disabled:opacity-50 transition-colors"
             >
-              {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "💾 Sauvegarder"}
+              {isSaving ? "⏳ Sauvegarde..." : isUploading ? "📤 Upload..." : "Sauvegarder"}
             </button>
           </div>
         </div>

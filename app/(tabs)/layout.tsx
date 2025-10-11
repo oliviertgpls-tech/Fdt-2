@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { RecipesProvider } from "@/contexts/RecipesProvider";
 import { ToastProvider } from '@/components/Toast';
 
+
 function ProtectedContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Fonction pour vérifier si un lien est actif
+  const isActive = (path: string) => pathname === path;
 
   // Affichage loading
   if (status === "loading") {

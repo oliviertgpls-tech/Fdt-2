@@ -223,7 +223,7 @@ export default function RecipeDetailPage() {
         <div>
           <h2 className="text-xl font-medium mb-3">Ingrédients</h2>
           {recipe.ingredients.length > 0 ? (
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-accent-0 border border-accente-100 rounded-lg p-4">
               <ul className="capitalize space-y-2">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start gap-2">
@@ -342,8 +342,19 @@ export default function RecipeDetailPage() {
         </div>
 
         {/* Actions */}
-        <div className="pt-6 border-t space-y-4">
-          <div className="flex gap-3">
+        <div className="flex justify-end pt-6 border-t space-y-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                if (window.confirm(`Êtes-vous sûr de vouloir supprimer "${recipe.title}" ?\n\nCette action est irréversible.`)) {
+                  deleteRecipe(recipe.id);
+                  router.push("/recipes");
+                }
+              }}
+              className="items-center text-red-700 px-4 mr-2  py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
+            >
+              <Trash2 className="inline-flex items-center w-4 h-4"/> Supprimer
+            </button>
             <Link
               href={`/recipes/edit/${recipe.id}`}
               className="inline-flex-1 bg-accent-200 text-accent-800 px-4 py-2 rounded-lg hover:bg-accent-300 transition-colors font-medium text-center"
@@ -352,17 +363,6 @@ export default function RecipeDetailPage() {
               Modifier la recette
             </Link>
             
-            <button
-              onClick={() => {
-                if (window.confirm(`Êtes-vous sûr de vouloir supprimer "${recipe.title}" ?\n\nCette action est irréversible.`)) {
-                  deleteRecipe(recipe.id);
-                  router.push("/recipes");
-                }
-              }}
-              className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
-            >
-              <Trash2 className="inline-flex items-center w-4 h-4"/>
-            </button>
           </div>
         </div>
       </article>

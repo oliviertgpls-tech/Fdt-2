@@ -189,7 +189,7 @@ function BooksLoadingSkeleton() {
                         href={`/livres/${book.id}`}
                         className="inline-flex-1 bg-secondary-100 text-secondary-700 py-2 px-3 rounded-lg hover:bg-secondary-200 hover:text-secondary-800 transition-colors text-xs md:text-sm text-center"
                       >
-                        Voir le livre
+                        Editer le livre
                       </Link>
                     </div>
                   </div>
@@ -315,7 +315,7 @@ function BooksLoadingSkeleton() {
                     {recipe.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-secondary-200 text-secondary-600 px-2 py-0.5 rounded-md text-xs"
+                        className="bg-secondary-200 text-secondary-700 px-2 py-0.5 rounded-md text-xs"
                       >
                         #{tag}
                       </span>

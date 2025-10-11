@@ -26,7 +26,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 pt-10 pb-24 text-center">
           <div className="space-y-10">
             {/* Badge */}
-            <div className="inline-block bg-orange-100 text-orange-700 px-6 py-3 rounded-full text-sm font-medium">
+            <div className="inline-block bg-accent-200 text-accent-700 px-6 py-3 rounded-full text-sm font-medium">
               ✨ Les recettes sont votre histoire
             </div>
             
@@ -198,7 +198,7 @@ export default function HomePage() {
             href="/auth/signin"
             className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
           >
-            ✨ Créer mon premier carnet
+            ✨ Créer une première recette
           </Link>
         </div>
       </div>
