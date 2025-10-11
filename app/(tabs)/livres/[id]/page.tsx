@@ -71,7 +71,7 @@ function SortableRecipeItem({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-green-50 border border-green-200 rounded-lg p-3"
+      className="bg-secondary-50 border border-secondary-200 rounded-lg p-3"
     >
       <div className="flex items-center gap-3">
         {/* Handle de drag EN PREMIER */}
@@ -80,14 +80,14 @@ function SortableRecipeItem({
           {...attributes}
           onMouseDown={triggerHaptic}
           onTouchStart={triggerHaptic}
-          className="cursor-move p-1 hover:bg-green-200 rounded transition-all flex-shrink-0"
+          className="cursor-move p-1 hover:bg-secondary-200 rounded transition-all flex-shrink-0"
           title="Glisser pour réorganiser"
         >
           <GripVertical className="w-4 h-4 text-gray-500" />
         </button>
 
         {/* Numéro de page */}
-        <div className="w-7 h-7 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
+        <div className="w-7 h-7 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
           p.{4 + index}
         </div>
 
@@ -672,7 +672,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
           <p className="text-gray-600 mb-6">Ce livre n'existe pas ou a été supprimé.</p>
           <button
             onClick={() => router.push('/livres')}
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+            className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
           >
             ← Retour aux livres
           </button>
@@ -711,7 +711,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                   <button
                     onClick={saveTitle}
                     disabled={!tempTitle.trim()}
-                    className="bg-green-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-green-700 disabled:opacity-50"
+                    className="bg-secondary-600 text-white px-2 md:px-3 py-1 rounded text-sm hover:bg-secondary-700 disabled:opacity-50"
                   >
                     ✓
                   </button>
@@ -753,7 +753,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
               <h2 className="text-base font-semibold text-gray-800">Description du livre</h2>
               <button
                 onClick={() => setEditingDescription(!editingDescription)}
-                className="text-gray-500 hover:text-gray-700 p-1"
+                className="text-gray-500 text-base hover:text-gray-700 p-1"
               >
                 <Edit3 className="w-4 h-4" />
               </button>
@@ -764,13 +764,13 @@ const handleDragEnd = async (event: DragEndEvent) => {
                 <textarea
                   value={bookDescription}
                   onChange={(e) => setBookDescription(e.target.value)}
-                  className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
+                  className="w-full h-32 text-sm p-3 border border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none resize-none"
                   placeholder="Décrivez ce livre de recettes..."
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={saveDescription}
-                    className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="bg-secondary-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-secondary-700 transition-colors"
                   >
                     Sauvegarder
                   </button>
@@ -807,7 +807,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                     />
                     
                     {coverImageVersions && (
-                      <div className="absolute bottom-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-2 left-2 bg-secondary-500 text-white text-xs px-2 py-1 rounded">
                         Uploadé !
                       </div>
                     )}
@@ -815,11 +815,11 @@ const handleDragEnd = async (event: DragEndEvent) => {
                 )}
                 
                 {/* Upload + Unsplash */}
-                <div className="flex flex-wrap gap-3">
-                  <label className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
+                <div className="flex justify-center py-3 gap-3">
+                  <label className={`flex items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
                     isUploadingCover 
                       ? 'bg-blue-100 text-blue-700 cursor-wait' 
-                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
                   }`}>
                     <input
                       type="file"
@@ -838,7 +838,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                       </>
                     ) : (
                       <>
-                        📷 Ma photo
+                        Choisir ma photo
                       </>
                     )}
                   </label>
@@ -855,12 +855,12 @@ const handleDragEnd = async (event: DragEndEvent) => {
                     type="url"
                     value={coverImageUrl}
                     onChange={(e) => setCoverImageUrl(e.target.value)}
-                    className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
+                    className="flex justify-center rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
                     placeholder="Ou collez un lien d'image..."
                   />
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex justify-center gap-2">
                   <button
                     onClick={() => {
                       updateBook(book.id, { 
@@ -871,7 +871,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                       router.refresh();
                     }}
                     disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
-                    className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-vert-700 transition-colors disabled:opacity-50"
+                    className="bg-secondary-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-vert-700 transition-colors disabled:opacity-50"
                   >
                     Définir comme couverture
                   </button>
@@ -936,12 +936,21 @@ const handleDragEnd = async (event: DragEndEvent) => {
               <div className="space-y-3">
                 
                 {/* Pages fixes */}
+                <div className="bg-accent-50 rounded-lg p-4 border border-accent-300">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 bg-accent-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.1</div>
+                    <div>
+                      <h4 className="font-medium text-sm text-accent-900">Couverture</h4>
+                      <p className="text-xs text-gray-600">Titre + Image si définie + description</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.1</div>
+                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.2</div>
                     <div>
-                      <h4 className="font-medium text-sm text-gray-900">Couverture</h4>
-                      <p className="text-xs text-gray-600">Titre+Image si définie+ description</p>
+                      <h4 className="font-medium text-sm text-accent-900">Page de Garde</h4>
+                      <p className="text-xs text-gray-600">Vide</p>
                     </div>
                   </div>
                 </div>
@@ -998,7 +1007,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                 {availableRecipes.map((recipe) => (
                   <div 
                     key={recipe.id} 
-                    className="border border-gray-200 rounded-lg p-2 sm:p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors cursor-pointer"
+                    className="border border-secondary-200 rounded-lg p-2 sm:p-3 hover:border-secondary-300 hover:bg-secondary-50 transition-colors cursor-pointer"
                     onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
                   >
                     <div className="flex gap-2 sm:gap-3">
@@ -1008,8 +1017,8 @@ const handleDragEnd = async (event: DragEndEvent) => {
                         className="w-12 h-12 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h5 className="font-medium text-gray-900 truncate">{recipe.title}</h5>
-                        <p className="text-xs text-gray-600">{recipe.author || 'Famille'}</p>
+                        <h5 className="text-sm font-medium text-accent-900 truncate">{recipe.title}</h5>
+                        <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
                         {recipe.isFromExternalUrl && (
                           <div className="mt-1 text-xs text-red-600 font-medium">
                             ⚠️ Impression indisponible (recette externe)
@@ -1041,7 +1050,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
             <button
               onClick={generatePreviewPDF}
               disabled={isGeneratingPreview}
-              className="bg-green-600 text-white text-sm mx-3 px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+              className="bg-secondary-600 text-white text-sm mx-3 px-4 py-2 rounded-lg hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
             >
               {isGeneratingPreview ? (
                 <>
@@ -1058,10 +1067,10 @@ const handleDragEnd = async (event: DragEndEvent) => {
 
             <button
               onClick={handleDeleteBook}
-              className="inline-flex items-center text-sm bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
+              className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
             >
               <Trash2 className="w-4 h-6 mx-2" />
-              Supprimer
+              Supprimer le livre
             </button>
           </div>
           </div>
@@ -1100,7 +1109,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
         <div className="m-10">
           <button
             onClick={downloadPDF}
-            className="flex items-center justify-center bg-green-600 text-white text-sm px-6 py-4 rounded-lg hover:bg-green-700 transition-colors font-semibold gap-3"
+            className="flex items-center justify-center bg-secondary-600 text-white text-sm px-6 py-4 rounded-lg hover:bg-secondary-700 transition-colors font-semibold gap-3"
           >
             <Download className="w-4 h-4" />
             🚀 Soon : Impression du livre ! En attendant → Téléchargez le PDF

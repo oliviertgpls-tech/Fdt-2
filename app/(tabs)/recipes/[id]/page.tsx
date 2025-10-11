@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { OptimizedImage } from "@/components/OptimizedImage"; // 🆕 IMPORT
+import { Plus, Eye, Trash2, ArrowLeft, Edit3, Clock4, Utensils} from 'lucide-react';
 import Link from "next/link";
 
 
@@ -191,13 +192,12 @@ export default function RecipeDetailPage() {
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4 text-gray-600">
+          <div className="inline-flex items-center gap-1 text-gray-600">
             {recipe.author && <span>par {recipe.author}</span>}
-            {recipe.prepMinutes && <span>⏱ {recipe.prepMinutes} min</span>}
-            <div className="flex items-center gap-2">
-              <span>👥</span>
-              <span>pour {recipe.servings || '4'} personnes</span>
-            </div>
+             <Clock4 className="ml-3 w-4 h-4"/>
+            {recipe.prepMinutes && <span> {recipe.prepMinutes} min</span>}
+             <Utensils className="ml-3 w-4 h-4"/>
+              <span>{recipe.servings || '4'} personnes</span>
           </div>
           
           {recipe.description && (
@@ -211,7 +211,7 @@ export default function RecipeDetailPage() {
             {recipe.tags.map((tag) => (
               <span 
                 key={tag}
-                className="bg-green-100 text-gray-700 px-3 py-1 rounded-lg text-sm"
+                className="bg-secondary-100 text-gray-700 px-3 py-1 rounded-lg text-sm"
               >
                 #{tag}
               </span>
@@ -221,10 +221,10 @@ export default function RecipeDetailPage() {
 
         {/* Ingrédients */}
         <div>
-          <h2 className="text-xl font-medium mb-3">🥄 Ingrédients</h2>
+          <h2 className="text-xl font-medium mb-3">Ingrédients</h2>
           {recipe.ingredients.length > 0 ? (
             <div className="bg-gray-50 rounded-lg p-4">
-              <ul className="space-y-2">
+              <ul className="capitalize space-y-2">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="flex-shrink-0 mt-2 w-2 h-2 bg-primary-400 rounded-full"></span>
@@ -241,7 +241,7 @@ export default function RecipeDetailPage() {
         {/* Instructions - Version étapes */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-medium">📋 Instructions</h2>
+            <h2 className="text-xl font-medium">Instructions</h2>
             {hasMultipleSteps && (
               <div className="text-sm text-gray-500">
                 Étape {currentStep + 1} sur {steps.length}
@@ -289,7 +289,7 @@ export default function RecipeDetailPage() {
                   {currentStep < steps.length - 1 ? (
                     <button
                       onClick={nextStep}
-                      className="bg-green-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                      className="bg-secondary-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm"
                     >
                       Suivante →
                     </button>
@@ -307,8 +307,8 @@ export default function RecipeDetailPage() {
               {/* Résumé de toutes les étapes (replié par défaut) */}
               {hasMultipleSteps && (
                 <details className="border border-gray-200 rounded-lg">
-                  <summary className="px-4 py-2 cursor-pointer text-gray-600 hover:bg-gray-50 font-medium">
-                    👁️ Voir toutes les étapes
+                  <summary className="px-4 py-2 cursor-pointer mr-2 text-gray-600 hover:bg-gray-50 font-medium">
+                    Voir toutes les étapes
                   </summary>
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100">
                     <ol className="space-y-3">
@@ -316,12 +316,12 @@ export default function RecipeDetailPage() {
                         <li 
                           key={index} 
                           className={`flex items-start gap-3 p-2 rounded ${
-                            index === currentStep ? 'bg-primary-50 border border-green-200' : ''
+                            index === currentStep ? 'bg-primary-50 border border-secondary-200' : ''
                           }`}
                         >
                           <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
                             index < currentStep 
-                              ? 'bg-green-100 text-secondary-600' 
+                              ? 'bg-secondary-100 text-secondary-600' 
                               : index === currentStep 
                                 ? 'bg-primary-500 text-white'
                                 : 'bg-gray-100 text-gray-600'
@@ -346,9 +346,10 @@ export default function RecipeDetailPage() {
           <div className="flex gap-3">
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="inline-flex-1 bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-00 transition-colors font-medium text-center"
+              className="inline-flex-1 bg-accent-200 text-accent-800 px-4 py-2 rounded-lg hover:bg-accent-300 transition-colors font-medium text-center"
             >
-              ✏️ Modifier la recette
+              <Edit3 className="inline-flex mr-2 items-center w-4 h-4"/>
+              Modifier la recette
             </Link>
             
             <button
@@ -360,7 +361,7 @@ export default function RecipeDetailPage() {
               }}
               className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
             >
-              🗑️
+              <Trash2 className="inline-flex items-center w-4 h-4"/>
             </button>
           </div>
         </div>

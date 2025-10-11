@@ -157,10 +157,9 @@ export default function CarnetPage() {
               <div>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
+                  className="text-red-600 pt-6 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors items-center gap-1 text-sm font-medium"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Supprimer</span>
+                  <span className="hidden sm:inline">Supprimer ce carnet</span>
                 </button>
                 </div>
             </div>
@@ -239,7 +238,7 @@ export default function CarnetPage() {
                       {recipe.tags.slice(0, 3).map((tag) => (
                         <span 
                           key={tag}
-                          className="bg-green-100 text-green-600 px-2 py-1 rounded text-xs"
+                          className="bg-secondary-100 text--600 px-2 py-1 rounded text-xs"
                         >
                           #{tag}
                         </span>
@@ -257,10 +256,10 @@ export default function CarnetPage() {
           </div>
 
             {/* Ligne 2: Boutons d'actions - Responsive */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex justify-center flex-wrap gap-2 p-6">
           <Link
             href={`/carnets/${id}/edit`}
-            className="bg-blue-400 text-white px-4 py-2.5 rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2 text-sm"
+            className="bg-accent-200 text-accent-800 px-4 py-2.5 rounded-lg hover:bg-accent-300 transition-colors font-medium flex items-center gap-2 text-sm"
           >
             <Edit3 className="w-4 h-4" />
             Modifier ce carnet
@@ -268,7 +267,7 @@ export default function CarnetPage() {
     
           <button
             onClick={handleDeleteCarnet}
-            className="bg-red-100 text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-1 text-sm font-medium"
+            className="text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 text-sm font-medium"
           >
             <Trash2 className="w-4 h-4" />
             <span className="hidden sm:inline">Supprimer</span>

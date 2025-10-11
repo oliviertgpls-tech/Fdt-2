@@ -184,10 +184,10 @@ function BooksLoadingSkeleton() {
                       </p>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="justify-end flex gap-2">
                       <Link
                         href={`/livres/${book.id}`}
-                        className="inline-flex-1 bg-green-600 text-white py-2 px-4 md:py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-xs md:text-sm text-center"
+                        className="inline-flex-1 bg-secondary-100 text-secondary-700 py-2 px-3 rounded-lg hover:bg-secondary-200 hover:text-secondary-800 transition-colors text-xs md:text-sm text-center"
                       >
                         Voir le livre
                       </Link>
@@ -213,7 +213,7 @@ function BooksLoadingSkeleton() {
               </span>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-orange-700 transition-colors text-xs md:text-sm"
+                className="bg-blue-600 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-blue-700 transition-colors text-xs md:text-sm"
               >
                 Créer le livre
               </button>
@@ -288,7 +288,7 @@ function BooksLoadingSkeleton() {
                 key={recipe.id} 
                 className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
-                    ? 'border-green-300 bg-green-50'
+                    ? 'border-secondary-300 bg-secondary-50'
                     : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
                 onClick={() => toggleRecipeSelection(recipe.id)}
@@ -301,7 +301,7 @@ function BooksLoadingSkeleton() {
                       className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
                     />
                     {selectedRecipes.includes(recipe.id) && (
-                      <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                      <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
                         ✓
                       </div>
                     )}
@@ -309,13 +309,13 @@ function BooksLoadingSkeleton() {
                   
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">{recipe.title}</h4>
-                    <p className="text-xs md:text-sm text-gray-600">par {recipe.author || 'Anonyme'}{" / "}⏱️ {recipe.prepMinutes || '?'}min</p>
+                    <p className="text-xs md:text-sm text-secondary-900">par {recipe.author || 'Anonyme'}{" / "}⏱️ {recipe.prepMinutes || '?'}min</p>
                    {recipe.tags && recipe.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {recipe.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-green-100 text-gray-500 px-2 py-0.5 rounded-xl text-xs"
+                        className="bg-secondary-200 text-secondary-600 px-2 py-0.5 rounded-md text-xs"
                       >
                         #{tag}
                       </span>

@@ -143,7 +143,7 @@ export default function CarnetEditPage() {
   // Trouver le carnet actuel
   const currentCarnet = notebooks.find(n => n.id === id);
 
-  // Initialiser les états avec les valeurs actuelles
+    // Initialiser les états avec les valeurs actuelles
   React.useEffect(() => {
     if (currentCarnet) {
       setCarnetTitle(currentCarnet.title);
@@ -157,6 +157,7 @@ export default function CarnetEditPage() {
       setLocalRecipeIds(currentCarnet.recipeIds);
     }
   }, [currentCarnet?.recipeIds]);
+
 
   // Gestion du cas où le carnet n'existe pas
   if (!currentCarnet) {

@@ -351,9 +351,11 @@ export default function CarnetsPage() {
                     <div className="items-center justify-between text-sm text-gray-500 mb-4">
                       <span>{carnetRecipeCount} recette(s) dans ce carnet</span>
                     </div>
-                      <div className="inline-block justify-end w-auto bg-green-600 text-sm text-bold text-green-100 rounded-lg text-sm px-3 py-2">
+                    <div className="flex justify-end">
+                      <div className="flex justify-end bg-secondary-100 text-secondary-700 text-sm hover:bg-secondary-200 hover:text-secondary-800 rounded-lg text-sm px-3 py-2">
                       <button>
                       Voir le carnet</button>
+                      </div>
                       </div>
                   </div>
                 </Link>

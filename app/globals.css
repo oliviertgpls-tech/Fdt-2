@@ -3,14 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 🌾 FOND FARINE - Background principal */
+/* FOND FARINE - Background principal */
 body {
   background: 
-    /* Texture farine subtile */
     radial-gradient(circle at 20% 30%, rgba(239, 139, 95, 0.03) 0%, transparent 30%),
     radial-gradient(circle at 80% 70%, rgba(107, 179, 107, 0.02) 0%, transparent 30%),
     radial-gradient(circle at 40% 80%, rgba(240, 180, 41, 0.02) 0%, transparent 30%),
-    /* Pattern farine */
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -25,42 +23,41 @@ body {
       rgba(245, 245, 244, 0.2) 2px,
       rgba(245, 245, 244, 0.2) 4px
     ),
-    /* Fond principal */
     linear-gradient(135deg, #fefcfb 0%, #faf8f6 100%);
   font-family: 'Inter', sans-serif;
-  color: #292524; /* neutral-800 */
+  color: #292524;
   min-height: 100vh;
 }
 
-/* 🎭 TITRES EN GRIS FONCÉ avec Poppins */
+/* TITRES EN GRIS FONCE avec Poppins */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Poppins', sans-serif;
-  color: #292524 !important; /* neutral-800 - FORCE avec !important */
+  color: #292524 !important;
 }
 
 h1 {
-  font-size: 2.25rem; /* text-4xl */
+  font-size: 2.25rem;
   font-weight: 800;
   color: #292524 !important;
 }
 
 h2 {
-  font-size: 1.875rem; /* text-3xl */
+  font-size: 1.875rem;
   font-weight: 700;
-  color: #44403c !important; /* neutral-700 */
+  color: #44403c !important;
 }
 
 h3 {
-  font-size: 1.5rem; /* text-2xl */
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #44403c !important; /* neutral-700 */
+  color: #44403c !important;
 }
 
-/* 📦 CARTES BLANCHES sur fond farine */
+/* CARTES BLANCHES sur fond farine */
 .card {
   background: white;
   border-radius: 1rem;
-  border: 1px solid #e7e5e4; /* neutral-200 */
+  border: 1px solid #e7e5e4;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   transition: all 0.2s ease;
 }
@@ -70,7 +67,7 @@ h3 {
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-/* 🔘 BOUTONS */
+/* BOUTONS */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -86,16 +83,16 @@ h3 {
 }
 
 .btn-primary {
-  background: #ef8b5f; /* orange au lieu de bleu */
+  background: #ef8b5f; 
   color: white;
 }
 
 .btn-primary:hover {
-  background: #e06d42; /* orange foncé au lieu de bleu */
+  background: #e06d42;
   transform: translateY(-1px);
 }
 
-/* 📱 INPUTS */
+/* INPUTS */
 input[type="text"],
 input[type="email"], 
 input[type="url"],
@@ -103,7 +100,7 @@ input[type="number"],
 textarea,
 select {
   background: white;
-  border: 1px solid #d6d3d1; /* neutral-300 */
+  border: 1px solid #d6d3d1;
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
   transition: all 0.2s ease;
@@ -113,7 +110,7 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: #ef8b5f; /* orange au lieu de bleu */
+  border-color: #ef8b5f;
   box-shadow: 0 0 0 3px rgba(239, 139, 95, 0.1);
 }
 
@@ -122,6 +119,6 @@ select:focus {
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE et Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
