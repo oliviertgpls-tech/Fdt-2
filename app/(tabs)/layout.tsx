@@ -43,8 +43,8 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
       <RecipesProvider>
-        <div className="min-h-screen bg-white">
-          <header className="sticky top-0 z-50 border-b bg-white/90 backdrop-blur">
+        <div className="min-h-screen bg-primary-50">
+          <header className="sticky top-0 z-50 border-b bg-white backdrop-blur shadow-md">
             <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6 py-3">
               <Link href="/recipes" className="font-semibold text-base md:text-lg">
                 RICIPIZ
@@ -106,17 +106,6 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
               <p>
                 © {new Date().getFullYear()} Ricipiz - Préservez votre patrimoine culinaire
               </p>
-              <div className="flex gap-6">
-                <Link href="/profile" className="hover:text-orange-600 transition-colors">
-                  Mon compte
-                </Link>
-                <a 
-                  href="mailto:contact@ricipiz.com" 
-                  className="hover:text-orange-600 transition-colors"
-                >
-                  Contact
-                </a>
-              </div>
             </div>
           </div>
         </footer>

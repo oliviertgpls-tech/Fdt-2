@@ -116,7 +116,7 @@ function BooksLoadingSkeleton() {
   return (
     <div className="space-y-6 md:space-y-8 max-w-full overflow-y-hidden ">
       {/* Section En-tête */}  
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
           <p className="text-gray-600 mt-1 text-sm md:text-base">
@@ -133,7 +133,7 @@ function BooksLoadingSkeleton() {
             window.scrollBy(0, -20);
           }, 300);
         }}
-          className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
+          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap flex-shrink-0"
           >
           <span className="sm:hidden">✨ Nouveau Livre </span>
           <span className="hidden sm:inline">✨ Nouveau Livre</span>
@@ -146,7 +146,7 @@ function BooksLoadingSkeleton() {
       {books.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-lg md:text-xl font-semibold text-gray-800">Mes livres en cours</h2>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map((book) => {
               const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));
               const pageCount = 1 + (book.recipeIds.length * 2);
