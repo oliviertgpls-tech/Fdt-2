@@ -157,7 +157,7 @@ export default function CarnetPage() {
             <div>
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="text-red-600 pt-6 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors items-center gap-1 text-sm font-medium"
+                  className="text-red-600 mt-3 p-3 rounded-lg hover:bg-red-200 transition-colors items-center gap-1 text-sm font-medium"
                 >
                   <span className="sm:inline">Supprimer ce carnet</span>
                 </button>
@@ -266,12 +266,23 @@ export default function CarnetPage() {
           </Link>
     
           <button
-            onClick={handleDeleteCarnet}
+            onClick={() => setShowDeleteModal(true)} 
             className="text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 text-sm font-medium"
           >
             <Trash2 className="w-4 h-4" />
             <span className="hidden sm:inline">Supprimer</span>
           </button>
+          {/* Modale de confirmation */}
+                <ConfirmModal
+                  isOpen={showDeleteModal}
+                  onClose={() => setShowDeleteModal(false)}
+                  onConfirm={handleDeleteCarnet}
+                  title="Supprimer ce carnet ?"
+                  message={`Êtes-vous sûr de vouloir supprimer le carnet "${carnet.title}" ? Cette action est irréversible.`}
+                  confirmText="Supprimer"
+                  cancelText="Annuler"
+                  isDangerous={true}
+                />
         </div>
 
           {/* Section "Créer un livre" en bas - Nouveau design */}
@@ -295,17 +306,6 @@ export default function CarnetPage() {
           </div>
         </>
       )}
-          {/* Modale de confirmation */}
-                <ConfirmModal
-                  isOpen={showDeleteModal}
-                  onClose={() => setShowDeleteModal(false)}
-                  onConfirm={handleDeleteCarnet}
-                  title="Supprimer ce carnet ?"
-                  message={`Êtes-vous sûr de vouloir supprimer le carnet "${carnet.title}" ? Cette action est irréversible.`}
-                  confirmText="Supprimer"
-                  cancelText="Annuler"
-                  isDangerous={true}
-                />
     </div>
   );
 }

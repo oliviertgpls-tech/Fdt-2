@@ -310,7 +310,7 @@ export default function CarnetsPage() {
       </div>
 
       {notebooks.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl">
+        <div className="text-center py-16 bg-white rounded-xl">
           <div className="text-6xl mb-4">📋</div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Aucun carnet pour l'instant
@@ -320,7 +320,7 @@ export default function CarnetsPage() {
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium inline-flex items-center gap-2"
+            className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium inline-flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
             Créer mon premier carnet

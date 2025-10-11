@@ -98,6 +98,28 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
           <main className="mx-auto max-w-6xl px-4 md:px-6 py-4 md:py-8">
             {children}
           </main>
+
+        {/* Footer */}
+        <footer className="border-t bg-gray-50 mt-12">
+          <div className="mx-auto max-w-6xl px-4 md:px-6 py-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-600">
+              <p>
+                © {new Date().getFullYear()} Ricipiz - Préservez votre patrimoine culinaire
+              </p>
+              <div className="flex gap-6">
+                <Link href="/profile" className="hover:text-orange-600 transition-colors">
+                  Mon compte
+                </Link>
+                <a 
+                  href="mailto:contact@ricipiz.com" 
+                  className="hover:text-orange-600 transition-colors"
+                >
+                  Contact
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
         </div>
       </RecipesProvider>
     </ToastProvider>
