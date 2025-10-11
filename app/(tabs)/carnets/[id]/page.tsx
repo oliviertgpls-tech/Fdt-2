@@ -154,14 +154,14 @@ export default function CarnetPage() {
               >
                 Ajouter des recettes
               </Link>
-              <div>
+            <div>
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className="text-red-600 pt-6 px-3 py-2.5 rounded-lg hover:bg-red-200 transition-colors items-center gap-1 text-sm font-medium"
                 >
-                  <span className="hidden sm:inline">Supprimer ce carnet</span>
+                  <span className="sm:inline">Supprimer ce carnet</span>
                 </button>
-                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">

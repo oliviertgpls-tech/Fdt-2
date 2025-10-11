@@ -196,7 +196,7 @@ export default function HomePage() {
           
           <Link
             href="/auth/signin"
-            className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
+            className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
           >
             ✨ Créer une première recette
           </Link>

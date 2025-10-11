@@ -122,6 +122,7 @@ function BooksLoadingSkeleton() {
           <p className="text-gray-600 mt-1 text-sm md:text-base">
             Créez de beaux livres à imprimer et transmettez votre patrimoine
           </p>
+          <div>
           <button
           onClick={() => {
           sectionRef.current?.scrollIntoView({ 
@@ -132,11 +133,12 @@ function BooksLoadingSkeleton() {
             window.scrollBy(0, -20);
           }, 300);
         }}
-          className="mt-3 bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start"
-        >
+          className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base"
+          >
           <span className="sm:hidden">✨ Nouveau Livre </span>
           <span className="hidden sm:inline">✨ Nouveau Livre</span>
           </button>
+          </div>
         </div>
       </div>
 
@@ -144,7 +146,7 @@ function BooksLoadingSkeleton() {
       {books.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-lg md:text-xl font-semibold text-gray-800">Mes livres en cours</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map((book) => {
               const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));
               const pageCount = 1 + (book.recipeIds.length * 2);
