@@ -296,6 +296,7 @@ RETOURNE UN JSON avec seulement la liste nettoyée :
       return Array.from(new Set(ingredients));
     }
   }
+} // ← Fermeture de la classe OpenAIService
 
 // Instance singleton
 export const openAIService = new OpenAIService();
