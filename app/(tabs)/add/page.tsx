@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
 import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { useToast } from '@/components/Toast';
+import { openAIService } from '@/lib/openai';
 
 
 // 🆕 NOUVEAU TYPE pour les résultats d'upload optimisé
@@ -425,8 +426,6 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
   );
 }
 
-const openAIService = new OpenAIService();
-
 export default function AddRecipePage() {
   const { data: session } = useSession() 
   const firstName = session?.user?.name?.split(' ')[0] || 'Utilisateur' 
@@ -548,7 +547,7 @@ const handleMultipleScanUpload = async () => {
       finalIngredients = await openAIService.deduplicateIngredients(finalIngredients);
       console.log('✅ Ingrédients après déduplication:', finalIngredients);
     }
-    
+
     // Pré-remplir le formulaire avec les données combinées
     setTitle(combinedResult.title || '');
     setAuthor(combinedResult.author || '');
