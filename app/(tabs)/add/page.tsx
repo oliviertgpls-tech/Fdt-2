@@ -540,6 +540,14 @@ const handleMultipleScanUpload = async () => {
     
     // Combiner les résultats
     const combinedResult = combineMultipleScanResults(allResults);
+
+    // 🧹 DÉDUPLICATION INTELLIGENTE DES INGRÉDIENTS
+    let finalIngredients = combinedResult.ingredients || [];
+    if (finalIngredients.length > 0) {
+      console.log('🔄 Lancement déduplication intelligente...');
+      finalIngredients = await openAIService.deduplicateIngredients(finalIngredients);
+      console.log('✅ Ingrédients après déduplication:', finalIngredients);
+    }
     
     // Pré-remplir le formulaire avec les données combinées
     setTitle(combinedResult.title || '');
@@ -573,11 +581,25 @@ const handleMultipleScanUpload = async () => {
     const title = results[0].title || '';
     const author = results[0].author || '';
     
-    // Combiner tous les ingrédients (dédupliqués)
-    const allIngredients = new Set<string>();
-    results.forEach(r => {
-      (r.ingredients || []).forEach((ing: string) => allIngredients.add(ing));
-    });
+// ⭐ NOUVELLE LOGIQUE : Prioriser les vraies listes d'ingrédients
+const allIngredients = new Set<string>();
+
+// D'abord, chercher s'il y a une photo avec une vraie liste officielle
+const resultsWithLists = results.filter(r => r.hasIngredientsList === true);
+
+if (resultsWithLists.length > 0) {
+  // Si on a trouvé une/des vraie(s) liste(s), prendre UNIQUEMENT celle(s)-ci
+  console.log(`✅ ${resultsWithLists.length} photo(s) avec liste officielle trouvée(s)`);
+  resultsWithLists.forEach(r => {
+    (r.ingredients || []).forEach((ing: string) => allIngredients.add(ing));
+  });
+} else {
+  // Sinon, combiner tous les ingrédients trouvés (ancien comportement)
+  console.log('⚠️ Aucune liste officielle trouvée, extraction de tous les ingrédients');
+  results.forEach(r => {
+    (r.ingredients || []).forEach((ing: string) => allIngredients.add(ing));
+  });
+}
     
   // Combiner toutes les étapes dans l'ordre (SANS numérotation)
       const allSteps = results

@@ -224,12 +224,78 @@ FORMAT DE RÉPONSE (JSON uniquement) :
     });
   }
 
-  // 💰 HELPER : Estimer le coût d'une analyse
-  estimateAnalysisCost(imageSize: 'high' | 'low' = 'high'): number {
-    // Prix approximatifs en euros
-    return imageSize === 'high' ? 0.008 : 0.003;
+  // 🧹 DÉDUPLICATION INTELLIGENTE DES INGRÉDIENTS
+  async deduplicateIngredients(ingredients: string[]): Promise<string[]> {
+    if (!this.apiKey) {
+      console.warn('⚠️ Pas de clé OpenAI, déduplication basique seulement');
+      return Array.from(new Set(ingredients));
+    }
+
+    if (ingredients.length <= 1) {
+      return ingredients;
+    }
+
+    try {
+      console.log('🧹 Déduplication intelligente de', ingredients.length, 'ingrédients...');
+      
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "user",
+              content: `Voici une liste d'ingrédients qui peut contenir des doublons sémantiques.
+
+LISTE :
+${ingredients.map((ing, i) => `${i + 1}. ${ing}`).join('\n')}
+
+RÈGLES DE DÉDUPLICATION :
+- Si 2 ingrédients désignent la même chose (ex: "200g de farine" et "farine"), ne garde QUE le plus précis
+- Si un ingrédient est une variante d'un autre (ex: "une botte de coriandre" et "coriandre"), ne garde QUE la version complète
+- Respecte l'ordre de priorité : les versions avec quantités sont meilleures que celles sans
+
+RETOURNE UN JSON avec seulement la liste nettoyée :
+{
+  "ingredients": ["ingrédient 1", "ingrédient 2", ...]
+}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Pas de réponse');
+      }
+
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Format invalide');
+      }
+
+      const result = JSON.parse(jsonMatch[0]);
+      console.log('✅ Déduplication : de', ingredients.length, 'à', result.ingredients.length, 'ingrédients');
+      
+      return result.ingredients;
+      
+    } catch (error) {
+      console.error('❌ Erreur déduplication, fallback sur déduplication basique:', error);
+      return Array.from(new Set(ingredients));
+    }
   }
-}
 
 // Instance singleton
 export const openAIService = new OpenAIService();
