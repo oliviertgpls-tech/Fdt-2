@@ -357,7 +357,7 @@ export default function RecipeDetailPage() {
             </button>
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="inline-flex-1 bg-accent-200 text-accent-800 px-4 py-2 rounded-lg hover:bg-accent-300 transition-colors font-medium text-center"
+              className="inline-flex-1 bg-accent-300 text-accent-800 px-4 py-3 rounded-lg hover:bg-accent-400 transition-colors font-medium text-center"
             >
               <Edit3 className="inline-flex mr-2 items-center w-4 h-4"/>
               Modifier la recette

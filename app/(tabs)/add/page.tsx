@@ -928,7 +928,10 @@ if (resultsWithLists.length > 0) {
             <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Cela prend généralement 10-20 secondes...
+            Cela prend généralement 15 à 20 secondes...
+            <p className="text-xs - text-gray-400 mt-4">
+              NB : Si toutefois le processus échoue vous pouvez réessayer une seconde fois
+          </p>
           </p>
         </div>
       </div>
@@ -1323,7 +1326,7 @@ if (resultsWithLists.length > 0) {
         
         {/* Titre */}
         <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-2">
+          <label className="block text-lg font-semibold text-gray-700 ml-1 mb-2">
             Nom de la recette *
           </label>
           <input
@@ -1380,8 +1383,8 @@ if (resultsWithLists.length > 0) {
 
         {/* 🔄 SECTION PHOTO MISE À JOUR avec optimisations */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Photo (optionnel)
+          <label className="block text-sm font-semibold text-gray-700 ml-1 mb-2">
+            Photo
           </label>
           
           <div className="space-y-3">
@@ -1431,7 +1434,7 @@ if (resultsWithLists.length > 0) {
 
         {/* Ingrédients */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 ml-1 mb-2">
          <div className="inline-flex items-center">
          <Carrot className="w-4 h-4 mr-2"/> Ingrédients
          </div>
@@ -1448,8 +1451,8 @@ if (resultsWithLists.length > 0) {
         {/* 🆕 TAGS */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-           <div className="inline-flex items-center">
-         <Tag className="w-4 h-4 mr-1"/>Tags
+           <div className="inline-flex items-center ml-1 ">
+         <Tag className="w-4 h-4 mr-1"/>Tags (optionnel)
          </div>
           </label>
           <input
@@ -1459,7 +1462,7 @@ if (resultsWithLists.length > 0) {
             className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             placeholder="Ex: dessert, rapide, végétarien"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs ml-1 text-gray-500 mt-1">
             Séparez les tags par des virgules
           </p>
         </div>
@@ -1467,7 +1470,7 @@ if (resultsWithLists.length > 0) {
 
         {/* Étapes */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-gray-700 ml-1 mb-2">
           <div className="inline-flex items-center">
           <ListChecks className="w-4 h-4 mr-1"/>Instructions
           </div>
@@ -1494,9 +1497,9 @@ if (resultsWithLists.length > 0) {
             type="button"
             onClick={handleSave}
             disabled={isSaving || !title.trim() || isUploading}
-            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex-1 bg-secondary-600 text-white py-3 rounded-lg font-medium hover:bg-secondary-700 disabled:opacity-50 transition-colors"
           >
-            {isSaving ? "⏳ Sauvegarde..." : "✨ Créer"}
+            {isSaving ? "⏳ Sauvegarde..." : "Enregistrer la recette"}
           </button>
         </div>
       </div>
