@@ -13,14 +13,15 @@ export class OpenAIService {
     .trim();
 }
   
-  constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY || '';
-    if (!this.apiKey) {
-      throw new Error('OPENAI_API_KEY manquante dans les variables d\'environnement');
-    }
+constructor() {
+  // Essayer NEXT_PUBLIC d'abord (côté client), puis côté serveur
+  this.apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
+  
+  // Ne pas throw d'erreur au chargement, juste logger
+  if (!this.apiKey) {
+    console.warn('⚠️ OpenAI API key non configurée - les fonctions IA seront désactivées');
   }
-
-
+} 
 
   // 📷 ANALYSE PHOTO DE PLAT → RECETTE
    async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{
@@ -33,6 +34,11 @@ export class OpenAIService {
     confidence: number;
   }> {
     try {
+      // Vérifier la clé API    
+      if (!this.apiKey) {
+          throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
+        }
+
       // Convertir l'image en base64
       const base64Image = await this.fileToBase64(imageFile);
       
@@ -128,6 +134,11 @@ FORMAT DE RÉPONSE (JSON uniquement) :
     confidence: number;
   }> {
     try {
+
+   if (!this.apiKey) {
+      throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
+    }
+
       const base64Image = await this.fileToBase64(imageFile);
       
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
