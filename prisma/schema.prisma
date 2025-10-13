@@ -58,14 +58,15 @@ model NotebookRecipe {
 }
 
 model Book {
-  id            String   @id @default(cuid())
-  title         String
-  description   String?
-  coverImageUrl String?  // Photo de couverture dédiée
-  status        String   @default("draft") // draft, ready, ordered, printed
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  userId        String
+  id                 String   @id @default(cuid())
+  title              String
+  description        String?
+  coverImageUrl      String?  // Photo de couverture dédiée
+  coverImageVersions Json?    // AJOUT : Versions optimisées (thumbnail, medium, large)
+  status             String   @default("draft")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  userId             String
   
   // Relations
   recipes BookRecipe[]

@@ -81,8 +81,8 @@ export default function EditRecipePage() {
       console.log('✅ Upload réussi:', result);
       
       if (result.success) {
-        setImageUrl(result.imageUrl); // URL permanente : /uploads/filename.jpg
-        console.log('📸 Image URL mise à jour:', result.imageUrl);
+        setImageUrl(result.originalUrl); // URL permanente : /uploads/filename.jpg
+        console.log('📸 Image URL mise à jour:', result.originalUrl);
       } else {
         throw new Error(result.error || 'Erreur upload');
       }

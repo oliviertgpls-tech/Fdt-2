@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon, Carott, Utensils, ListChecks } from "lucide-react";
 import { useToast } from '@/components/Toast';
 import { openAIService } from '@/lib/openai';
 
@@ -560,6 +560,11 @@ const handleMultipleScanUpload = async () => {
     setTags(combinedResult.tags?.join(', ') || '');
     setAiConfidence(combinedResult.confidence || null);
     
+    // 🆕 Garder la photo du plat si elle a été ajoutée
+      if (dishPhotoUrl) {
+        setImageUrl(dishPhotoUrl);
+      }
+
     // Passer en mode manuel pour éditer
     setMode('manual');
     showToast(`✅ ${scannedImages.length} page(s) analysée(s) avec succès !`, 'success');
@@ -802,7 +807,12 @@ if (resultsWithLists.length > 0) {
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-4">
           <button 
-            onClick={() => setMode('choose')}
+            onClick={() => {
+              setMode('choose');
+              setScannedImages([]);
+              setDishPhotoUrl("");
+              setImageVersions(null);
+            }}
             className="text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-2 mx-auto"
           >
             ← Retour aux options
@@ -918,7 +928,7 @@ if (resultsWithLists.length > 0) {
             <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Cela prend généralement 5-10 secondes...
+            Cela prend généralement 10-20 secondes...
           </p>
         </div>
       </div>
@@ -927,17 +937,17 @@ if (resultsWithLists.length > 0) {
 
   if (mode === 'choose') {
     return (
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900">
-            ✨ Nouvelle recette
+          <h1 className="text-3xl mt-6 mb-4 font-bold text-gray-900">
+             Nouvelle recette
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl mb-6 text-gray-600">
             Choisissez comment vous souhaitez ajouter votre recette
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-6 px-4 md:px-0">
           
           
           {/* Mode 2 : Photo d'un plat */}
@@ -960,7 +970,7 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div className="pt-4 space-y-2">
-                <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
+                <div className="inline-flex bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
                   🤖 IA - 5 gratuites
                 </div>
               </div>
@@ -968,13 +978,13 @@ if (resultsWithLists.length > 0) {
           </div>
 
           {/* Mode 3 : Scan recette manuscrite */}
-          <div 
-            onClick={() => setMode('scan')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
-          >
+             <div 
+              onClick={() => setMode('scan')}
+              className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            >
             <div className="text-center space-y-3 md:space-y-4">
               <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
-                <PenTool className="w-10 h-10 text-green-600" />
+                <FileText className="w-10 h-10 text-green-600" />
               </div>
               
               <div>
@@ -987,21 +997,20 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div className="pt-4">
-                <div className="bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
-                  🤖 IA - 5 offertes
+                <div className="inline-flex bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
+                  🤖 IA - 5 gratuites
                 </div>
               </div>
             </div>
           </div>
 
           {/* Mode 1 : Saisie manuelle */}
+        <div className="flex justify-center px-4 md:px-0">
           <div 
             onClick={() => setMode('manual')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
-            >
+            className="w-full max-w-md bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+          >
             <div className="text-center space-y-3 md:space-y-4">
-              
-              
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
                   Ou saisie manuelle
@@ -1012,13 +1021,14 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div className="pt-4">
-                <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
-                  🆓 Gratuit
-                  </div>
+                <div className="inline-flex bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
+                  🆓 10 Gratuites
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
       </div>
     );
   }
@@ -1034,7 +1044,7 @@ if (resultsWithLists.length > 0) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            📸 Photo d'un plat
+            Photo d'un plat
           </h1>
         </div>
 
@@ -1044,10 +1054,10 @@ if (resultsWithLists.length > 0) {
           </div>
           
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Photographiez votre plat
+            Reconnaissance par photo
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA va analyser votre photo et créer automatiquement la recette complète avec optimisation d'image
+            Notre IA va analyser votre photo et créer automatiquement la recette complète
           </p>
 
           <label className="inline-block">
@@ -1060,9 +1070,9 @@ if (resultsWithLists.length > 0) {
               }}
               className="hidden"
             />
-            <div className="bg-orange-600 text-white px-8 py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
+            <div className="bg-primary-500 text-white px-8 py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
               <Upload className="w-5 h-5" />
-              Prendre une photo / Choisir une image
+              Choisir une image
             </div>
           </label>
 
@@ -1073,7 +1083,6 @@ if (resultsWithLists.length > 0) {
               <li>• Éclairage naturel de préférence</li>
               <li>• Évitez les reflets et ombres fortes</li>
               <li>• L'IA fonctionne mieux avec des plats reconnaissables</li>
-              <li>• 🆕 Votre image sera automatiquement optimisée (3 tailles)</li>
             </ul>
           </div>
         </div>
@@ -1092,7 +1101,7 @@ if (resultsWithLists.length > 0) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">
-            📄 Recette manuscrite ou imprimée
+            Recette texte 
           </h1>
         </div>
 
@@ -1102,7 +1111,7 @@ if (resultsWithLists.length > 0) {
           {scannedImages.length > 0 && (
             <div className="mb-6">
               <h3 className="font-semibold text-gray-800 mb-3">
-                📚 Pages scannées ({scannedImages.length}/3)
+                Pages scannées ({scannedImages.length}/3)
               </h3>
               <div className="grid grid-cols-3 gap-3">
                 {scannedImages.map((img, index) => (
@@ -1140,7 +1149,7 @@ if (resultsWithLists.length > 0) {
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 {scannedImages.length === 0 
                   ? "Scannez votre recette" 
-                  : "Ajouter une autre page ?"}
+                  : "Scanner une autre page ?"}
               </h2>
               <p className="text-gray-600 mb-6">
                 {scannedImages.length === 0
@@ -1161,14 +1170,88 @@ if (resultsWithLists.length > 0) {
                   className="hidden"
                 />
                 <div className="bg-green-100 text-green-700 px-8 py-4 rounded-lg hover:bg-green-200 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
-                  <Upload className="w-5 h-5" />
+                  <FileText className="w-5 h-5" />
                   {scannedImages.length === 0 
-                    ? "Prendre une photo de la recette"
-                    : "Ajouter une page supplémentaire"}
+                    ? "Démarrer le scan"
+                    : "Scanner une page supplémentaire"}
                 </div>
               </label>
             </div>
           )}
+
+           <div className="mt-8 bg-secondary-50 border border-secondary-200 rounded-lg p-4">
+            <h4 className="font-medium text-orange-800 mb-2">🤖 Conseils pour l'IA</h4>
+            <ul className="text-sm text-secondary-600 text-left space-y-1">
+              <li>• Cadrez bien le plat au centre</li>
+              <li>• Éclairage naturel de préférence</li>
+              <li>• Évitez les reflets et ombres fortes</li>
+              <li>• L'IA fonctionne mieux avec des plats reconnaissables</li>
+            </ul>
+          </div>
+
+          {/* 🆕 NOUVEAU : Photo du plat final (optionnelle) */}
+            {scannedImages.length > 0 && (
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-4">
+                <h3 className="font-semibold text-sm text-blue-900 mb-3 flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5" />
+                  Photo du plat final (optionnelle)
+                </h3>
+                
+                <p className="text-sm text-blue-700 mb-4">
+                  Ajoutez une photo du plat pour illustrer votre recette. 
+                </p>
+                
+                {/* Zone d'upload photo */}
+                <div className="space-y-3">
+                  {dishPhotoUrl ? (
+                    <div className="relative">
+                      <img 
+                        src={dishPhotoUrl} 
+                        alt="Photo du plat" 
+                        className="w-full max-w-sm h-48 object-cover rounded-lg border-blue-300"
+                      />
+                      <button
+                        onClick={() => {
+                          setDishPhotoUrl("");
+                          setImageVersions(null);
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center gap-3 px-6 py-8 bg-white  border-dashed border-blue-300 rounded-lg hover:border-blue-500 transition-colors cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const result = await handleImageUpload(file);
+                            if (result) {
+                              setDishPhotoUrl(result.originalUrl);
+                              showToast('Photo du plat ajoutée !', 'success');
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                      <ImageIcon className="w-12 h-12 text-blue-400" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-blue-900">
+                          {isUploading ? 'Upload en cours...' : 'Cliquez pour ajouter une photo'}
+                        </p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          JPG, PNG jusqu'à 10 Mo
+                        </p>
+                      </div>
+                    </label>
+                  )}
+                </div>
+              </div>
+            )}
 
           {/* 🆕 BOUTON : Analyser les scans */}
           {scannedImages.length > 0 && (
@@ -1218,7 +1301,7 @@ if (resultsWithLists.length > 0) {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900">
-          ✍️ Saisie manuelle
+          Saisie manuelle
         </h1>
       </div>
 
@@ -1240,15 +1323,15 @@ if (resultsWithLists.length > 0) {
         
         {/* Titre */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-lg font-semibold text-gray-700 mb-2">
             Nom de la recette *
           </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-            placeholder="Ex: Gâteau de Mamie"
+            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+            placeholder="Ex: Le mythique gâteau de Mamie"
             required
           />
         </div>
@@ -1256,19 +1339,19 @@ if (resultsWithLists.length > 0) {
         {/* Rangée rapide */}
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block ml-1 text-sm font-semibold text-gray-700 mb-2">
               Par qui ?
             </label>
             <input
               type="text"
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              className="w-full text-sm rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="Mamie, Papa..."
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block ml-1 text-sm font-semibold text-gray-700 mb-2">
               Temps (min)
             </label>
             <input
@@ -1277,19 +1360,19 @@ if (resultsWithLists.length > 0) {
               max="999"
               value={prepMinutes}
               onChange={(e) => setPrepMinutes(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              className="w-full text-sm rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="30"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block ml-1 text-sm font-semibold text-gray-700 mb-2">
               Personnes
             </label>
             <input
               type="text"
               value={servings}
               onChange={(e) => setServings(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
+              className="w-full texte-sm rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
               placeholder="4, 6-8..."
             />
           </div>
@@ -1309,12 +1392,11 @@ if (resultsWithLists.length > 0) {
                 setImageUrl(e.target.value);
                 setImageVersions(null); // Reset versions si URL manuelle
               }}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none"
-              placeholder="Collez un lien d'image..."
+    
             />
             
             <div className="flex flex-wrap gap-3">
-              <label className="flex items-center gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+              <label className="flex items-center mt-2 mb-2 gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
@@ -1325,7 +1407,9 @@ if (resultsWithLists.length > 0) {
                   className="hidden"
                   disabled={isUploading}
                 />
-                📷 {isUploading ? "Optimisation..." : "Ajouter ma photo"}
+                <div className="inline-flex items-center">
+                <Camera className="w-4 h-4 mr-2"/>{isUploading ? "Optimisation..." : "Ajouter ma photo"}
+                </div>
               </label>
 
               <ImageSearch 
@@ -1342,32 +1426,31 @@ if (resultsWithLists.length > 0) {
           </div>
           
           <p className="text-xs text-gray-500 mt-2">
-            💡 Upload optimisé automatique : 3 tailles (200px, 800px, 2400px) pour des performances optimales !
           </p>
         </div>
 
         {/* Ingrédients */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            🥄 Ingrédients
+         <div className="inline-flex items-center">
+         <Utensils className="w-4 h-4 mr-2"/> Ingrédients
+         </div>
           </label>
           <textarea
             rows={6}
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Un ingrédient par ligne :
-
-200g de farine
-3 œufs
-100ml de lait"
+            placeholder="Un ingrédient par ligne"
           />
         </div>
 
         {/* 🆕 TAGS */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            🏷️ Tags
+           <div className="inline-flex items-center">
+         <Tag className="w-4 h-4 mr-1"/>Tags
+         </div>
           </label>
           <input
             type="text"
@@ -1385,20 +1468,16 @@ if (resultsWithLists.length > 0) {
         {/* Étapes */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            📋 Instructions
+          <div className="inline-flex items-center">
+          <ListChecks className="w-4 h-4 mr-1"/>Instructions
+          </div>
           </label>
           <textarea
             rows={8}
             value={steps}
             onChange={(e) => setSteps(e.target.value)}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-            placeholder="Écrivez les étapes naturellement en laissant une ligne vide entre chacune  :
-
-Préchauffer le four à 180°C.
-
-Mélanger la farine et le sucre.
-
-Enfourner 25 minutes."
+            placeholder="Important :  laissez une ligne vide entre chaque étape, et ne numérotez pas les étapes. Tout est automatique :)"
           />
         </div>
 

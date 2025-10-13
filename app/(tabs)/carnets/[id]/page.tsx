@@ -257,6 +257,13 @@ export default function CarnetPage() {
 
             {/* Ligne 2: Boutons d'actions - Responsive */}
         <div className="flex justify-center flex-wrap gap-2 p-6">
+            <button
+            onClick={() => setShowDeleteModal(true)} 
+            className="text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 text-sm font-medium"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Supprimer</span>
+          </button>
           <Link
             href={`/carnets/${id}/edit`}
             className="bg-accent-200 text-accent-800 px-4 py-2.5 rounded-lg hover:bg-accent-300 transition-colors font-medium flex items-center gap-2 text-sm"
@@ -265,13 +272,7 @@ export default function CarnetPage() {
             Modifier ce carnet
           </Link>
     
-          <button
-            onClick={() => setShowDeleteModal(true)} 
-            className="text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 text-sm font-medium"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Supprimer</span>
-          </button>
+        
           {/* Modale de confirmation */}
                 <ConfirmModal
                   isOpen={showDeleteModal}

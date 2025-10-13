@@ -26,7 +26,12 @@ export type Book = {
   title: string;           // "Les recettes de famille", "Carnet de Mamie"
   description?: string;    // Description du livre
   coverUrl?: string;       // Image de couverture
-  coverImageUrl?: string;  // 🆕 NOUVELLE : Photo de couverture dédiée
+  coverImageUrl?: string;  
+  coverImageVersions?: {   
+    thumbnail: string;
+    medium: string;
+    large: string;
+  } | null;
   recipeIds: string[];     // IDs des recettes dans l'ordre souhaité
   createdAt: number;       // Timestamp de création
   updatedAt?: number;      // Timestamp de dernière modification

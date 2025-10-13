@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRecipes } from "@/contexts/RecipesProvider";
+import { Nut, NutIcon } from 'lucide-react';
 
 // Composant Skeleton pour les cartes de recettes
 function RecipeCardSkeleton() {

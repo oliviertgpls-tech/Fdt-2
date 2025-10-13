@@ -1291,7 +1291,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
               className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
             >
               <Trash2 className="w-4 h-6 mx-2" />
-              Supprimer le livre
+              Supprimer
             </button>
             <button
               onClick={generatePreviewPDF}

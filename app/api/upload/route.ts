@@ -76,16 +76,16 @@ export async function POST(request: NextRequest) {
     console.log('✅ Upload réussi! URL:', result.secure_url)
 
     // 🆕 RETOURNER LE NOUVEAU FORMAT pour compatibilité
-    return NextResponse.json({ 
-      success: true, 
-      originalUrl: result.secure_url,
+      return NextResponse.json({ 
+        success: true, 
+        originalUrl: result.secure_url.replace('/upload/', '/upload/a_exif/'),
       // Générer les versions optimisées à partir de l'URL de base
       versions: {
-        thumbnail: result.secure_url.replace('/upload/', '/upload/w_200,h_200,c_fill,q_auto:good,f_auto/'),
-        medium: result.secure_url.replace('/upload/', '/upload/w_800,h_600,c_fill,q_auto:good,f_auto/'),
-        large: result.secure_url.replace('/upload/', '/upload/w_2400,h_1800,c_limit,q_auto:good,f_auto/')
-      },
-      message: "Upload réussi avec versions optimisées!" 
+        thumbnail: result.secure_url.replace('/upload/', '/upload/w_200,h_200,c_fill,q_auto:good,f_auto,a_exif/'),
+        medium: result.secure_url.replace('/upload/', '/upload/w_800,h_600,c_fill,q_auto:good,f_auto,a_exif/'),
+        large: result.secure_url.replace('/upload/', '/upload/w_2400,h_1800,c_limit,q_auto:good,f_auto,a_exif/')
+      }
+      message: "Upload réussi !" 
     })
     
   } catch (error: any) {

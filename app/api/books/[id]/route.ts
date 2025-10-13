@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { title, description, coverImageUrl, status } = body
+    const { title, description, coverImageUrl, coverImageVersions, status } = body
     
     const book = await prisma.book.update({
       where: { id: params.id },
@@ -16,6 +16,7 @@ export async function PUT(
         title: title || undefined,
         description: description || undefined,
         coverImageUrl: coverImageUrl || undefined,
+        coverImageVersions: coverImageVersions !== undefined ? coverImageVersions : undefined,  // 🆕 AJOUT
         status: status || undefined,
         updatedAt: new Date()
       }
@@ -37,6 +38,7 @@ export async function PUT(
       description: book.description,
       status: book.status,
       coverImageUrl: book.coverImageUrl,
+      coverImageVersions: book.coverImageVersions,  // 🆕 AJOUT
       createdAt: book.createdAt.getTime(),
       updatedAt: book.updatedAt.getTime(),
       recipeIds: bookWithRecipes?.recipes.map(r => r.recipeId) || []
