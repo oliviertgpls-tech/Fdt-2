@@ -919,7 +919,7 @@ if (resultsWithLists.length > 0) {
             <Sparkles className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            🤖 IA en cours d'analyse...
+            Photo en cours d'analyse...
           </h2>
           <p className="text-gray-600 mb-8">
             Notre IA analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
@@ -1300,8 +1300,8 @@ if (resultsWithLists.length > 0) {
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Saisie manuelle
+        <h1 className="text-xl font-bold text-gray-900">
+          Retour
         </h1>
       </div>
 

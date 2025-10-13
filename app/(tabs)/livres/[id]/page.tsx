@@ -243,44 +243,76 @@ export default function BookPage() {
     }
   };
 
-  // FONCTION D'UPLOAD pour les images de couverture
-  const handleCoverImageUpload = async (file: File) => {
-    setIsUploadingCover(true);
-    
-    try {
-      console.log('📤 Upload image de couverture...', file.name);
+    // FONCTION D'UPLOAD pour les images de couverture AVEC CONVERSION HEIC
+    const handleCoverImageUpload = async (file: File) => {
+      setIsUploadingCover(true);
       
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      try {
+        console.log('📤 Upload image de couverture...', file.name);
+        
+        // 🔄 CONVERSION HEIC → JPEG si nécessaire
+        let processedFile = file;
+        
+        if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+          console.log('🔄 Conversion HEIC → JPEG en cours...');
+          try {
+            // Import dynamique de la librairie (chargée uniquement si nécessaire)
+            const heic2any = (await import('heic2any')).default;
+            
+            const convertedBlob = await heic2any({
+              blob: file,
+              toType: 'image/jpeg',
+              quality: 0.9
+            });
+            
+            // heic2any peut retourner un tableau de Blobs, on prend le premier
+            const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+            
+            processedFile = new File(
+              [blob], 
+              file.name.replace(/\.heic$/i, '.jpg'),
+              { type: 'image/jpeg' }
+            );
+            console.log('✅ Conversion HEIC réussie');
+          } catch (error) {
+            console.error('❌ Erreur conversion HEIC:', error);
+            showToast('Erreur lors de la conversion HEIC, tentative avec le fichier original...', 'error');
+            // On continue avec le fichier original en cas d'échec
+          }
+        }
+        
+        // Upload du fichier (converti ou original)
+        const formData = new FormData();
+        formData.append('file', processedFile);
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Upload couverture réussi:', result);
+        
+        if (result.success) {
+          setCoverImageUrl(result.originalUrl);
+          setCoverImageVersions(result.versions || null);
+          showToast('Image de couverture uploadée !', 'success');
+        } else {
+          throw new Error(result.message || 'Erreur upload');
+        }
+        
+      } catch (error: any) {
+        console.error('💥 Erreur upload couverture:', error);
+        showToast('Erreur lors de l\'upload de l\'image', 'error');
+      } finally {
+        setIsUploadingCover(false);
       }
-      
-      const result = await response.json();
-      console.log('✅ Upload couverture réussi:', result);
-      
-      if (result.success) {
-        setCoverImageUrl(result.originalUrl);
-        setCoverImageVersions(result.versions || null);
-        showToast('Image de couverture uploadée !', 'success');
-      } else {
-        throw new Error(result.message || 'Erreur upload');
-      }
-      
-    } catch (error: any) {
-      console.error('💥 Erreur upload couverture:', error);
-      showToast('Erreur lors de l\'upload de l\'image', 'error');
-    } finally {
-      setIsUploadingCover(false);
-    }
-  };
+    };
 
   // Génération PDF
   const generatePreviewPDF = async () => {
@@ -373,8 +405,31 @@ export default function BookPage() {
         return;
       }
 
-      const isPng = url?.toLowerCase().endsWith('.png');
-      const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+        // Détection robuste : essayer JPEG d'abord, puis PNG en cas d'erreur
+        let img;
+        try {
+          // La plupart des photos sont des JPEG
+          img = await pdfDoc.embedJpg(bytes);
+        } catch (jpgError) {
+          try {
+            // Si JPG échoue, essayer PNG
+            img = await pdfDoc.embedPng(bytes);
+          } catch (pngError) {
+            console.error('❌ Impossible d\'intégrer l\'image (ni JPG ni PNG)');
+            // Afficher un rectangle de remplacement
+            page.drawRectangle({
+              x, y, width: boxW, height: boxH,
+              color: rgb(0.95, 0.94, 0.92),
+              borderColor: rgb(0.8, 0.8, 0.8),
+              borderWidth: 1
+            });
+            page.drawText('Image incompatible', {
+              x: x + 12, y: y + boxH / 2 - 6,
+              size: 12, color: rgb(0.4, 0.35, 0.3)
+            });
+            return;
+          }
+        }
       const { width, height } = img.size();
 
       // Calcul du ratio pour préserver les proportions
@@ -996,94 +1051,89 @@ const handleDragEnd = async (event: DragEndEvent) => {
               <h2 className="text-base font-semibold text-gray-800">Photo de couverture</h2>
             </div>
 
-            {editingCover ? (
-              <div className="space-y-4">
-                {/* Aperçu immédiat en mode édition */}
-                {imageUrlToDisplay && (
-                  <div className="relative mb-4 mx-auto w-48 h-64 border rounded-lg shadow-md">
-                    <img 
-                      src={imageUrlToDisplay}
-                      alt="Nouvelle couverture" 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    
-                    {coverImageVersions && (
-                      <div className="absolute bottom-2 left-2 bg-secondary-500 text-white text-xs px-2 py-1 rounded">
-                        Uploadé !
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Upload + Unsplash */}
-                <div className="flex justify-center py-3 gap-3">
-                  <label className={`flex items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
-                    isUploadingCover 
-                      ? 'bg-blue-100 text-blue-700 cursor-wait' 
-                      : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
-                  }`}>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleCoverImageUpload(file);
-                      }}
-                      className="hidden"
-                      disabled={isUploadingCover}
-                    />
-                    {isUploadingCover ? (
-                      <>
-                        <Loader className="w-4 h-4 animate-spin" />
-                        Upload en cours...
-                      </>
-                    ) : (
-                      <>
-                        Choisir ma photo
-                      </>
-                    )}
-                  </label>
-
-                  <ImageSearch 
-                    onImageSelect={(url) => {
-                      setCoverImageUrl(url);
-                      setEditingCover(false);
-                    }}
-                    initialQuery={`${book.title} family cooking`}
-                  />
-                  
-                  <input
-                    type="url"
-                    value={coverImageUrl}
-                    onChange={(e) => setCoverImageUrl(e.target.value)}
-                    className="flex justify-center rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none text-sm"
-                    placeholder="Ou collez un lien d'image..."
-                  />
-                </div>
-                
-                <div className="flex justify-center gap-2">
-                  <button
-                    onClick={() => {
-                      updateBook(book.id, { 
-                        coverImageUrl: coverImageUrl,
-                        coverImageVersions: coverImageVersions
-                      });
-                      setEditingCover(false);
-                      router.refresh();
-                    }}
-                    disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
-                    className="bg-secondary-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-vert-700 transition-colors disabled:opacity-50"
-                  >
-                    Définir comme couverture
-                  </button>
-                  <button
-                    onClick={() => setEditingCover(false)}
-                    className="bg-gray-100 text-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Annuler
-                  </button>
-                </div>
-              </div>
+{editingCover ? (
+  <div className="space-y-4">
+    {/* Aperçu immédiat en mode édition */}
+    {imageUrlToDisplay && (
+      <div className="relative mb-4 mx-auto w-48 h-64 border rounded-lg shadow-md">
+        <img 
+          src={imageUrlToDisplay}
+          alt="Nouvelle couverture" 
+          className="w-full h-full object-cover rounded-lg"
+        />
+        
+        {coverImageVersions && (
+          <div className="absolute bottom-2 left-2 bg-secondary-500 text-white text-xs px-2 py-1 rounded">
+            Uploadé !
+          </div>
+        )}
+      </div>
+    )}
+    
+        {/* 🆕 Upload + Unsplash - EN COLONNE SUR MOBILE */}
+        <div className="flex flex-col md:flex-row justify-center py-3 gap-3">
+          <label className={`flex justify-center items-center justify-center gap-2 px-4 py-2 text-sm rounded-lg transition-all cursor-pointer ${
+            isUploadingCover 
+              ? 'bg-secondary-100 text-secondary-700 cursor-wait' 
+              : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200'
+          }`}>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleCoverImageUpload(file);
+              }}
+              className="hidden"
+              disabled={isUploadingCover}
+            />
+            {isUploadingCover ? (
+              <>
+                <Loader className="w-4 h-4 animate-spin" />
+                Upload en cours...
+              </>
+            ) : (
+              <>
+                Choisir ma photo
+              </>
+            )}
+          </label>
+        <div className="flex justify-center">
+          <ImageSearch 
+            onImageSelect={(url) => {
+              setCoverImageUrl(url);
+              setEditingCover(false);
+            }}
+            initialQuery={`${book.title} family cooking`}
+          />
+          </div>
+        </div>
+        
+        {/* Boutons de validation */}
+        <div className="flex justify-center gap-2">
+          <button
+            onClick={() => {
+              updateBook(book.id, { 
+                coverImageUrl: coverImageUrl,
+                coverImageVersions: coverImageVersions
+              });
+              setEditingCover(false);
+              router.refresh();
+            }}
+            disabled={isUploadingCover || (!coverImageUrl && !imageUrlToDisplay)}
+            className="bg-secondary-500 0 text-secondary-100 text-sm px-4 py-2 rounded-lg hover:bg-secondary-700 transition-colors disabled:opacity-50"
+          >
+            Définir comme couverture
+          </button>
+          <button
+            onClick={() => setEditingCover(false)}
+            className="text-sm text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+      
             ) : (
               <div>
                 {imageUrlToDisplay ? (
@@ -1290,7 +1340,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
               onClick={handleDeleteBook}
               className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
             >
-              <Trash2 className="w-4 h-6 mx-2" />
+              <Trash2 className="w-4 h-6 mr-2" />
               Supprimer
             </button>
             <button
@@ -1306,7 +1356,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
               ) : (
                 <>
                   <Eye className="w-4 h-4" />
-                  Aperçu
+                  Aperçu du livre
                 </>
               )}
             </button>
@@ -1349,8 +1399,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
             onClick={downloadPDF}
             className="flex items-center justify-center bg-secondary-600 text-white text-sm px-6 py-4 rounded-lg hover:bg-secondary-700 transition-colors font-semibold gap-3"
           >
-            <Download className="w-4 h-4" />
-            🚀 Soon : Impression du livre ! En attendant → Téléchargez le PDF
+            Bientôt dispo : Impression du livre ! En attendant → Téléchargez le PDF
           </button>
         </div>
       </div>
