@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon, Carott, Utensils, ListChecks } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon, Carrot, Utensils, ListChecks } from "lucide-react";
 import { useToast } from '@/components/Toast';
 import { openAIService } from '@/lib/openai';
 
@@ -1433,7 +1433,7 @@ if (resultsWithLists.length > 0) {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
          <div className="inline-flex items-center">
-         <Utensils className="w-4 h-4 mr-2"/> Ingrédients
+         <Carott className="w-4 h-4 mr-2"/> Ingrédients
          </div>
           </label>
           <textarea
