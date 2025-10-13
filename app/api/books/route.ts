@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, description, recipeIds = [], coverImageUrl } = body
+    const { title, description, recipeIds = [], coverImageUrl, coverImageVersions } = body
     
     console.log('🚀 Création livre:', { title, recipeIds: recipeIds.length })
     
@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
         description: description || null,
         status: 'draft',
         coverImageUrl: coverImageUrl || null,
-        userId: user.id // 🎯 AJOUTÉ : assigne au user connecté
+        coverImageVersions: coverImageVersions || null, 
+        userId: user.id
       }
     })
     
@@ -91,6 +92,7 @@ export async function POST(request: NextRequest) {
       description: book.description,
       status: book.status,
       coverImageUrl: book.coverImageUrl,
+      coverImageVersions: book.coverImageVersions, 
       createdAt: book.createdAt.getTime(),
       updatedAt: book.updatedAt.getTime(),
       recipeIds: recipeIds

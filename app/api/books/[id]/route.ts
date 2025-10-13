@@ -16,7 +16,7 @@ export async function PUT(
         title: title || undefined,
         description: description || undefined,
         coverImageUrl: coverImageUrl || undefined,
-        coverImageVersions: coverImageVersions !== undefined ? coverImageVersions : undefined,  // 🆕 AJOUT
+        coverImageVersions: coverImageVersions !== undefined ? coverImageVersions : undefined, 
         status: status || undefined,
         updatedAt: new Date()
       }
@@ -38,7 +38,7 @@ export async function PUT(
       description: book.description,
       status: book.status,
       coverImageUrl: book.coverImageUrl,
-      coverImageVersions: book.coverImageVersions,  // 🆕 AJOUT
+      coverImageVersions: book.coverImageVersions, 
       createdAt: book.createdAt.getTime(),
       updatedAt: book.updatedAt.getTime(),
       recipeIds: bookWithRecipes?.recipes.map(r => r.recipeId) || []
