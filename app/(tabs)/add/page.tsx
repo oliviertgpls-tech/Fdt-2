@@ -1433,7 +1433,7 @@ if (resultsWithLists.length > 0) {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
          <div className="inline-flex items-center">
-         <Carott className="w-4 h-4 mr-2"/> Ingrédients
+         <Carrot className="w-4 h-4 mr-2"/> Ingrédients
          </div>
           </label>
           <textarea
