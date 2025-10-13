@@ -120,7 +120,7 @@ function BooksLoadingSkeleton() {
       <div className="flex-1">
         <h1 className="text-3xl font-bold text-gray-900">Mes livres</h1>
         <p className="text-gray-600 mt-1">
-          Organisez vos recettes par thématique
+          Créez votre propre livre de cuisine
         </p>
       </div>
       
@@ -160,7 +160,7 @@ function BooksLoadingSkeleton() {
                       </div>
                     ) : (
                       // Icône livre par défaut
-                      <div className="w-full h-full bg-gradient-to-br from-orange-200 to-orange-50 flex items-center justify-center text-3xl md:text-4xl">
+                      <div className="w-full h-full bg-secondary-200 flex items-center justify-center text-3xl md:text-4xl">
                         📖
                       </div>
                     )}
@@ -168,13 +168,13 @@ function BooksLoadingSkeleton() {
                   
                   <div className="p-3 md:p-4">
                     <h3 className="font-semibold text-gray-900 mb-2 text-m md:text-base truncate">{book.title}</h3>
-                    <div className="text-xs md:text-sm text-gray-600 space-y-1 mb-3">
+                    <div className="text-sm md:text-sm text-gray-600 space-y-1 mb-3">
                       <p>{book.recipeIds.length} recettes • {pageCount} pages</p>
-                      <p className="text-xs text-gray-500">
-                        {book.status === 'draft' && '📝 Brouillon'}
-                        {book.status === 'ready' && '✅ Prêt'}
-                        {book.status === 'ordered' && '🚚 Commandé'}
-                        {book.status === 'printed' && '📚 Imprimé'}
+                      <p className="text-sm text-gray-500">
+                        {book.status === 'draft' && 'Statut : Brouillon'}
+                        {book.status === 'ready' && 'Statut : Prêt'}
+                        {book.status === 'ordered' && 'Statut : Commandé'}
+                        {book.status === 'printed' && 'Statut : Imprimé'}
                       </p>
                     </div>
                     

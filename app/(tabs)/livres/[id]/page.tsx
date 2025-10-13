@@ -39,10 +39,12 @@ type UploadResult = {
 function SortableRecipeItem({ 
   recipe, 
   index, 
+  pageNumber,
   onRemove 
 }: { 
   recipe: any; 
   index: number; 
+  pageNumber: string;  // Ex: "5" ou "5-6"
   onRemove: (id: string) => void;
 }) {
   const {
@@ -60,48 +62,37 @@ function SortableRecipeItem({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  // Haptique mobile
-  const triggerHaptic = () => {
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate(10); // Vibration de 10ms
-    }
-  };
-
-    return (
+  return (
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-secondary-50 border border-secondary-200 rounded-lg p-3"
+      className={`bg-green-50 rounded-lg p-4 border-2 ${
+        isDragging ? 'border-green-400 shadow-lg z-50' : 'border-green-200'
+      }`}
     >
       <div className="flex items-center gap-3">
-        {/* Handle de drag EN PREMIER */}
+        {/* Poignée de drag */}
         <button
-          {...listeners}
           {...attributes}
-          onMouseDown={triggerHaptic}
-          onTouchStart={triggerHaptic}
-          className="cursor-move p-1 hover:bg-secondary-200 rounded transition-all flex-shrink-0"
-          title="Glisser pour réorganiser"
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-green-100 rounded transition-colors touch-none flex-shrink-0"
+          title="Réorganiser"
         >
-          <GripVertical className="w-4 h-4 text-gray-500" />
+          <GripVertical className="w-5 h-5 text-gray-400" />
         </button>
 
-        {/* Numéro de page */}
-        <div className="w-7 h-7 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
-          p.{4 + index}
+        {/* Numéro de page dynamique */}
+        <div className="w-auto min-w-[2.5rem] px-2 h-7 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
+          p.{pageNumber}
         </div>
 
-        {/* Contenu texte */}
+        {/* Info recette */}
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm text-gray-900 whitespace-normal break-words">
-            {recipe.title}
-          </h4>
-          <p className="text-xs text-gray-600">
-            par {recipe.author || 'Famille'}
-          </p>
+          <h4 className="text-sm font-medium text-gray-900 truncate">{recipe.title}</h4>
+          <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
         </div>
 
-        {/* Bouton suppression EN DERNIER */}
+        {/* Bouton suppression */}
         <button
           onClick={() => {
             if (confirm(`Retirer "${recipe.title}" de ce livre ?`)) {
@@ -366,34 +357,56 @@ export default function BookPage() {
         }
       };
 
-      const drawImageFitted = async (pdfDoc: any, page: any, url: string | undefined, x: number, y: number, boxW: number, boxH: number) => {
-        const bytes = await fetchImageBytes(url);
-        if (!bytes) {
-          page.drawRectangle({
-            x, y, width: boxW, height: boxH,
-            color: rgb(0.95, 0.94, 0.92),
-            borderColor: rgb(0.8, 0.8, 0.8),
-            borderWidth: 1
-          });
-          page.drawText('Image indisponible', {
-            x: x + 12, y: y + boxH / 2 - 6,
-            size: 12, color: rgb(0.4, 0.35, 0.3)
-          });
-          return;
+      const drawImageFitted = async (pdfDoc: any, page: any, url: string | undefined, x: number, y: number, boxW: number, boxH: number, preserveAspect = true) => {
+      const bytes = await fetchImageBytes(url);
+      if (!bytes) {
+        page.drawRectangle({
+          x, y, width: boxW, height: boxH,
+          color: rgb(0.95, 0.94, 0.92),
+          borderColor: rgb(0.8, 0.8, 0.8),
+          borderWidth: 1
+        });
+        page.drawText('Image indisponible', {
+          x: x + 12, y: y + boxH / 2 - 6,
+          size: 12, color: rgb(0.4, 0.35, 0.3)
+        });
+        return;
+      }
+
+      const isPng = url?.toLowerCase().endsWith('.png');
+      const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+      const { width, height } = img.size();
+
+      // Calcul du ratio pour préserver les proportions
+      const imgRatio = width / height;
+      const boxRatio = boxW / boxH;
+      
+      let w, h;
+      
+      if (preserveAspect) {
+        // Préserver le ratio - l'image rentre entièrement dans la box
+        if (imgRatio > boxRatio) {
+          // Image plus large que la box
+          w = boxW;
+          h = boxW / imgRatio;
+        } else {
+          // Image plus haute que la box
+          h = boxH;
+          w = boxH * imgRatio;
         }
-
-        const isPng = url?.toLowerCase().endsWith('.png');
-        const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-        const { width, height } = img.size();
-
+      } else {
+        // Ancien comportement - remplir la box
         const scale = Math.min(boxW / width, boxH / height);
-        const w = width * scale;
-        const h = height * scale;
-        const cx = x + (boxW - w) / 2;
-        const cy = y + (boxH - h) / 2;
+        w = width * scale;
+        h = height * scale;
+      }
+      
+      // Centrer l'image dans la box
+      const cx = x + (boxW - w) / 2;
+      const cy = y + (boxH - h) / 2;
 
-        page.drawImage(img, { x: cx, y: cy, width: w, height: h });
-      };
+      page.drawImage(img, { x: cx, y: cy, width: w, height: h });
+    };
 
       // Création du PDF
       const pdfDoc = await PDFDocument.create();
@@ -433,122 +446,306 @@ export default function BookPage() {
       if (imageUrlToDisplay) {
         const imageSize = 320;
         const imageX = (A4.w - imageSize) / 2; // Centré horizontalement
-        const imageY = titleY - 50 - imageSize;
+        const imageY = titleY - 10 - imageSize;
         
         await drawImageFitted(pdfDoc, cover, imageUrlToDisplay, imageX, imageY, imageSize, imageSize);
         
        // Description en italique centrée sous l'image (si présente)
-        if (book.description) {
+       if (book.description) {
           const fontItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
-          // Centrer la description
-          const descriptionLines = wrapText(book.description, fontItalic, 14, A4.w - 120);
-          let descY = titleY - 110 - imageSize;
+          const descSize = 14;  // 🆕 Définir la taille une seule fois
+          const descriptionLines = wrapText(book.description, fontItalic, descSize, A4.w - 120);
+          let descY = imageY - 20;  // 🆕 Position sous l'image
+          
           descriptionLines.forEach(line => {
-            const lineWidth = fontItalic.widthOfTextAtSize(line, 12);
+            const lineWidth = fontItalic.widthOfTextAtSize(line, descSize);  // ✅ Même taille
             cover.drawText(line, {
-              x: (A4.w - lineWidth) / 2, // Centré
+              x: (A4.w - lineWidth) / 2,  // Centré
               y: descY,
-              size: 14,
+              size: descSize,  // ✅ Même taille
               font: fontItalic,
               color: colorBody
             });
-            descY -= 16;
+            descY -= 18;
           });
         }
       }
-      // 2) Pages des recettes
-      for (const recipe of printableRecipes) {
-        const page = pdfDoc.addPage([A4.w, A4.h]);
+
+      // 2) Page de garde vide (p.2 - verso couverture)
+      const guardPage1 = pdfDoc.addPage([A4.w, A4.h]);
+      guardPage1.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h,
+        color: rgb(0.99, 0.98, 0.96) // Même couleur que le reste
+      });
+
+// 3) Générer TOUTES les pages de recettes AVANT le sommaire
+const recipePageNumbers: { recipe: any; startPage: number; endPage: number }[] = [];
+let currentPageNumber = 5; // Première recette = page 5
+
+for (const recipe of printableRecipes) {
+  const startPage = currentPageNumber;
+  let currentPage = pdfDoc.addPage([A4.w, A4.h]);
+  
+  // Fond stone-100
+  currentPage.drawRectangle({
+    x: 0, y: 0, width: A4.w, height: A4.h,
+    color: rgb(0.96, 0.96, 0.95)
+  });
+
+  let currentY = A4.h - 60;
+  const minY = 80; // Limite basse de page
+
+  // 📌 EN-TÊTE : Ligne décorative simple
+  const lineY = currentY;
+  currentPage.drawLine({
+    start: { x: 60, y: lineY },
+    end: { x: A4.w - 60, y: lineY },
+    thickness: 1,
+    color: rgb(0.2, 0.2, 0.2)
+  });
+
+  currentY -= 80;
+
+  // 📌 TITRE DE LA RECETTE
+  const titleLines = wrapText(recipe.title.toUpperCase(), fontTitle, 36, 320);
+  titleLines.forEach(line => {
+    currentPage.drawText(line, {
+      x: 60,
+      y: currentY,
+      size: 36,
+      font: fontTitle,
+      color: rgb(0, 0, 0)
+    });
+    currentY -= 42;
+  });
+
+  currentY -= 20;
+
+  // Métadonnées
+  const metaParts = [];
+  if (recipe.author) metaParts.push(`Par ${recipe.author}`);
+  if (recipe.prepMinutes) metaParts.push(`${recipe.prepMinutes} min`);
+  if (recipe.servings) metaParts.push(`${recipe.servings} pers.`);
+  const metaText = metaParts.join('  •  ');
+
+  if (metaText) {
+    currentPage.drawText(metaText, {
+      x: 60,
+      y: currentY,
+      size: 9,
+      font: fontBody,
+      color: rgb(0.4, 0.4, 0.4)
+    });
+    currentY -= 40;
+  }
+
+  // 📌 LAYOUT EN 2 COLONNES
+  const leftColWidth = 270;
+  const rightColWidth = 150;
+  const leftX = 60;
+  const marginRight = 60; // Marge droite souhaitée
+
+  // Calculer rightX en tenant compte du padding de la box
+  const boxPadding = 20;
+  const rightX = A4.w - marginRight - boxPadding - rightColWidth;
+
+  // === COLONNE DROITE : ENCADRÉ INGRÉDIENTS (PAGE 1 UNIQUEMENT) ===
+  const boxX = rightX - boxPadding;
+  const imageHeight = recipe.imageUrl ? 150 : 0;
+  const imageWidth = rightColWidth;
+
+  let calculatedHeight = 0;
+  if (imageHeight > 0) {
+    calculatedHeight += (imageHeight / 2) + 20;
+  }
+  calculatedHeight += 40;
+
+  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+let tempY = 0;
+for (const ingredient of ingredients) {
+  // Capitaliser : première lettre en majuscule
+  const capitalizedIngredient = ingredient.charAt(0).toUpperCase() + ingredient.slice(1);
+  const lines = wrapText(capitalizedIngredient, fontBody, 10, rightColWidth - 10);
+  tempY += (lines.length * 12) + 8;
+}
+calculatedHeight += tempY + boxPadding * 2;
+
+  const boxHeight = Math.max(calculatedHeight, 250);
+  const rightYStart = currentY + 40;
+  const boxY = rightYStart - boxHeight;
+
+  // Encadré
+  currentPage.drawRectangle({
+    x: boxX,
+    y: boxY,
+    width: rightColWidth + (boxPadding * 2),
+    height: boxHeight,
+    color: rgb(0.94, 0.87, 0.80),
+  });
+
+  let contentY = rightYStart - boxPadding;
+  if (imageHeight > 0) {
+    contentY -= (imageHeight / 2) + 15;
+  }
+
+  currentPage.drawText('INGRÉDIENTS', {
+    x: rightX,
+    y: contentY,
+    size: 14,
+    font: fontTitle,
+    color: rgb(0, 0, 0)
+  });
+  contentY -= 30;
+
+for (const ingredient of ingredients) {
+  if (contentY < boxY + boxPadding + 10) break;
+  
+  // Capitaliser
+  const capitalizedIngredient = ingredient.charAt(0).toUpperCase() + ingredient.slice(1);
+  
+  contentY = drawParagraph(currentPage, capitalizedIngredient, rightX, contentY, fontBody, 10, rgb(0.2, 0.2, 0.2), rightColWidth - 10, 2) - 8;
+}
+
+  // Image débordant en haut
+  if (recipe.imageUrl) {
+    const imageX = rightX;
+    const imageY = (boxY + boxHeight) - (imageHeight / 2);
+
+    await drawImageFitted(pdfDoc, currentPage, recipe.imageUrl, imageX, imageY, imageWidth, imageHeight, true);
+  }
+
+  // === COLONNE GAUCHE : ÉTAPES AVEC PAGINATION ===
+  let leftY = currentY;
+
+  currentPage.drawText('ÉTAPES', {
+    x: leftX,
+    y: leftY,
+    size: 14,
+    font: fontTitle,
+    color: rgb(0, 0, 0)
+  });
+  leftY -= 25;
+
+  const steps = typeof recipe.steps === 'string'
+    ? recipe.steps.split('\n\n').filter((s: string) => s.trim())
+    : Array.isArray(recipe.steps) ? recipe.steps : [];
+
+  // 🆕 GESTION DES PAGES MULTIPLES
+  for (let idx = 0; idx < steps.length; idx++) {
+    const step = steps[idx];
+    
+    // Vérifier si on a assez d'espace pour le numéro + au moins 2 lignes
+    if (leftY < minY + 40) {
+      // Créer une nouvelle page
+      currentPageNumber += 1;
+      currentPage = pdfDoc.addPage([A4.w, A4.h]);
+      
+      currentPage.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h,
+        color: rgb(0.96, 0.96, 0.95)
+      });
+      
+      leftY = A4.h - 80;
+      
+      // Titre de section sur la nouvelle page
+      currentPage.drawText('ÉTAPES (suite)', {
+        x: leftX,
+        y: leftY,
+        size: 14,
+        font: fontTitle,
+        color: rgb(0, 0, 0)
+      });
+      leftY -= 25;
+    }
+
+    // Numéro de l'étape
+    const stepNumber = `${idx + 1}.`;
+    currentPage.drawText(stepNumber, {
+      x: leftX,
+      y: leftY,
+      size: 11,
+      font: fontTitle,
+      color: rgb(0, 0, 0)
+    });
+
+    // Texte de l'étape
+    const stepText = step.replace(/^\d+\.?\s*/, '');
+    const newY = drawParagraph(currentPage, stepText, leftX + 20, leftY, fontBody, 11, rgb(0.2, 0.2, 0.2), leftColWidth - 20, 3);
+    leftY = newY - 15;
+  }
+
+    // Numéro de page sur toutes les pages de la recette
+    currentPageNumber += 1;
+    const endPage = currentPageNumber - 1;
+    
+    recipePageNumbers.push({ recipe, startPage, endPage });
+  }
+
+      // 4) Insérer le SOMMAIRE en position 2 (= page 3 physique)
+      const summaryPage = pdfDoc.insertPage(2, [A4.w, A4.h]);
+
+      // Fond
+      summaryPage.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h,
+        color: rgb(0.99, 0.98, 0.96)
+      });
+
+      // Titre "Sommaire"
+      let summaryY = A4.h - margin - 20;
+      summaryPage.drawText('Sommaire', {
+        x: margin,
+        y: summaryY,
+        size: 24,
+        font: fontTitle,
+        color: colorTitle
+      });
+
+      summaryY -= 50;
+
+      // Ligne décorative
+      summaryPage.drawLine({
+        start: { x: margin, y: summaryY + 10 },
+        end: { x: A4.w - margin, y: summaryY + 10 },
+        thickness: 1,
+        color: rgb(0.7, 0.6, 0.5)
+      });
+
+      summaryY -= 30;
+
+      // Liste des recettes avec VRAIS numéros
+      recipePageNumbers.forEach(({ recipe, startPage, endPage }) => {
+        if (summaryY < margin + 40) return;
         
-        page.drawRectangle({
-          x: 0, y: 0, width: A4.w, height: A4.h,
-          color: rgb(0.99, 0.98, 0.96)
-        });
-
-        let currentY = A4.h - margin;
-
-        // Titre de la recette
-        const titleLines = wrapText(recipe.title, fontTitle, 20, A4.w - 80);
-        titleLines.forEach(line => {
-          page.drawText(line, {
-            x: margin, y: currentY,
-            size: 20, font: fontTitle, color: colorTitle
+        const pageText = startPage === endPage 
+          ? `p.${startPage}` 
+          : `p.${startPage}-${endPage}`;
+        
+        const authorText = recipe.author ? ` par ${recipe.author}` : '';
+        const recipeText = `${pageText} - ${recipe.title}${authorText}`;
+        
+        const lines = wrapText(recipeText, fontBody, 12, A4.w - (margin * 2));
+        
+        lines.forEach((line, lineIndex) => {
+          summaryPage.drawText(line, {
+            x: margin + (lineIndex > 0 ? 40 : 0),
+            y: summaryY,
+            size: 12,
+            font: fontBody,
+            color: colorBody
           });
-          currentY -= 25;
+          summaryY -= 18;
         });
+        
+        summaryY -= 8;
+      });
 
-        // Métadonnées
-        const metaText = [
-          recipe.author ? `par ${recipe.author}` : '',
-          recipe.prepMinutes ? `${recipe.prepMinutes} min` : '',
-          recipe.servings ? `${recipe.servings} pers.` : ''
-        ].filter(Boolean).join(' • ');
+      // 5) Insérer page de garde vide après sommaire (= page 4 physique)
+      const guardPage2 = pdfDoc.insertPage(3, [A4.w, A4.h]);
+      guardPage2.drawRectangle({
+        x: 0, y: 0, width: A4.w, height: A4.h,
+        color: rgb(0.99, 0.98, 0.96)
+      });
 
-        if (metaText) {
-          page.drawText(metaText, {
-            x: margin, y: currentY,
-            size: 11, font: fontBody, color: colorBody
-          });
-          currentY -= 25;
-        }
-
-        // Layout en 2 colonnes
-        const colWidth = (A4.w - margin * 3) / 2;
-        const colGap = margin;
-        const leftX = margin;
-        const rightX = margin + colWidth + colGap;
-
-        // Colonne de gauche : image + ingrédients
-        let leftY = currentY;
-
-        if (recipe.imageUrl) {
-          const imageSize = 180;
-          await drawImageFitted(pdfDoc, page, recipe.imageUrl, leftX, leftY - imageSize, colWidth, imageSize);
-          leftY -= imageSize + 25;
-        }
-
-        page.drawText('Ingrédients', {
-          x: leftX, y: leftY,
-          size: 16, font: fontTitle, color: colorTitle
-        });
-        leftY -= 20;
-
-        const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-        for (const ingredient of ingredients) {
-          if (leftY < margin + 40) break;
-          
-          page.drawCircle({ 
-            x: leftX + 4, y: leftY + 4, 
-            size: 1.5, color: colorBody 
-          });
-          
-          leftY = drawParagraph(page, ingredient, leftX + 12, leftY, fontBody, 12, colorBody, colWidth - 12, 2) - 4;
-        }
-
-        // Colonne de droite : préparation
-        let rightY = currentY;
-
-        page.drawText('Préparation', {
-          x: rightX, y: rightY,
-          size: 16, font: fontTitle, color: colorTitle
-        });
-        rightY -= 20;
-
-        const steps = typeof recipe.steps === 'string'
-          ? recipe.steps.split('\n\n').filter((s: string) => s.trim())
-          : Array.isArray(recipe.steps) ? recipe.steps : [];
-
-        steps.forEach((step: string, idx: number) => {
-          if (rightY < margin + 40) return;
-
-          // Ajouter le numéro si pas déjà présent
-          const stepWithNumber = /^\d+\.?\s/.test(step) 
-            ? step // Déjà numéroté
-            : `${idx + 1}. ${step}`; // Ajouter le numéro
-
-          rightY = drawParagraph(page, stepWithNumber, rightX, rightY, fontBody, 12, colorBody, colWidth, 2) - 12;
-        });
-      }
       console.log('💾 Génération des bytes PDF...');
       // Export du PDF
       const pdfBytes = await pdfDoc.save();
@@ -589,7 +786,11 @@ export default function BookPage() {
   };
 
   // Calculs
-  const pageCount = 6 + (bookRecipes.length * 2);
+  const pageCount = 1 + 1 + 1 + (bookRecipes.length * 2);
+  // Page 1 : Couverture
+  // Page 2 : Verso vide
+  // Page 3 : Sommaire
+  // Pages 4+ : Recettes (2 pages par recette)
   const estimatedPrice = Math.round((pageCount * 0.30 + 15) * 1) / 1;
 
 
@@ -965,6 +1166,16 @@ const handleDragEnd = async (event: DragEndEvent) => {
                   </div>
                 </div>
 
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-medium">p.4</div>
+                    <div>
+                      <h4 className="font-medium text-sm text-accent-900">Page de Garde</h4>
+                      <p className="text-xs text-gray-600">Vide</p>
+                    </div>
+                  </div>
+                </div>
+
               {/* Recettes avec drag & drop */}
               <DndContext
                 sensors={sensors}
@@ -976,14 +1187,42 @@ const handleDragEnd = async (event: DragEndEvent) => {
                   items={bookRecipes.map(r => r.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {bookRecipes.map((recipe, index) => (
-                    <SortableRecipeItem
-                      key={recipe.id}
-                      recipe={recipe}
-                      index={index}
-                      onRemove={handleRemoveRecipe}
-                    />
-                  ))}
+                  {bookRecipes.map((recipe, index) => {
+                    // 🆕 Calculer le numéro de page dynamiquement
+                    let currentPageCalc = 5; // Page de départ
+                    
+                    // Ajouter les pages des recettes précédentes
+                    for (let i = 0; i < index; i++) {
+                      const prevRecipe = bookRecipes[i];
+                      const steps = typeof prevRecipe.steps === 'string'
+                        ? prevRecipe.steps.split('\n\n').filter((s: string) => s.trim())
+                        : Array.isArray(prevRecipe.steps) ? prevRecipe.steps : [];
+                      
+                      // Estimer si débordement (plus de 10 étapes = 2 pages)
+                      const pageCount = steps.length > 10 ? 2 : 1;
+                      currentPageCalc += pageCount;
+                    }
+                    
+                    // Calculer pour la recette actuelle
+                    const currentSteps = typeof recipe.steps === 'string'
+                      ? recipe.steps.split('\n\n').filter((s: string) => s.trim())
+                      : Array.isArray(recipe.steps) ? recipe.steps : [];
+                    
+                    const currentPageCount = currentSteps.length > 10 ? 2 : 1;
+                    const pageDisplay = currentPageCount === 1 
+                      ? `${currentPageCalc}` 
+                      : `${currentPageCalc}-${currentPageCalc + 1}`;
+                    
+                    return (
+                      <SortableRecipeItem
+                        key={recipe.id}
+                        recipe={recipe}
+                        index={index}
+                        pageNumber={pageDisplay}
+                        onRemove={handleRemoveRecipe}
+                      />
+                    );
+                  })}
                 </SortableContext>
               </DndContext>
               </div>
@@ -1048,6 +1287,13 @@ const handleDragEnd = async (event: DragEndEvent) => {
 <div className="mb-4 border-gray-500">
       <div className="items-center justify-center m-4 mb-4 flex items-center">
             <button
+              onClick={handleDeleteBook}
+              className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
+            >
+              <Trash2 className="w-4 h-6 mx-2" />
+              Supprimer le livre
+            </button>
+            <button
               onClick={generatePreviewPDF}
               disabled={isGeneratingPreview}
               className="bg-secondary-600 text-white text-sm mx-3 px-4 py-2 rounded-lg hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
@@ -1063,14 +1309,6 @@ const handleDragEnd = async (event: DragEndEvent) => {
                   Aperçu
                 </>
               )}
-            </button>
-
-            <button
-              onClick={handleDeleteBook}
-              className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
-            >
-              <Trash2 className="w-4 h-6 mx-2" />
-              Supprimer le livre
             </button>
           </div>
           </div>

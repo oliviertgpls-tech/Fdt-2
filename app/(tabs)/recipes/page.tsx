@@ -205,12 +205,12 @@ export default function RecipesPage() {
                 <div className="flex items-center gap-4 text-xs text-gray-500">
                   {recipe.prepMinutes && (
                     <span className="flex items-center gap-1">
-                      ⏱️ {recipe.prepMinutes}min
+                      {recipe.prepMinutes} min
                     </span>
                   )}
                   {recipe.ingredients.length > 0 && (
                     <span className="flex items-center gap-1">
-                      🥄 {recipe.ingredients.length} ingrédients
+                    {recipe.ingredients.length} ingrédients
                     </span>
                   )}
                 </div>

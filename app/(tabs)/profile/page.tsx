@@ -30,7 +30,7 @@ const handleLogout = async () => {
   const notebookCount = notebooks.length
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-2xl mx-auto px-4">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Mon Profil</h1>
@@ -45,20 +45,6 @@ const handleLogout = async () => {
           
           <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                {session?.user?.image ? (
-                  <img 
-                    src={session.user.image} 
-                    alt={session.user.name || "Avatar"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-xl font-semibold text-gray-600">
-                    {session?.user?.name?.[0]?.toUpperCase() || "U"}
-                  </span>
-                )}
-              </div>
-              
               <div>
                 <h3 className="text-xl font-semibold">{session?.user?.name}</h3>
                 <p className="text-gray-600 flex items-center gap-1">
@@ -69,10 +55,9 @@ const handleLogout = async () => {
             </div>
 
             <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">Compte créé</h4>
+              <h4 className="font-medium mb-2">Statut de compte</h4>
               <p className="text-gray-600 flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                Récemment
+                Amateur
               </p>
             </div>
 

@@ -107,10 +107,10 @@ export function ImageSearch({ onImageSelect, initialQuery = "" }: ImageSearchPro
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">
-                    🖼️ Choisir une image
+                    Bibliothèque libre de droits unsplash
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Photos libres de droits via Unsplash
+                    Essayez en FR sinon en EN pour plus de choix
                   </p>
                 </div>
                 <button

@@ -100,7 +100,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
           </main>
 
         {/* Footer */}
-        <footer className="border-t bg-gray-50 mt-12">
+        <footer className="border-t bg-white mt-12">
           <div className="mx-auto max-w-6xl px-4 md:px-6 py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-600">
               <p>
