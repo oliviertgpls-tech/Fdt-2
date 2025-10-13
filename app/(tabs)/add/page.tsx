@@ -360,8 +360,10 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
         
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-gray-900">
-              🖼️ Bibliothèque Unsplash. (Libre de droits)
+            <h3 className="text-sm font-semibold text-gray-900">
+              Bibliothèque libre de droits Unsplash
+              <div className="text-xs font-normal">
+                Essayez en FR ou en EN pour plus de resultats</div>
             </h3>
             <button
               onClick={() => setIsOpen(false)}
@@ -383,7 +385,7 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
             <button
               type="submit"
               disabled={loading || !query.trim()}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-6 py-3 bg-secondary-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {loading ? "..." : "Chercher"}
             </button>
@@ -959,7 +961,7 @@ if (resultsWithLists.length > 0) {
               
               <div className="pt-4 space-y-2">
                 <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
-                  🤖 IA - 5 offertes
+                  🤖 IA - 5 gratuites
                 </div>
               </div>
             </div>
@@ -1045,7 +1047,7 @@ if (resultsWithLists.length > 0) {
             Photographiez votre plat
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA OpenAI va analyser votre photo et créer automatiquement la recette complète avec optimisation d'image
+            Notre IA va analyser votre photo et créer automatiquement la recette complète avec optimisation d'image
           </p>
 
           <label className="inline-block">

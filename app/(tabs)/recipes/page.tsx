@@ -111,10 +111,10 @@ export default function RecipesPage() {
         </div>
         <Link 
           href="/add" 
-          className="bg-blue-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm md:text-base self-start"
+          className="bg-transparent text-blue-700 px-3 md:px-4 py-2  border border-2 color-primary-800 rounded-lg hover:bg-blue-100 transition-colors font-medium text-sm md:text-base self-start"
         >
-          <span className="sm:hidden">✨ Nouvelle Recette</span>
-          <span className="hidden sm:inline">✨ Nouvelle recette</span>
+          <span className="sm:hidden">+ Nouvelle Recette</span>
+          <span className="hidden sm:inline">+ Nouvelle recette</span>
         </Link>
       </div>
 

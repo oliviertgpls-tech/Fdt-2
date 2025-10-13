@@ -114,33 +114,25 @@ function BooksLoadingSkeleton() {
 
   // UN SEUL return principal
   return (
-    <div className="space-y-6 md:space-y-8 max-w-full overflow-y-hidden ">
-      {/* Section En-tête */}  
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Mes Livres</h1>
-          <p className="text-gray-600 mt-1 text-sm md:text-base">
-            Créez de beaux livres à imprimer et transmettez votre patrimoine
-          </p>
-          <div>
-          <button
-          onClick={() => {
-          sectionRef.current?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start' 
-          });
-          setTimeout(() => {
-            window.scrollBy(0, -20);
-          }, 300);
-        }}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm whitespace-nowrap flex-shrink-0"
-          >
-          <span className="sm:hidden">✨ Nouveau Livre </span>
-          <span className="hidden sm:inline">✨ Nouveau Livre</span>
-          </button>
-          </div>
-        </div>
+  <section className="space-y-8">
+    {/* EN-TÊTE AVEC BOUTON NOUVEAU CARNET */}
+    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 w-full">
+      <div className="flex-1">
+        <h1 className="text-3xl font-bold text-gray-900">Mes livres</h1>
+        <p className="text-gray-600 mt-1">
+          Organisez vos recettes par thématique
+        </p>
       </div>
+      
+      <button
+        onClick={() => setShowCreateModal(true)}
+        className="bg-transparent text-blue-700 px-3 md:px-4 py-2 border-2 rounded-lg hover:bg-blue-100 transition-colors font-medium text-sm md:text-base self-start"
+      >
+        <span className="sm:hidden">+ Nouveau Livre</span>
+        <span className="hidden sm:inline">+ Nouveau Livre</span>
+      </button>
+    </div>
+  
 
       {/* Livres existants */}
       {books.length > 0 && (
@@ -200,6 +192,7 @@ function BooksLoadingSkeleton() {
             })}
           </div>
         </div>
+
       )}
 
       {/* Sélection de recettes */}
@@ -365,6 +358,6 @@ function BooksLoadingSkeleton() {
         }}
         selectedCount={selectedRecipes.length}
       />
-    </div>
+  </section>
   );
 }
