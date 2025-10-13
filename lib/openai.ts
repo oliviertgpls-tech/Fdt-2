@@ -49,7 +49,7 @@ constructor() {
           'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
-          model: "gpt-4-vision-preview",
+          model: "gpt-4o-mini",
           messages: [
             {
               role: "user",
@@ -148,7 +148,7 @@ FORMAT DE RÉPONSE (JSON uniquement) :
           'Authorization': `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify({
-          model: "gpt-4-vision-preview",
+          model: "gpt-4o-mini",
           messages: [
             {
               role: "user",
