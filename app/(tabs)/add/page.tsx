@@ -1298,7 +1298,6 @@ if (resultsWithLists.length > 0) {
                         className="hidden"
                         disabled={isUploading}
                       />
-                      />
                       <ImageIcon className="w-12 h-12 text-blue-400" />
                       <div className="text-center">
                         <p className="text-sm font-medium text-blue-900">
