@@ -476,13 +476,50 @@ const handleImageUpload = async (file: File): Promise<UploadResult | null> => {
     console.log('📦 Taille fichier:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
     console.log('📦 Type fichier:', file.type);
     
+    // 🆕 CONVERSION HEIC → JPEG (pour iPhone)
+    let processedFile = file;
+    
+    if (file.name.toLowerCase().endsWith('.heic') || 
+        file.name.toLowerCase().endsWith('.heif') || 
+        file.type === '' || 
+        file.type === 'image/heic') {
+      
+      console.log('🔄 Format HEIC détecté, conversion en JPEG...');
+      
+      try {
+        const heic2any = (await import('heic2any')).default;
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.9
+        });
+        
+        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        
+        processedFile = new File(
+          [blob], 
+          file.name.replace(/\.heic$/i, '.jpg'),
+          { type: 'image/jpeg' }
+        );
+        
+        console.log('✅ Conversion HEIC → JPEG réussie');
+        showToast('📸 Conversion iPhone → JPEG...', 'success');
+        
+      } catch (conversionError) {
+        console.error('❌ Erreur conversion HEIC:', conversionError);
+        showToast('Format photo iPhone non supporté', 'error');
+        return null;
+      }
+    }
+    
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', processedFile); // ← Utilise processedFile au lieu de file
     
     const response = await fetch('/api/upload', {
       method: 'POST',
       body: formData
     });
+    
     
     console.log('📡 Réponse API upload, status:', response.status);
     

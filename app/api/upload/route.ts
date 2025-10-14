@@ -13,12 +13,20 @@ export async function POST(request: NextRequest) {
 
     // Convertir en base64
     const bytes = await file.arrayBuffer()
-    const base64 = Buffer.from(bytes).toString('base64')
+    let base64 = Buffer.from(bytes).toString('base64')
 
-    // 🔧 Valider et corriger le type MIME
-    let mimeType = file.type;
+    // 🆕 NETTOYER le base64 : supprimer espaces/retours ligne
+    base64 = base64.replace(/\s+/g, '');
 
-    // Si le type est vide ou invalide, on détecte selon l'extension du fichier
+    console.log('📏 Taille base64:', base64.length, 'caractères');
+
+    // 🆕 VALIDATION du format base64
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) {
+      console.error('❌ Base64 contient des caractères invalides');
+      throw new Error('Format d\'image invalide - caractères non autorisés');
+    }
+
+    // Si le type est vide ou invalide, on détecte selon l'extension
     if (!mimeType || mimeType === 'application/octet-stream' || !mimeType.startsWith('image/')) {
       const fileName = file.name.toLowerCase();
       
@@ -30,22 +38,34 @@ export async function POST(request: NextRequest) {
         mimeType = 'image/webp';
       } else if (fileName.endsWith('.gif')) {
         mimeType = 'image/gif';
+      } else if (fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
+        console.error('❌ HEIC non supporté - doit être converti en JPEG côté client');
+        return NextResponse.json({ 
+          success: false,
+          error: 'Format HEIC non supporté. Veuillez utiliser JPEG ou PNG.' 
+        }, { status: 400 });
       } else {
-        // Par défaut, on force JPEG (le plus universel)
+        // Par défaut JPEG
         mimeType = 'image/jpeg';
       }
       
       console.log(`🔧 Type MIME corrigé : ${file.type} → ${mimeType}`);
     }
 
+    // 🆕 VÉRIFIER que le MIME est valide
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(mimeType)) {
+      console.error('❌ Type MIME non supporté:', mimeType);
+      return NextResponse.json({ 
+        success: false,
+        error: `Type d'image non supporté : ${mimeType}` 
+      }, { status: 400 });
+    }
+
     const dataURI = `data:${mimeType};base64,${base64}`;
 
     console.log('📦 Type MIME utilisé:', mimeType);
     console.log('📦 Taille dataURI:', dataURI.length, 'caractères');
-
-    console.log('☁️ Tentative upload Cloudinary')
-    console.log('📋 Cloud name:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
-    console.log('📋 Upload preset:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
+    console.log('✅ DataURI valide, prêt pour Cloudinary');
 
     // Upload ULTRA-SIMPLE vers Cloudinary (comme avant)
     const response = await fetch(
