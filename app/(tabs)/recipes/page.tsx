@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRecipes } from "@/contexts/RecipesProvider";
-import { Nut, NutIcon } from 'lucide-react';
+import { Nut, NutIcon, Carrot, Clock2, Share } from 'lucide-react';
 
 // Composant Skeleton pour les cartes de recettes
 function RecipeCardSkeleton() {
@@ -203,17 +203,23 @@ export default function RecipesPage() {
                 )}
                 
                 {/* Métadonnées */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex flex-row justify-between items-center gap-1 text-xs text-gray-500">
+                  <div className="inline-flex gap-1 items-center ">
+                  <Clock2 className="w-3 h-3 items-center"/>
                   {recipe.prepMinutes && (
                     <span className="flex items-center gap-1">
                       {recipe.prepMinutes} min
                     </span>
                   )}
+                  
                   {recipe.ingredients.length > 0 && (
                     <span className="flex items-center gap-1">
+                      <Carrot className="w-4 h-4 ml-2"/>
                     {recipe.ingredients.length} ingrédients
                     </span>
+                    
                   )}
+                  </div>
                 </div>
                 
                 {/* Tags */}

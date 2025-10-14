@@ -148,14 +148,14 @@ function BooksLoadingSkeleton() {
                 <div key={book.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
                   
                   {/* Couverture avec image ou icône */}
-                  <div className="aspect-[2/1] relative overflow-hidden">
+                  <div className="aspect-[4/3] relative overflow-hidden">
                     {book.coverImageUrl ? (
                       // Photo de couverture personnalisée
-                      <div className="w-full h-full bg-gradient-to-br from-orange-100 to-orange-50 p-4">
+                      <div className="bg-secondary-200 p-4">
                         <img 
                           src={book.coverImageUrl} 
                           alt={`Couverture - ${book.title}`}
-                          className="w-full/3 h-full/2 object-cover rounded-lg shadow-sm"
+                          className="aspect-[1] object-cover rounded-lg shadow-sm"
                         />
                       </div>
                     ) : (
@@ -310,7 +310,7 @@ function BooksLoadingSkeleton() {
                     {recipe.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="bg-secondary-200 text-secondary-700 px-2 py-0.5 rounded-md text-xs"
+                        className="bg-secondary-100 text-secondary-600 px-2 py-0.5 rounded-md text-xs"
                       >
                         #{tag}
                       </span>

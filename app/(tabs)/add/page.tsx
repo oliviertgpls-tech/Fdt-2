@@ -959,7 +959,7 @@ if (resultsWithLists.length > 0) {
             Photo en cours d'analyse...
           </h2>
           <p className="text-gray-600 mb-8">
-            Notre IA analyse votre {mode === 'photo' ? 'photo' : 'recette manuscrite'} et extrait automatiquement les informations
+            Notre IA analyse votre {mode === 'photo' ? 'photo' : 'recette écrite'} et extrait automatiquement les informations
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '70%' }}></div>

@@ -234,11 +234,11 @@ export default function CarnetPage() {
                   
                   {/* Tags */}
                   {recipe.tags && recipe.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       {recipe.tags.slice(0, 3).map((tag) => (
                         <span 
                           key={tag}
-                          className="bg-secondary-100 text--600 px-2 py-1 rounded text-xs"
+                          className="bg-secondary-100 text-secondary-600 px-2 py-1 rounded text-xs"
                         >
                           #{tag}
                         </span>

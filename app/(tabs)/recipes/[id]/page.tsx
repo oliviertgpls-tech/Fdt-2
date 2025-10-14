@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { OptimizedImage } from "@/components/OptimizedImage"; // 🆕 IMPORT
-import { Plus, Eye, Trash2, ArrowLeft, Edit3, Clock4, Utensils} from 'lucide-react';
+import { Plus, Eye, Trash2, ArrowLeft, Edit3, Clock4, Utensils, Share, Check} from 'lucide-react';
 import Link from "next/link";
 
 
@@ -188,7 +188,7 @@ export default function RecipeDetailPage() {
         <div className="space-y-3">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h1 className="text-3xl font-semibold">{recipe.title}</h1>
+              <h1 className="text-2xl font-semibold">{recipe.title}</h1>
             </div>
           </div>
           
@@ -227,8 +227,11 @@ export default function RecipeDetailPage() {
               <ul className="capitalize space-y-2">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="flex-shrink-0 mt-2 w-2 h-2 bg-primary-400 rounded-full"></span>
-                    <span className="text-gray-700">{ingredient}</span>
+                   <div className="items-center inline-flex">
+                   <Check className="w-3 h-3 mr-2"/> 
+                    <span className="text-gray-700">
+                      {ingredient}</span>
+                      </div>
                   </li>
                 ))}
               </ul>
@@ -269,21 +272,75 @@ export default function RecipeDetailPage() {
                     ← Précédente
                   </button>
 
-                  {/* Indicateur de progression */}
-                  <div className="flex gap-1">
-                    {steps.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentStep(index)}
-                        className={`w-3 h-3 rounded-full transition-colors ${
-                          index === currentStep 
-                            ? 'bg-primary-500' 
-                            : index < currentStep 
-                              ? 'bg-secondary-500' 
-                              : 'bg-gray-300'
-                        }`}
-                      />
-                    ))}
+                  {/* Indicateur de progression avec fenêtre glissante */}
+                  <div className="flex gap-1 items-center">
+                    {/* Calcul de la fenêtre visible */}
+                    {(() => {
+                      const MAX_DOTS = 9; // Nombre max de points affichés
+                      const totalSteps = steps.length;
+                      
+                      // Si on a moins de MAX_DOTS étapes, on affiche tout
+                      if (totalSteps <= MAX_DOTS) {
+                        return steps.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentStep(index)}
+                            className={`w-3 h-3 rounded-full transition-colors ${
+                              index === currentStep 
+                                ? 'bg-secondary-600' 
+                                : index < currentStep 
+                                  ? 'bg-secondary-400' 
+                                  : 'bg-gray-300'
+                            }`}
+                          />
+                        ));
+                      }
+                      
+                      // Sinon, on affiche une fenêtre glissante
+                      const halfWindow = Math.floor(MAX_DOTS / 2); // 4 de chaque côté
+                      let startIndex = Math.max(0, currentStep - halfWindow);
+                      let endIndex = Math.min(totalSteps - 1, startIndex + MAX_DOTS - 1);
+                      
+                      // Ajustement si on est vers la fin
+                      if (endIndex === totalSteps - 1) {
+                        startIndex = Math.max(0, endIndex - MAX_DOTS + 1);
+                      }
+                      
+                      const visibleSteps = [];
+                      
+                      // Indicateur "..." au début si nécessaire
+                      if (startIndex > 0) {
+                        visibleSteps.push(
+                          <span key="start-dots" className="text-gray-400 text-xs px-1">...</span>
+                        );
+                      }
+                      
+                      // Points visibles
+                      for (let i = startIndex; i <= endIndex; i++) {
+                        visibleSteps.push(
+                          <button
+                            key={i}
+                            onClick={() => setCurrentStep(i)}
+                            className={`w-3 h-3 rounded-full transition-colors ${
+                              i === currentStep 
+                                ? 'bg-secondary-600' 
+                                : i < currentStep 
+                                  ? 'bg-secondary-400' 
+                                  : 'bg-gray-200'
+                            }`}
+                          />
+                        );
+                      }
+                      
+                      // Indicateur "..." à la fin si nécessaire
+                      if (endIndex < totalSteps - 1) {
+                        visibleSteps.push(
+                          <span key="end-dots" className="text-gray-400 text-xs px-1">...</span>
+                        );
+                      }
+                      
+                      return visibleSteps;
+                    })()}
                   </div>
 
                   {currentStep < steps.length - 1 ? (
@@ -351,17 +408,30 @@ export default function RecipeDetailPage() {
                   router.push("/recipes");
                 }
               }}
-              className="items-center text-red-700 px-4 mr-2  py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
+              className="flex items-center justify-between text-red-700 px-2 py-2 rounded-lg hover:bg-red-200 transition-colors font-medium"
             >
-              <Trash2 className="inline-flex items-center w-4 h-4"/> Supprimer
+              <div className="inline-flex items-center text-sm">
+              <Trash2 className="w-4 h-4 mr-2"/> Supprimer
+               </div>
             </button>
+             <button className="bg-transparent over:bg-blue-100">
+               <div className="inline-flex items-center gap-2  mr-3 over:bg-blue-100">
+               
+                <Share className="w-4 h-4 ml-4 text-blue-700 ml-2 mb-1 over:text-blue-800"/> <span className="text-sm text-blue-800"
+                >Partager</span>
+                  </div>
+                </button>
             <Link
               href={`/recipes/edit/${recipe.id}`}
-              className="inline-flex-1 bg-accent-300 text-accent-800 px-4 py-3 rounded-lg hover:bg-accent-400 transition-colors font-medium text-center"
+              className="inline-flex bg-accent-300 text-accent-800 items-center px-4 py-2 text-base rounded-lg hover:bg-accent-400 transition-colors font-medium text-center"
             >
-              <Edit3 className="inline-flex mr-2 items-center w-4 h-4"/>
-              Modifier la recette
+              <div className="inline-flex text-sm items-center">
+              <Edit3 className="mr-2 w-4 h-4"/>
+              Modifier
+              </div>
             </Link>
+
+            
             
           </div>
         </div>
