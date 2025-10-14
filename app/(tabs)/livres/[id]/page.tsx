@@ -1102,7 +1102,6 @@ const handleDragEnd = async (event: DragEndEvent) => {
           <ImageSearch 
             onImageSelect={(url) => {
               setCoverImageUrl(url);
-              setEditingCover(false);
             }}
             initialQuery={`${book.title} family cooking`}
           />

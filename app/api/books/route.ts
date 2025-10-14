@@ -23,6 +23,13 @@ export async function GET() {
       },
       orderBy: { createdAt: 'desc' }
     })
+
+        // 🆕 Type pour les versions d'images
+    type ImageVersions = {
+      thumbnail: string;
+      medium: string;
+      large: string;
+    };
     
     // Reformater pour correspondre au format attendu par le front
     const formattedBooks = books.map(book => ({
@@ -31,6 +38,7 @@ export async function GET() {
       description: book.description,
       status: book.status,
       coverImageUrl: book.coverImageUrl || undefined,
+      coverImageVersions: book.coverImageVersions || undefined,
       createdAt: book.createdAt.getTime(),
       updatedAt: book.updatedAt.getTime(),
       recipeIds: book.recipes.map(r => r.recipeId)
