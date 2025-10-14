@@ -48,9 +48,9 @@ export default function HomePage() {
             <div className="space-y-4 pt-6">
               <Link
                 href="/auth/signin"
-                className="inline-block bg-orange-600 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-orange-700 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
+                className="inline-block bg-accent-300 text-accent-800 px-10 py-5 rounded-2xl text-xl font-bold hover:bg-accent-400 transition-all transform hover:scale-105 shadow-xl hover:shadow-2xl"
               >
-                🚀 Commencer gratuitement
+              Commencer gratuitement
               </Link>
               
               <p className="text-gray-500 text-lg">
@@ -196,7 +196,7 @@ export default function HomePage() {
           
           <Link
             href="/auth/signin"
-            className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-xl"
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-2xl text-xl font-bold transition-all transform hover:scale-105 shadow-xl"
           >
             ✨ Créer une première recette
           </Link>

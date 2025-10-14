@@ -364,7 +364,7 @@ export default function RecipeDetailPage() {
               {/* Résumé de toutes les étapes (replié par défaut) */}
               {hasMultipleSteps && (
                 <details className="border border-gray-200 rounded-lg">
-                  <summary className="px-4 py-2 cursor-pointer mr-2 text-gray-600 hover:bg-gray-50 font-medium">
+                  <summary className="px-4 py-2 cursor-pointer mr-2 text-gray-600 hover:bg-accent-200 font-medium">
                     Voir toutes les étapes
                   </summary>
                   <div className="px-4 pb-4 pt-2 border-t border-gray-100">
@@ -373,14 +373,14 @@ export default function RecipeDetailPage() {
                         <li 
                           key={index} 
                           className={`flex items-start gap-3 p-2 rounded ${
-                            index === currentStep ? 'bg-primary-50 border border-secondary-200' : ''
+                            index === currentStep ? 'bg-secondary-100 border border-secondary-200' : ''
                           }`}
                         >
                           <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${
                             index < currentStep 
                               ? 'bg-secondary-100 text-secondary-600' 
                               : index === currentStep 
-                                ? 'bg-primary-500 text-white'
+                                ? 'bg-secondary-500 text-white'
                                 : 'bg-gray-100 text-gray-600'
                           }`}>
                             {index < currentStep ? '✓' : index + 1}

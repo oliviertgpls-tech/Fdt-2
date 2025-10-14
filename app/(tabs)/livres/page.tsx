@@ -283,7 +283,7 @@ function BooksLoadingSkeleton() {
                 key={recipe.id} 
                 className={`overflow-x-hidden border rounded-xl p-3 md:p-4 cursor-pointer transition-all ${
                   selectedRecipes.includes(recipe.id)
-                    ? 'border-secondary-300 bg-secondary-50'
+                    ? 'border-secondary-300 bg-secondary-100'
                     : 'border-gray-200 hover:border-gray-300 bg-white'
                 }`}
                 onClick={() => toggleRecipeSelection(recipe.id)}
