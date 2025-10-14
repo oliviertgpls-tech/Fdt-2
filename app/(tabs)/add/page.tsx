@@ -1262,21 +1262,42 @@ if (resultsWithLists.length > 0) {
                     </div>
                   ) : (
                     <label className="flex flex-col items-center justify-center gap-3 px-6 py-8 bg-white  border-dashed border-blue-300 rounded-lg hover:border-blue-500 transition-colors cursor-pointer">
-                      <input
+                     <input
                         type="file"
                         accept="image/*"
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
-                          if (file) {
+                          if (!file) return;
+                          
+                          try {
+                            console.log('📸 Upload photo du plat...', file.name, file.type);
+                            
+                            // 🆕 VÉRIFIER si c'est un HEIC
+                            if (file.name.toLowerCase().endsWith('.heic') || 
+                                file.name.toLowerCase().endsWith('.heif') || 
+                                file.type === '' || 
+                                file.type === 'image/heic') {
+                              console.log('⚠️ Format HEIC détecté pour photo du plat');
+                            }
+                            
                             const result = await handleImageUpload(file);
+                            
                             if (result) {
                               setDishPhotoUrl(result.originalUrl);
                               showToast('Photo du plat ajoutée !', 'success');
+                              console.log('✅ Photo du plat uploadée:', result.originalUrl);
+                            } else {
+                              console.error('❌ handleImageUpload a retourné null');
+                              showToast('Erreur upload photo du plat', 'error');
                             }
+                          } catch (error: any) {
+                            console.error('💥 Erreur inattendue upload photo du plat:', error);
+                            showToast(error.message || 'Erreur lors de l\'ajout de la photo', 'error');
                           }
                         }}
                         className="hidden"
                         disabled={isUploading}
+                      />
                       />
                       <ImageIcon className="w-12 h-12 text-blue-400" />
                       <div className="text-center">
