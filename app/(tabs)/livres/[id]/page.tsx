@@ -499,7 +499,7 @@ export default function BookPage() {
       
       // Image de couverture centrée (si présente)
       if (imageUrlToDisplay) {
-        const imageSize = 320;
+        const imageSize = 527;
         const imageX = (A4.w - imageSize) / 2; // Centré horizontalement
         const imageY = titleY - 10 - imageSize;
         
@@ -508,9 +508,9 @@ export default function BookPage() {
        // Description en italique centrée sous l'image (si présente)
        if (book.description) {
           const fontItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
-          const descSize = 14;  // 🆕 Définir la taille une seule fois
+          const descSize = 14;  // Définir la taille une seule fois
           const descriptionLines = wrapText(book.description, fontItalic, descSize, A4.w - 120);
-          let descY = imageY - 20;  // 🆕 Position sous l'image
+          let descY = imageY + imageSize + 20;  // Position au dessus de l'image
           
           descriptionLines.forEach(line => {
             const lineWidth = fontItalic.widthOfTextAtSize(line, descSize);  // ✅ Même taille
