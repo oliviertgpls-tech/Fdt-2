@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
-import { ArrowLeft, Edit3, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit3, Plus, Trash2, Clock4, Share, Carrot } from "lucide-react";
 import { useToast } from '@/components/Toast';
 import { ConfirmModal } from '@/components/ConfirmModal';
 
@@ -108,7 +108,7 @@ export default function CarnetPage() {
           
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-              📚 {carnet.title}
+              {carnet.title}
             </h1>
             {carnet.description && (
         
@@ -221,14 +221,20 @@ export default function CarnetPage() {
                   {/* Métadonnées */}
                   <div className="flex items-center gap-4 text-xs text-gray-500">
                     {recipe.prepMinutes && (
-                      <span className="flex items-center gap-1">
-                        ⏱️ {recipe.prepMinutes}min
+                      <div className="Items-center inline-flex">
+                      <Clock4 className="W-4 h-4" />
+                      <span className="flex items-center">
+                         {recipe.prepMinutes}min
                       </span>
+                      </div>
                     )}
                     {recipe.ingredients && recipe.ingredients.length > 0 && (
-                      <span className="flex items-center gap-1">
-                        🥄 {recipe.ingredients.length} ingrédients
+                       <div className="Items-center inline-flex">
+                      <Carrot className="W-4 h-4" />
+                      <span className="flex items-center">
+                        {recipe.ingredients.length} ingrédients
                       </span>
+                      </div>
                     )}
                   </div>
                   
@@ -262,11 +268,18 @@ export default function CarnetPage() {
             className="text-red-600 px-3 py-2.5 rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1 text-sm font-medium"
           >
             <Trash2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Supprimer</span>
+            <span className="sm:inline">Supprimer</span>
+          </button>
+           <button
+            onClick={() => (true)} 
+            className="text-blue-600 disabled-50 px-3 py-2.5 rounded-lg  transition-colors flex items-center gap-1 text-sm font-medium"
+          >
+            <Share className="w-4 h-4" />
+            <span className="sm:inline">Partager</span>
           </button>
           <Link
             href={`/carnets/${id}/edit`}
-            className="bg-accent-200 text-accent-800 px-4 py-2.5 rounded-lg hover:bg-accent-300 transition-colors font-medium flex items-center gap-2 text-sm"
+            className="bg-accent-300 text-accent-800 px-4 py-2.5 rounded-lg hover:bg-accent-400 transition-colors font-medium flex items-center gap-2 text-sm"
           >
             <Edit3 className="w-4 h-4" />
             Modifier ce carnet

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react"
-import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Image as ImageIcon, Link as LinkIcon, Carrot, Utensils, ListChecks } from "lucide-react";
+import { Camera, PenTool, Edit3, ArrowLeft, Sparkles, Upload, FileText, Tag, Keyboard, Image as ImageIcon, Link as LinkIcon, Carrot, Utensils, ListChecks } from "lucide-react";
 import { useToast } from '@/components/Toast';
 import { openAIService } from '@/lib/openai';
 
@@ -980,20 +980,20 @@ if (resultsWithLists.length > 0) {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-4">
           <h1 className="text-3xl mt-6 mb-4 font-bold text-gray-900">
-             Nouvelle recette
+             Mode de création
           </h1>
           <p className="text-xl mb-6 text-gray-600">
             Choisissez comment vous souhaitez ajouter votre recette
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-6 px-4 md:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 px-4 md:px-0">
           
           
           {/* Mode 2 : Photo d'un plat */}
           <div 
             onClick={() => setMode('photo')}
-            className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-orange-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="group bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-orange-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <div className="text-center space-y-3 md:space-y-4">
               <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-orange-200 transition-colors">
@@ -1001,7 +1001,7 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <h3 className="text-xl text-pretty font-bold text-gray-900 mb-3">
                   Depuis une photo de plat{!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
@@ -1010,8 +1010,8 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div className="pt-4 space-y-2">
-                <div className="inline-flex bg-orange-50 text-orange-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-orange-100 transition-colors">
-                  🤖 IA - 5 gratuites
+                <div className="inline-flex bg-primary-500 text-primary-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-primary-200 transition-colors">
+                  Choisir une photo
                 </div>
               </div>
             </div>
@@ -1020,15 +1020,15 @@ if (resultsWithLists.length > 0) {
           {/* Mode 3 : Scan recette manuscrite */}
              <div 
               onClick={() => setMode('scan')}
-              className="group bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+              className="group bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
             <div className="text-center space-y-3 md:space-y-4">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
+              <div className="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-secondary-200 transition-colors">
                 <FileText className="w-10 h-10 text-green-600" />
               </div>
               
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <h3 className="text-xl text-pretty font-bold text-gray-900 mb-3">
                   Depuis une photo de texte{!process.env.NEXT_PUBLIC_OPENAI_API_KEY && '🚫'}
                 </h3>
                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
@@ -1037,37 +1037,40 @@ if (resultsWithLists.length > 0) {
               </div>
               
               <div className="pt-4">
-                <div className="inline-flex bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-green-100 transition-colors">
-                  🤖 IA - 5 gratuites
+                <div className="inline-flex bg-secondary-500 text-green-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-secondary-300 transition-colors">
+                  Scanner une recette
                 </div>
               </div>
             </div>
           </div>
 
           {/* Mode 1 : Saisie manuelle */}
-        <div className="flex justify-center px-4 md:px-0">
+        
           <div 
             onClick={() => setMode('manual')}
-            className="w-full max-w-md bg-white rounded-2xl border-2 border-gray-200 p-4 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
+            className="self-center max-w-md bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <div className="text-center space-y-3 md:space-y-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
+                <Keyboard className="w-9 h-9 text-blue-500" />
+              </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  Ou saisie manuelle
+                <h3 className="text-xl text-pretty font-bold text-gray-900 mb-3">
+                  Ou saisie classique simplifiée
                 </h3>
                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed">
-                  Entrez votre recette directement. Parfait pour créer une nouvelle recette ou retranscrire fidèlement.
+                  Entrez votre recette directement. Parfait pour créer une nouvelle recette ou retranscrire fidèlement votre recette.
                 </p>
               </div>
               
               <div className="pt-4">
-                <div className="inline-flex bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
-                  🆓 10 Gratuites
+                <div className="inline-flex bg-blue-500 text-blue-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
+                  Saisir une recette
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        
       </div>
       </div>
     );
@@ -1117,7 +1120,7 @@ if (resultsWithLists.length > 0) {
           </label>
 
           <div className="mt-8 bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <h4 className="font-medium text-orange-800 mb-2">🤖 Conseils pour l'IA</h4>
+            <h4 className="font-medium text-orange-800 mb-2">Conseils pour l'IA</h4>
             <ul className="text-sm text-orange-700 text-left space-y-1">
               <li>• Cadrez bien le plat au centre</li>
               <li>• Éclairage naturel de préférence</li>
@@ -1209,7 +1212,7 @@ if (resultsWithLists.length > 0) {
                   }}
                   className="hidden"
                 />
-                <div className="bg-green-100 text-green-700 px-8 py-4 rounded-lg hover:bg-green-200 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
+                <div className="bg-green-500 text-green-50 px-8 py-4 rounded-lg hover:bg-green-200 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
                   <FileText className="w-5 h-5" />
                   {scannedImages.length === 0 
                     ? "Démarrer le scan"
@@ -1536,7 +1539,7 @@ if (resultsWithLists.length > 0) {
           <button
             type="button"
             onClick={() => setMode('choose')}
-            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            className="flex mr-3 bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
           >
             Annuler
           </button>

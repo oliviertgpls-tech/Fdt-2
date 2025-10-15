@@ -221,13 +221,13 @@ function CreateCarnetModal({
               />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-100 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="text-blue-500 text-xl">💡</div>
+                <div className="text-blue-500 text-xl"></div>
                 <div>
-                  <h4 className="font-medium text-blue-800 mb-1">Astuce</h4>
-                  <p className="text-sm text-blue-700">
-                    Les carnets vous aident à organiser vos recettes. Plus tard, vous pourrez créer des livres à imprimer à partir de vos carnets !
+                  <h4 className="font-medium text-gray-800 mb-1">Un carnet... des carnets !</h4>
+                  <p className="text-sm text-gray-700">
+                    Les carnets vous aident à organiser vos recettes et à les partager. Vous pouvez facilement créer des livres à partir de vos carnets !
                   </p>
                 </div>
               </div>
@@ -236,16 +236,16 @@ function CreateCarnetModal({
             <div className="flex gap-3 pt-4">
               <button
                 onClick={resetForm}
-                className="flex-1 bg-gray-100 text-gray-700 py-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                className="flex px-10 py-2 bg-gray-100 text-gray-700 py-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Annuler
               </button>
               <button
                 onClick={handleCreateCarnet}
                 disabled={!carnetTitle.trim()}
-                className="flex-1 bg-orange-600 text-white py-4 rounded-lg font-medium hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                className="flex px-8 py-2 bg-secondary-600 text-white py-4 rounded-lg font-medium hover:bg-secondary-700 disabled:opacity-50 transition-colors"
               >
-                ✨ Créer le carnet
+                Créer le carnet
               </button>
             </div>
           </div>

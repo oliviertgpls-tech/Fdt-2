@@ -303,8 +303,8 @@ function BooksLoadingSkeleton() {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate text-sm md:text-base">{recipe.title}</h4>
-                    <p className="text-xs md:text-sm text-secondary-900">par {recipe.author || 'Anonyme'}{" / "}⏱️ {recipe.prepMinutes || '?'}min</p>
+                    <h4 className="font-medium text-gray-900 text-wrap truncate text-sm md:text-base">{recipe.title}</h4>
+                    <p className="text-xs md:text-sm items-center text-secondary-900">par {recipe.author || 'Anonyme'}{" / "}⏱ {recipe.prepMinutes || '?'} min.</p>
                    {recipe.tags && recipe.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {recipe.tags.map((tag) => (

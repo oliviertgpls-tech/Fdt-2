@@ -75,20 +75,20 @@ function SortableRecipeItem({
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 hover:bg-green-100 rounded transition-colors touch-none flex-shrink-0"
+          className="cursor-grab active:cursor-grabbing hover:bg-green-100 rounded transition-colors touch-none flex-shrink-0"
           title="Réorganiser"
         >
           <GripVertical className="w-5 h-5 text-gray-400" />
         </button>
 
         {/* Numéro de page dynamique */}
-        <div className="w-auto min-w-[2.5rem] px-2 h-7 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
+        <div className="w-auto min-w-[2.5rem] px-1 h-7 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">
           p.{pageNumber}
         </div>
 
         {/* Info recette */}
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-gray-900 truncate">{recipe.title}</h4>
+          <h4 className="text-sm font-medium text-gray-900">{recipe.title}</h4>
           <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
         </div>
 
@@ -1297,32 +1297,21 @@ const handleDragEnd = async (event: DragEndEvent) => {
                     key={recipe.id} 
                     className="border border-secondary-200 rounded-lg p-2 sm:p-3 hover:border-secondary-300 hover:bg-secondary-100 transition-colors cursor-pointer"
                     onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
-                  >
-                    <div className="flex gap-2 sm:gap-3">
+                      >
+                    <div className="flex items-center justify-left gap-2 sm:gap-3">
                       <img 
                         src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
                         alt={recipe.title}
-                        className="w-12 h-12 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <h5 className="text-sm font-medium text-accent-900 truncate">{recipe.title}</h5>
-                        <p className="text-xs text-gray-600">par {recipe.author || 'Famille'}</p>
-                        {recipe.isFromExternalUrl && (
-                          <div className="mt-1 text-xs text-red-600 font-medium">
-                            ⚠️ Impression indisponible (recette externe)
-                          </div>
-                        )}
-                      </div>
-                      
-                      {recipe.isFromExternalUrl ? (
-                        <div className="self-center text-red-400">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.366zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      ) : (
-                        <Plus className="w-4 h-4 text-gray-400 self-center" />
-                      )}
+                        className="w-14 h-20 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                            <h5 className="text-base md:text-wrap justify-left font-medium text-accent-900">{recipe.title}</h5>
+                          <span className="text-xs">par {recipe.author}</span></div>
+                              <div className="justify-end">
+                              <button className='bg-secondary-200 px-2 rounded text-secondary-600 mr-2 hover:bg-secondary-300'>+</button>
+                              </div>
+                            </div>  
+                        <div>
                     </div>
                   </div>
                 ))}
