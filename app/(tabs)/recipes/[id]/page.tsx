@@ -213,7 +213,7 @@ export default function RecipeDetailPage() {
             {recipe.tags.map((tag) => (
               <span 
                 key={tag}
-                className="bg-secondary-100 text-gray-700 px-3 py-1 rounded-lg text-sm"
+                className="bg-secondary-200 text-secondary-600 px-3 py-1 rounded-lg text-sm"
               >
                 #{tag}
               </span>

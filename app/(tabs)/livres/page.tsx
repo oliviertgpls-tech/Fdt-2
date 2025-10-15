@@ -137,7 +137,7 @@ function BooksLoadingSkeleton() {
       {/* Livres existants */}
       {books.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg md:text-xl font-semibold text-gray-800">Mes livres en cours</h2>
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-800">Mes livres en cours</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {books.map((book) => {
               const bookRecipes = recipes.filter(r => book.recipeIds.includes(r.id));

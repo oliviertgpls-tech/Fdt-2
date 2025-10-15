@@ -188,7 +188,7 @@ export default function RecipesPage() {
               
               {/* Contenu */}
               <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-xl text-gray-900 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-pretty text-xl text-gray-900 group-hover:text-blue-600 transition-colors">
                   {recipe.title}
                 </h3>
                 
