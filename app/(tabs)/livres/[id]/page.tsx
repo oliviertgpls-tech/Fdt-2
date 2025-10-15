@@ -1295,7 +1295,7 @@ const handleDragEnd = async (event: DragEndEvent) => {
                 {availableRecipes.map((recipe) => (
                   <div 
                     key={recipe.id} 
-                    className="border border-secondary-200 rounded-lg p-2 sm:p-3 hover:border-secondary-300 hover:bg-secondary-50 transition-colors cursor-pointer"
+                    className="border border-secondary-200 rounded-lg p-2 sm:p-3 hover:border-secondary-300 hover:bg-secondary-100 transition-colors cursor-pointer"
                     onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
                   >
                     <div className="flex gap-2 sm:gap-3">

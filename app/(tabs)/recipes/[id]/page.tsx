@@ -192,12 +192,14 @@ export default function RecipeDetailPage() {
             </div>
           </div>
           
-          <div className="inline-flex items-center gap-1 text-gray-600">
+          <div className="inline-flex flex-row items-center text-sm text-gray-600">
             {recipe.author && <span>par {recipe.author}</span>}
-             <Clock4 className="ml-3 w-4 h-4"/>
+            <div className="inline-flex flex items-center gap-1">
+             <Clock4 className="ml-3 mr-1 w-4 h-4"/>
             {recipe.prepMinutes && <span> {recipe.prepMinutes} min</span>}
-             <Utensils className="ml-3 w-4 h-4"/>
-              <span>{recipe.servings || '4'} personnes</span>
+            </div>
+             <Utensils className="ml-3 mr-1 w-4 h-4"/>
+              <span>{recipe.servings || '4'} pers.</span>
           </div>
           
           {recipe.description && (
@@ -267,9 +269,9 @@ export default function RecipeDetailPage() {
                   <button
                     onClick={prevStep}
                     disabled={currentStep === 0}
-                    className="text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="bg-gray-100 px-4 py-2 rounded-lg text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    ← Précédente
+                    ←
                   </button>
 
                   {/* Indicateur de progression avec fenêtre glissante */}
@@ -346,16 +348,16 @@ export default function RecipeDetailPage() {
                   {currentStep < steps.length - 1 ? (
                     <button
                       onClick={nextStep}
-                      className="bg-secondary-100 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                      className="bg-secondary-200 text-green-700 px-4 py-2 rounded-lg hover:bg-green-200 transition-colors text-sm"
                     >
-                      Suivante →
+                     →
                     </button>
                   ) : (
                     <button
                       onClick={resetSteps}
                       className="bg-secondary-100 text-secondary-700 px-4 py-2 rounded-lg hover:bg-secondary-200 transition-colors text-sm"
                     >
-                      ↻ Recommencer
+                     Retour au début
                     </button>
                   )}
                 </div>

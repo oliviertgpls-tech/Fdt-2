@@ -15,8 +15,13 @@ export async function PUT(
       data: {
         title: title || undefined,
         description: description || undefined,
-        coverImageUrl: coverImageUrl || undefined,
-        coverImageVersions: coverImageVersions !== undefined ? coverImageVersions : undefined, 
+        // 🆕 Gestion explicite de la suppression
+        coverImageUrl: coverImageUrl !== undefined 
+          ? (coverImageUrl === "" ? null : coverImageUrl)
+          : undefined,
+        coverImageVersions: coverImageVersions !== undefined 
+          ? coverImageVersions 
+          : undefined,
         status: status || undefined,
         updatedAt: new Date()
       }
