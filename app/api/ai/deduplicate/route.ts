@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  let ingredients: string[] = [];
+  
   try {
-    const { ingredients } = await request.json();
+    const body = await request.json();
+    ingredients = body.ingredients;
     
     const apiKey = process.env.OPENAI_API_KEY;
     
@@ -88,9 +91,14 @@ RETOURNE UN JSON avec UNIQUEMENT la liste nettoyée (pas de commentaire) :
     
   } catch (error: any) {
     console.error('❌ Erreur déduplication:', error);
-    // Fallback sûr
+    // Fallback : déduplication basique si on a les ingrédients
+    if (ingredients && ingredients.length > 0) {
+      return NextResponse.json({ 
+        ingredients: Array.from(new Set(ingredients)) 
+      });
+    }
     return NextResponse.json({ 
-      ingredients: Array.from(new Set(request.body?.ingredients || [])) 
-    });
+      ingredients: [] 
+    }, { status: 500 });
   }
 }
