@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ImageSearch } from "@/components/ImageSearch";
 import type { Recipe } from "@/lib/types";
-import { Plus, Eye, Trash2, Edit3, Clock4, Utensils, Save} from 'lucide-react';
+import { Plus, Eye, Trash2, Edit3, Clock4, Utensils, Save, Carrot} from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function EditRecipePage() {
@@ -358,9 +358,10 @@ export default function EditRecipePage() {
           </div>
 
           {/* Ingrédients - SIMPLE textarea */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              🥄 Ingrédients
+          <div className="inlne-flex items-center">
+            <label className="text-sm font-semibold text-gray-700 mb-2">
+              
+              <Carrot className="h-4"/>Ingrédients
             </label>
             <textarea
               rows={6}
@@ -436,12 +437,6 @@ export default function EditRecipePage() {
               placeholder="Écrivez les étapes comme vous le feriez naturellement :
 
 Préchauffer le four à 180°C.
-
-Mélanger la farine et le sucre dans un saladier.
-
-Ajouter les œufs un par un...
-
-Enfourner 25 minutes.
 
 Simple et naturel !"
             />

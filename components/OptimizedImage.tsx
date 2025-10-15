@@ -53,41 +53,60 @@ export function OptimizedImage({
   onClick 
 }: OptimizedImageProps) {
   
-  // Détermine l'URL à utiliser selon le type de src et la taille demandée
-  const getOptimizedUrl = (): string => {
-    // Si pas d'image du tout, retourne une image par défaut
-    if (!src) {
-      return 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=400'; // Placeholder food
+
+    // Détermine l'URL à utiliser selon le type de src et la taille demandée
+    const getOptimizedUrl = (): string | null => {
+      // Si pas d'image du tout, retourne null (on affichera le placeholder)
+      if (!src) {
+        return null;
+      }
+
+      if (typeof src === 'string') {
+        // URL simple (ancien format) - on essaie de l'optimiser via Cloudinary
+        return optimizeCloudinaryUrl(src, size);
+      } else {
+        // Objet avec versions (nouveau format) - on prend la bonne taille
+        return src[size] || src.large || src.medium || src.thumbnail;
+      }
+    };
+
+    const imageUrl = getOptimizedUrl();
+
+    // 🆕 Si pas d'image, afficher placeholder coloré
+    if (!imageUrl) {
+      return (
+        <div className={`flex items-center justify-center bg-accent-200 ${className}`}>
+          <svg 
+            className="w-1/3 h-1/3 text-accent-400" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={1.5} 
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+      );
     }
 
-    if (typeof src === 'string') {
-      // URL simple (ancien format) - on essaie de l'optimiser via Cloudinary
-      return optimizeCloudinaryUrl(src, size);
-    } else {
-      // Objet avec versions (nouveau format) - on prend la bonne taille
-      return src[size] || src.large || src.medium || src.thumbnail;
-    }
-  };
-
-  const imageUrl = getOptimizedUrl();
-
-  return (
-    <img
-      src={imageUrl}
-      alt={alt}
-      className={className}
-      loading={loading}
-      onClick={onClick}
-      onError={(e) => {
-        // Fallback en cas d'erreur - essaie l'URL originale si disponible
-        if (src && typeof src === 'object' && e.currentTarget.src !== src.large) {
-          e.currentTarget.src = src.large;
-        } else if (src && typeof src === 'string' && e.currentTarget.src !== src) {
-          e.currentTarget.src = src;
-        }
-      }}
-    />
-  );
+    return (
+      <img
+        src={imageUrl}
+        alt={alt}
+        className={className}
+        loading={loading}
+        onClick={onClick}
+        onError={(e) => {
+          // Fallback en cas d'erreur - masque l'image
+          e.currentTarget.style.display = 'none';
+          // Tu pourrais aussi remplacer par le placeholder ici
+        }}
+      />
+    );
 }
 
 /**

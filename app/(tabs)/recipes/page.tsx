@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { useRecipes } from "@/contexts/RecipesProvider";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { Nut, NutIcon, Carrot, Clock2, Share } from 'lucide-react';
 
 // Composant Skeleton pour les cartes de recettes
@@ -176,15 +177,15 @@ export default function RecipesPage() {
               className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
             >
               {/* Image */}
-              {recipe.imageUrl && (
-                <div className="aspect-[4/3] bg-gray-100">
-                  <img 
-                    src={recipe.imageUrl}
-                    alt={recipe.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                </div>
-              )}
+             {/* Image avec OptimizedImage qui gère le placeholder automatiquement */}
+              <div className="aspect-[4/3] overflow-hidden">
+                <OptimizedImage
+                  src={recipe.imageVersions || recipe.imageUrl}
+                  alt={recipe.title}
+                  size="medium"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               
               {/* Contenu */}
               <div className="p-4 space-y-2">
