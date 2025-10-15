@@ -145,7 +145,7 @@ export default function SignInPage() {
             <div className="px-8 py-8 space-y-6 ">
               <button
                 onClick={handleGoogleSignIn}
-                className="flex mx-auto items-center gap-3 px-4 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-blue-100 hover:border-blue-200 hover:bg-blue-200"
+                className="flex mx-auto items-center gap-3 px-4 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg hover:shadow-xl bg-blue-100 text-gray-700 border-2 border-blue-100 hover:border-blue-200"
               >
                 <Chrome className="w-5 h-5" />
                 Se connecter avec Google
@@ -204,7 +204,7 @@ export default function SignInPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex items-center mx-auto gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-secondary-100 text-gray-700 text-sm hover:bg-secondary-200 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  className="flex items-center mx-auto gap-3 px-6 py-4 rounded-xl font-semibold transition-all bg-secondary-200 text-gray-700 text-sm hover:bg-secondary-200 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? (
                     <>
@@ -234,7 +234,7 @@ export default function SignInPage() {
                   <div>
                     <div className="text-2xl mb-2">🆓</div>
                     <p className="text-sm text-gray-600 font-medium">
-                      Découvrez RiCiPiz gratuitement
+                      Découvrez RiCiPiZ gratuitement
                     </p>
                   </div>
                 </div>
@@ -244,7 +244,7 @@ export default function SignInPage() {
 
           <div className="text-center mt-8">
             <p className="text-gray-400">
-              Ricipiz - 2025
+              RiCiPiZ - 2025
             </p>
           </div>
         </div>

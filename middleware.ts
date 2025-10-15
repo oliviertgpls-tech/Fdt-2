@@ -40,6 +40,7 @@ export const config = {
     /*
      * Matcher toutes les routes SAUF :
      * - api/auth (NextAuth)
+     * - api/ai (AI analysis endpoints)
      * - _next/static (fichiers statiques)
      * - _next/image (images Next.js)
      * - favicon.ico
