@@ -1219,19 +1219,19 @@ if (resultsWithLists.length > 0) {
             </div>
           )}
 
-           <div className="mt-8 bg-secondary-50 border border-secondary-200 rounded-lg p-4">
-            <h4 className="font-medium text-orange-800 mb-2">🤖 Conseils pour l'IA</h4>
-            <ul className="text-sm text-secondary-600 text-left space-y-1">
-              <li>• Cadrez bien le plat au centre</li>
-              <li>• Éclairage naturel de préférence</li>
-              <li>• Évitez les reflets et ombres fortes</li>
-              <li>• L'IA fonctionne mieux avec des plats reconnaissables</li>
+           <div className="text-center mt-8 mx-auto border-secondary-200 rounded-lg p-4">
+            <h4 className="font-medium text-orange-800 mb-2">Conseils pour un bon scan</h4>
+            <ul className="text-center text-sm text-secondary-600 text-left space-y-1">
+                <li>• Les pages seront analysées dans l'ordre d'ajout</li>
+                <li>• Les étapes seront numérotées automatiquement</li>
+                <li>• Assurez-vous que le texte est bien lisible</li>
+                <li>• Éclairage uniforme sans ombres</li>
             </ul>
           </div>
 
           {/* 🆕 NOUVEAU : Photo du plat final (optionnelle) */}
             {scannedImages.length > 0 && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-4">
+              <div className="bg-blue-50 border-2 mt-6 border-blue-200 rounded-xl p-6 mb-4">
                 <h3 className="font-semibold text-sm text-blue-900 mb-3 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
                   Photo du plat final (optionnelle)
@@ -1333,16 +1333,6 @@ if (resultsWithLists.length > 0) {
                   </>
                 )}
               </button>
-
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="font-medium text-green-800 mb-2">📝 Conseils pour l'OCR</h4>
-                <ul className="text-sm text-green-700 text-left space-y-1">
-                  <li>• Les pages seront analysées dans l'ordre d'ajout</li>
-                  <li>• Les étapes seront numérotées automatiquement</li>
-                  <li>• Assurez-vous que le texte est lisible</li>
-                  <li>• Éclairage uniforme sans ombres</li>
-                </ul>
-              </div>
             </div>
           )}
         </div>

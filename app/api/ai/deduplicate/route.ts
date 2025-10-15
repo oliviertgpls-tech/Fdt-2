@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     ingredients = body.ingredients;
     
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
     
     if (!apiKey) {
       return NextResponse.json({ error: 'Clé OpenAI manquante' }, { status: 500 });
