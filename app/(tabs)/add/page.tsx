@@ -980,10 +980,10 @@ if (resultsWithLists.length > 0) {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-4">
           <h1 className="text-3xl mt-6 mb-4 font-bold text-gray-900">
-             Mode de création
+             Ajouter une recette
           </h1>
           <p className="text-xl mb-6 text-gray-600">
-            Choisissez comment vous souhaitez ajouter votre recette
+            Choisissez votre mode d'ajout de recette
           </p>
         </div>
 
