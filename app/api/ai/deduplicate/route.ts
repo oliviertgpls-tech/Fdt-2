@@ -47,6 +47,8 @@ RÈGLES DE DÉDUPLICATION STRICTES :
 
 5. Si vraiment identiques, garde celui qui apparaît en premier
 
+6. Si tu trouves une liste précise d'ingrédients sur la recette tu peux te fier à elle et uniquement à elle tu n'as alors plus besoin d'extraire ni reconnaitre des ingrédients depuis le texte de la recette. 
+
 IMPORTANT : Sois TRÈS AGRESSIF sur la déduplication. En cas de doute, déduplique !
 
 RETOURNE UN JSON avec UNIQUEMENT la liste nettoyée (pas de commentaire) :

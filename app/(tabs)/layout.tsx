@@ -50,7 +50,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
             {/* Desktop : Logo + Menu + rien à droite */}
             <div className="hidden md:flex items-center gap-8 flex-1">
               <Link href="/recipes" className="font-semibold text-lg">
-                RICIPIZ
+                RiCiPiZ
               </Link>
               
               <div className="flex items-center gap-6 text-sm">
@@ -67,6 +67,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
                   Mon compte
                 </Link>
               </div>
+             
             </div>
 
             {/* Mobile : Burger à gauche */}

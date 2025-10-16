@@ -36,7 +36,7 @@ FORMAT JSON STRICT :
   "title": "Titre exact de la recette",
   "author": "${firstName}",
   "prepMinutes": 30,
-  "servings": "4 personnes",
+  "servings": "4",
   "ingredients": ["ingrédient 1 avec quantité", "ingrédient 2 avec quantité"],
   "steps": "Texte complet étape 1|Texte complet étape 2|Texte complet étape 3",
   "confidence": 85
@@ -75,7 +75,7 @@ FORMAT JSON STRICT :
   "title": "Nom précis du plat",
   "author": "${firstName}",
   "prepMinutes": 30,
-  "servings": "4 personnes",
+  "servings": "4",
   "ingredients": ["200g de farine", "3 œufs", "100ml de lait", "1 pincée de sel"],
   "steps": "Étape détaillée 1|Étape détaillée 2|Étape détaillée 3|Étape détaillée 4",
   "confidence": 85
