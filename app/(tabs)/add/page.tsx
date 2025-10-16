@@ -994,7 +994,7 @@ const handlePhotoUpload = async (file: File) => {
             console.warn('🛑 Annulation manuelle par l\'utilisateur');
             resetForm();
             setIsProcessing(false);
-            setMode('choice');
+            setMode('choose');
             showToast('Analyse annulée', 'info');
           }}
           className="mt-4 px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition-colors active:scale-95"
@@ -1384,7 +1384,7 @@ const handlePhotoUpload = async (file: File) => {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={() => setMode('choice')}
+          onClick={() => setMode('choose')}
           className="text-gray-600 hover:text-gray-800 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
