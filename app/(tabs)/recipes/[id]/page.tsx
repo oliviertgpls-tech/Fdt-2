@@ -198,7 +198,7 @@ export default function RecipeDetailPage() {
              <Clock4 className="ml-3 mr-1 w-4 h-4"/>
             {recipe.prepMinutes && <span> {recipe.prepMinutes} min</span>}
             </div>
-             <Pe className="ml-3 mr-1 w-4 h-4"/>
+             <Utensils className="ml-3 mr-1 w-4 h-4"/>
               <span>{recipe.servings || '4'} pers.</span>
           </div>
           
