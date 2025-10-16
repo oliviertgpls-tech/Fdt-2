@@ -175,7 +175,7 @@ async analyzeManuscriptToRecipe(
             blob: file,
             toType: 'image/jpeg',
             quality: 0.9,
-            multiple: false
+            multiple: true
           });
           
           const timeoutPromise = new Promise((_, reject) => {
