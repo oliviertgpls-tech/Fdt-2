@@ -1354,7 +1354,7 @@ const handlePhotoUpload = async (file: File) => {
 
           {/* 🆕 BOUTON : Analyser les scans */}
           {scannedImages.length > 0 && (
-            <div className="space-y-4">se
+            <div className="space-y-4">
               <button
                 onClick={handleMultipleScanUpload}
                 disabled={isProcessing}
