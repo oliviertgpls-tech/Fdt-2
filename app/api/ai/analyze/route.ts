@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
 3. Sépare les étapes par le caractère | (pipe)
 4. NE résume JAMAIS, NE raccourcis JAMAIS
 5. Si tu vois "Étape 1 : Mélanger...", extrais "Mélanger..." (sans le numéro et sans le mot "étape")
-6. S tu vois des encadrés annexes type "Astuce" "Le saviez-vous?" "Tour de main" "Conseils" ajoute-les en dernières étape en indiquant "BONUS -" au début du texte de la dernière étape.
+6. Si tu vois des encadrés annexes type "Astuce" "Le saviez-vous?" "Tour de main" "Conseils" ajoute-les en dernières étape en indiquant "BONUS -" au début du texte de la dernière étape.
+7. Si tu vois qu'il ne s'agit absoluement pas d'une photo de plat renvoie une erreur et ne permet pas d'aller à l'étape création
 
 
 ✅ EXEMPLE CORRECT :

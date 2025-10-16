@@ -920,7 +920,7 @@ const handlePhotoUpload = async (file: File) => {
     }
 
     resetForm();
-    setMode('choice'); // Retour au choix
+    setMode('choose'); // Retour au choix
   } finally {
     setIsProcessing(false);
     console.log('🏁 Fin handlePhotoUpload');
@@ -1041,7 +1041,7 @@ const handlePhotoUpload = async (file: File) => {
               </div>
               
               <div className="pt-4 space-y-2">
-                <div className="inline-flex bg-primary-500 text-primary-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-primary-200 transition-colors">
+                <div className="inline-flex bg-primary-500 text-primary-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-primary-600 transition-colors">
                   Choisir une photo
                 </div>
               </div>
@@ -1051,7 +1051,6 @@ const handlePhotoUpload = async (file: File) => {
           {/* Mode 3 : Scan recette manuscrite */}
              <div 
               onClick={() => setMode('scan')}
-              resetForm();
               className="group bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
             <div className="text-center space-y-3 md:space-y-4">
@@ -1069,7 +1068,7 @@ const handlePhotoUpload = async (file: File) => {
               </div>
               
               <div className="pt-4">
-                <div className="inline-flex bg-secondary-500 text-green-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-secondary-300 transition-colors">
+                <div className="inline-flex bg-secondary-500 text-green-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-secondary-600 transition-colors">
                   Scanner une recette
                 </div>
               </div>
@@ -1083,9 +1082,9 @@ const handlePhotoUpload = async (file: File) => {
             className="self-center max-w-md bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
           >
             <div className="text-center space-y-3 md:space-y-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-green-200 transition-colors">
-                <Keyboard className="w-9 h-9 text-blue-500" />
-              </div>
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto hover:bg-blue-200 transition-colors">
+                    <Keyboard className="w-9 h-9 text-blue-500" />
+                  </div>
               <div>
                 <h3 className="text-xl text-pretty font-bold text-gray-900 mb-3">
                   Ou saisie classique simplifiée
@@ -1096,14 +1095,14 @@ const handlePhotoUpload = async (file: File) => {
               </div>
               
               <div className="pt-4">
-                <div className="inline-flex bg-blue-500 text-blue-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-100 transition-colors">
+                <div className="inline-flex bg-blue-500 text-blue-50 px-4 py-2 rounded-lg text-sm font-medium group-hover:bg-blue-600 transition-colors">
                   Saisir une recette
                 </div>
               </div>
             </div>
           </div>
         
-      </div>
+       </div>
       </div>
     );
   }
@@ -1113,7 +1112,10 @@ const handlePhotoUpload = async (file: File) => {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center gap-4 mb-6">
           <button
-            onClick={() => setMode('choose')}
+            onClick={() => {
+              resetForm();  
+              setMode('choose');
+              }}
             className="text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -1170,7 +1172,10 @@ const handlePhotoUpload = async (file: File) => {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center gap-4 mb-6">
           <button
-            onClick={() => setMode('choose')}
+            onClick={() => {
+            resetForm();       
+            setMode('choose');
+            }}
             className="text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -1254,9 +1259,9 @@ const handlePhotoUpload = async (file: File) => {
             </div>
           )}
 
-           <div className="text-center text-pretty mt-8 border-secondary-200 rounded-lg p-4">
+           <div className="text-center text-pretty mt-8 border bg-secondary-100 border-secondary-200 rounded-lg p-4">
             <h4 className="font-medium text-gray-800 mb-2">Conseils pour un bon scan</h4>
-            <ul className="bg-secondary-50 p-2 text-sm text-secondary-800  space-y-1">
+            <ul className="p-2 text-sm text-secondary-800  space-y-1">
                 <li>• Les pages seront analysées dans l'ordre d'ajout</li>
                 <li>• Assurez-vous que le texte est bien lisible</li>
                 <li>• Et que l'éclairage est uniforme sans ombres</li>
@@ -1268,7 +1273,7 @@ const handlePhotoUpload = async (file: File) => {
               <div className="bg-blue-50 border-2 mt-6 border-blue-200 rounded-xl p-6 mb-4">
                 <h3 className="font-semibold text-sm text-blue-900 mb-3 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
-                  Photo du plat(optionnelle)
+                  Photo du plat (optionnelle)
                 </h3>
                 
                 <p className="text-sm text-blue-700 mb-4">
@@ -1349,7 +1354,7 @@ const handlePhotoUpload = async (file: File) => {
 
           {/* 🆕 BOUTON : Analyser les scans */}
           {scannedImages.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4">se
               <button
                 onClick={handleMultipleScanUpload}
                 disabled={isProcessing}
@@ -1379,7 +1384,7 @@ const handlePhotoUpload = async (file: File) => {
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={() => setMode('choose')}
+          onClick={() => setMode('choice')}
           className="text-gray-600 hover:text-gray-800 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
