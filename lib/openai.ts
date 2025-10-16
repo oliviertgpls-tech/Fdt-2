@@ -24,100 +24,136 @@ export class OpenAIService {
     }
   } 
 
-  // 📷 ANALYSE PHOTO DE PLAT → RECETTE
-  async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{
-    title: string;
-    author: string;
-    prepMinutes: number;
-    servings: string;
-    ingredients: string[];
-    steps: string;
-    confidence: number;
-  }> {
-    try {
-      // Vérifier la clé API    
-      if (!this.apiKey) {
-        throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
-      }
-
-      // Convertir l'image en base64
-      const base64Image = await this.fileToBase64(imageFile);
-      
-      // ✅ Appel via notre API Next.js (pas directement OpenAI)
-      const response = await fetch('/api/ai/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64: base64Image,
-          firstName: firstName,
-          mode: 'photo'
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
-      const recipeData = await response.json();
-
-      recipeData.steps = recipeData.steps.split('|').join('\n\n');
-
-      // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
-      if (Array.isArray(recipeData.steps)) {
-        recipeData.steps = recipeData.steps.join('\n\n');
-      }
-
-      return recipeData;
-      
-    } catch (error) {
-      console.error('Erreur analyse photo:', error);
-      throw new Error('Impossible d\'analyser cette image');
+    // 📷 ANALYSE PHOTO DE PLAT → RECETTE (avec timeout)
+async analyzePhotoToRecipe(
+  imageFile: File, 
+  firstName: string,
+  signal?: AbortSignal  // ← Pour annuler
+): Promise<{
+  title: string;
+  author: string;
+  prepMinutes: number;
+  servings: string;
+  ingredients: string[];
+  steps: string;
+  confidence: number;
+}> {
+  console.log('🚀 Début analyzePhotoToRecipe');
+  
+  try {
+    // Vérifier la clé API    
+    if (!this.apiKey) {
+      throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
     }
-  }
 
-  // 📝 ANALYSE RECETTE MANUSCRITE → RECETTE STRUCTURÉE
-  async analyzeManuscriptToRecipe(imageFile: File, firstName: string): Promise<{
-    title: string;
-    author: string;
-    prepMinutes: number;
-    servings: string;
-    ingredients: string[];
-    steps: string;
-    confidence: number;
-  }> {
-    try {
-      if (!this.apiKey) {
-        throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
-      }
+    // Convertir l'image en base64
+    console.log('📸 Conversion image en base64...');
+    const base64Image = await this.fileToBase64(imageFile);
+    console.log('✅ Image convertie, taille:', base64Image.length, 'caractères');
+    
+    // ✅ Appel via notre API Next.js (pas directement OpenAI)
+    console.log('🌐 Appel API /api/ai/analyze...');
+    const response = await fetch('/api/ai/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64: base64Image,
+        firstName: firstName,
+        mode: 'photo'
+      }),
+      signal: signal  // ← Permet l'annulation + timeout
+    });
 
-      const base64Image = await this.fileToBase64(imageFile);
-      
-      // ✅ Appel via notre API Next.js (pas directement OpenAI)
-      const response = await fetch('/api/ai/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64: base64Image,
-          firstName: firstName,
-          mode: 'manuscript'
-        })
-      });
+    console.log('📡 Réponse API reçue, status:', response.status);
 
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-
-      const recipeData = await response.json();
-
-      recipeData.steps = recipeData.steps.split('|').join('\n\n');
-
-      return recipeData;
-      
-    } catch (error) {
-      console.error('Erreur analyse manuscrit:', error);
-      throw new Error('Impossible de lire cette recette manuscrite');
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status}`);
     }
+
+    const recipeData = await response.json();
+    console.log('✅ Données reçues:', recipeData);
+
+    recipeData.steps = recipeData.steps.split('|').join('\n\n');
+
+    // 🎉 Transformation du tableau en une seule chaîne avec des doubles sauts de ligne
+    if (Array.isArray(recipeData.steps)) {
+      recipeData.steps = recipeData.steps.join('\n\n');
+    }
+
+    console.log('🎉 Analyse photo terminée avec succès');
+    return recipeData;
+    
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.error('⏱️ Timeout ou annulation');
+      throw new Error('Analyse annulée');
+    }
+    console.error('💥 Erreur analyse photo:', error);
+    throw new Error('Impossible d\'analyser cette image');
   }
+}
+
+// 📝 ANALYSE RECETTE MANUSCRITE → RECETTE STRUCTURÉE (avec timeout)
+async analyzeManuscriptToRecipe(
+  imageFile: File, 
+  firstName: string,
+  signal?: AbortSignal  // ← Pour annuler
+): Promise<{
+  title: string;
+  author: string;
+  prepMinutes: number;
+  servings: string;
+  ingredients: string[];
+  steps: string;
+  confidence: number;
+}> {
+  console.log('🚀 Début analyzeManuscriptToRecipe');
+  
+  try {
+    if (!this.apiKey) {
+      throw new Error('Clé OpenAI non configurée. Ajoutez NEXT_PUBLIC_OPENAI_API_KEY dans vos variables d\'environnement.');
+    }
+
+    console.log('📸 Conversion image en base64...');
+    const base64Image = await this.fileToBase64(imageFile);
+    console.log('✅ Image convertie, taille:', base64Image.length, 'caractères');
+    
+    // ✅ Appel via notre API Next.js (pas directement OpenAI)
+    console.log('🌐 Appel API /api/ai/analyze...');
+    const response = await fetch('/api/ai/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64: base64Image,
+        firstName: firstName,
+        mode: 'manuscript'
+      }),
+      signal: signal  // ← Permet l'annulation + timeout
+    });
+
+    console.log('📡 Réponse API reçue, status:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status}`);
+    }
+
+    const recipeData = await response.json();
+    console.log('✅ Données reçues:', recipeData);
+
+    recipeData.steps = recipeData.steps.split('|').join('\n\n');
+
+    console.log('🎉 Analyse manuscrit terminée avec succès');
+    return recipeData;
+    
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.error('⏱️ Timeout ou annulation');
+      throw new Error('Analyse annulée');
+    }
+    console.error('💥 Erreur analyse manuscrit:', error);
+    throw new Error('Impossible de lire cette recette manuscrite');
+  }
+}
 
   // 🛠️ HELPER : Convertir File en base64
   private fileToBase64(file: File): Promise<string> {

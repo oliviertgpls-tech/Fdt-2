@@ -450,6 +450,28 @@ export default function AddRecipePage() {
   const [linkUrl, setLinkUrl] = useState('');
   const [isFromExternalUrl, setIsFromExternalUrl] = useState(false);
 
+
+  // 🧹 FONCTION DE NETTOYAGE COMPLÈTE
+const resetForm = () => {
+  console.log('🧹 Nettoyage complet du formulaire');
+  setTitle('');
+  setAuthor('');
+  setIngredients('');
+  setSteps('');
+  setPrepMinutes('');
+  setServings('');
+  setImageUrl('');
+  setTags('');
+  setAiConfidence(null);
+  setScannedImages([]);
+  setScanResults([]);
+  setCurrentScanIndex(0);
+  setDishPhotoUrl('');
+  setImageVersions(null);
+  setLinkUrl('');
+  setIsFromExternalUrl(false);
+};
+
   // 🆕 NOUVEL ÉTAT pour les versions optimisées
   const [imageVersions, setImageVersions] = useState<UploadResult['versions'] | null>(null);
 
@@ -460,6 +482,7 @@ export default function AddRecipePage() {
   const [currentScanIndex, setCurrentScanIndex] = useState(0); // Index du scan en cours
   const [scanResults, setScanResults] = useState<string[]>([]); // Résultats de chaque scan
   const [dishPhotoUrl, setDishPhotoUrl] = useState(""); // Photo du plat (séparée)
+
 
   // Debug des variables d'environnement au chargement
   useState(() => {
@@ -561,6 +584,14 @@ const handleMultipleScanUpload = async () => {
   setIsProcessing(true);
   setCurrentScanIndex(0);
   setScanResults([]);
+  console.log(`🎬 Début analyse multi-scan de ${scannedImages.length} pages`);
+  
+  // ✅ Timeout global de 60 secondes pour multi-scan
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.warn('⏱️ Timeout multi-scan déclenché après 60 secondes');
+    abortController.abort();
+  }, 60000);
   
   try {
     const allResults: any[] = [];
@@ -569,49 +600,75 @@ const handleMultipleScanUpload = async () => {
     for (let i = 0; i < scannedImages.length; i++) {
       setCurrentScanIndex(i);
       console.log(`🔍 Analyse de la page ${i + 1}/${scannedImages.length}...`);
+      showToast(`📄 Page ${i + 1}/${scannedImages.length}...`, 'info');
       
-      const result = await openAIService.analyzeManuscriptToRecipe(scannedImages[i], firstName);
+      const result = await openAIService.analyzeManuscriptToRecipe(
+        scannedImages[i], 
+        firstName,
+        abortController.signal  // ← Signal d'annulation
+      );
       allResults.push(result);
       
-      console.log(`✅ Page ${i + 1} analysée:`, result);
+      console.log(`✅ Page ${i + 1} analysée:`, result.title || 'Sans titre');
     }
     
+    clearTimeout(timeoutId);
+    console.log('✅ Toutes les pages analysées');
+    
     // Combiner les résultats
+    console.log('🔄 Combinaison des résultats...');
     const combinedResult = combineMultipleScanResults(allResults);
 
     // 🧹 DÉDUPLICATION INTELLIGENTE DES INGRÉDIENTS
     let finalIngredients = combinedResult.ingredients || [];
     if (finalIngredients.length > 0) {
-      console.log('🔄 Lancement déduplication intelligente...');
+      console.log('🧹 Lancement déduplication intelligente de', finalIngredients.length, 'ingrédients');
+      showToast('🧹 Nettoyage des doublons...', 'info');
       finalIngredients = await openAIService.deduplicateIngredients(finalIngredients);
-      console.log('✅ Ingrédients après déduplication:', finalIngredients);
+      console.log('✅ Ingrédients après déduplication:', finalIngredients.length);
     }
 
     // Pré-remplir le formulaire avec les données combinées
+    console.log('📝 Remplissage du formulaire...');
     setTitle(combinedResult.title || '');
     setAuthor(combinedResult.author || '');
-    setIngredients(combinedResult.ingredients?.join('\n') || '');
+    setIngredients(finalIngredients?.join('\n') || '');
     setSteps(combinedResult.steps || '');
     setPrepMinutes(combinedResult.prepMinutes?.toString() || '');
     setServings(combinedResult.servings || '');
-    setTags(combinedResult.tags?.join(', ') || '');
     setAiConfidence(combinedResult.confidence || null);
     
     // 🆕 Garder la photo du plat si elle a été ajoutée
-      if (dishPhotoUrl) {
-        setImageUrl(dishPhotoUrl);
-      }
+    if (dishPhotoUrl) {
+      setImageUrl(dishPhotoUrl);
+      console.log('✅ Photo du plat conservée:', dishPhotoUrl);
+    }
 
     // Passer en mode manuel pour éditer
     setMode('manual');
     showToast(`✅ ${scannedImages.length} page(s) analysée(s) avec succès !`, 'success');
+    console.log('🏁 Fin analyse multi-scan avec succès');
     
   } catch (error: any) {
-    console.error('❌ Erreur analyse multi-scan:', error);
-    showToast(`Erreur lors de l'analyse: ${error.message}`, 'error');
+    clearTimeout(timeoutId);
+    console.error('💥 Erreur analyse multi-scan:', error);
+    
+    if (error.message === 'Analyse annulée') {
+      console.warn('🛑 Utilisateur a annulé ou timeout');
+      showToast('❌ Analyse annulée', 'error');
+    } else if (error.name === 'AbortError') {
+      console.error('⏱️ Délai de 60 secondes dépassé');
+      showToast('⏱️ Délai dépassé. Réduisez le nombre de photos.', 'error');
+    } else {
+      showToast(`Erreur: ${error.message}`, 'error');
+    }
+
+    resetForm(); 
+
   } finally {
     setIsProcessing(false);
     setCurrentScanIndex(0);
+    console.log('🏁 Fin handleMultipleScanUpload');
   }
 };
 
@@ -794,18 +851,34 @@ if (resultsWithLists.length > 0) {
     }
   };
 
- const handlePhotoUpload = async (file: File) => {
+const handlePhotoUpload = async (file: File) => {
   setIsProcessing(true);
   console.log('🎬 Début handlePhotoUpload');
   console.log('📸 Fichier:', file.name, '-', (file.size / 1024 / 1024).toFixed(2), 'Mo');
   
+  // ✅ Créer un AbortController pour timeout + annulation
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.warn('⏱️ Timeout déclenché après 30 secondes');
+    abortController.abort();
+  }, 30000); // 30 secondes max
+  
   try {
     // 1️⃣ Analyse IA
-    console.log('Analyse IA en cours...');
-    const aiResult = await openAIService.analyzePhotoToRecipe(file, firstName);
+    console.log('🤖 Analyse IA en cours...');
+    showToast('Analyse de l\'image...', 'info');
+    
+    const aiResult = await openAIService.analyzePhotoToRecipe(
+      file, 
+      firstName,
+      abortController.signal  // ← Passe le signal d'annulation
+    );
+    
+    clearTimeout(timeoutId); // ✅ Annuler le timeout si succès
     console.log('✅ IA terminée:', aiResult.title);
     
     // 2️⃣ Remplir les champs
+    console.log('📝 Remplissage des champs...');
     setTitle(aiResult.title);
     setAuthor(aiResult.author);
     setPrepMinutes(aiResult.prepMinutes.toString());
@@ -816,99 +889,44 @@ if (resultsWithLists.length > 0) {
     
     // 3️⃣ Upload de la photo (AVEC VÉRIFICATION DU RÉSULTAT)
     console.log('📤 Upload de la photo en cours...');
+    showToast('Upload de la photo...', 'info');
+    
     const uploadResult = await handleImageUpload(file);
     
     if (!uploadResult) {
       console.error('❌ Upload a échoué, mais on continue avec les données IA');
-      showToast('⚠️ Photo non uploadée, mais recette analysée', 'error');
+      showToast('⚠️ Photo non uploadée, mais recette analysée', 'warning');
     } else {
       console.log('✅ Photo uploadée avec succès:', uploadResult.originalUrl);
     }
     
     // 4️⃣ Passer en mode manuel pour éditer
     console.log('✅ Passage en mode manuel');
-    showToast('✅ Image optimisée et données IA prêtes', 'success');
+    showToast('✅ Recette analysée avec succès !', 'success');
     setMode('manual');
     
   } catch (error: any) {
+    clearTimeout(timeoutId); // ✅ Annuler le timeout en cas d'erreur
     console.error('💥 Erreur dans handlePhotoUpload:', error);
-    showToast(`Erreur : ${error.message}`, 'error');
+    
+    if (error.message === 'Analyse annulée') {
+      console.warn('🛑 Utilisateur a annulé ou timeout');
+      showToast('❌ Analyse annulée', 'error');
+    } else if (error.name === 'AbortError') {
+      console.error('⏱️ Délai de 30 secondes dépassé');
+      showToast('⏱️ Délai dépassé (30s). Réessayez avec une photo plus simple.', 'error');
+    } else {
+      showToast(`Erreur : ${error.message}`, 'error');
+    }
+
+    resetForm();
+    setMode('choice'); // Retour au choix
   } finally {
     setIsProcessing(false);
+    console.log('🏁 Fin handlePhotoUpload');
   }
 };
 
-  // Mode "link" - Interface pour ajout par lien
-  if (mode === 'link') {
-    return (
-      <div className="max-w-3xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <button 
-            onClick={() => {
-              setMode('choose');
-              setScannedImages([]);
-              setDishPhotoUrl("");
-              setImageVersions(null);
-            }}
-            className="text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-2 mx-auto"
-          >
-            ← Retour aux options
-          </button>
-          <h1 className="text-3xl font-bold text-gray-900">
-            🔗 Ajouter depuis un lien
-          </h1>
-          <p className="text-gray-600">
-            Collez le lien d'une recette et nous essaierons de l'importer automatiquement
-          </p>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Lien de la recette
-            </label>
-            <input
-              type="url"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://www.pinterest.com/pin/... ou https://www.marmiton.org/..."
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none"
-            />
-          </div>
-
-          <div className="bg-blue-50 rounded-lg p-4">
-            <h4 className="font-medium text-blue-800 mb-2">Sites supportés :</h4>
-            <div className="text-sm text-blue-700 space-y-1">
-              <div>✅ <strong>Sites de recettes</strong> - Marmiton, 750g, blogs culinaires</div>
-              <div>⚠️ <strong>Réseaux sociaux</strong> - Mode manuel assisté (Instagram, TikTok)</div>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button 
-              onClick={() => setMode('choose')}
-              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-            >
-              Annuler
-            </button>
-            <button 
-              onClick={() => setMode('choose')}
-              className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-            >
-              Annuler
-            </button>
-            <button 
-              onClick={handleExtractFromUrl}
-              disabled={isExtracting || !linkUrl.trim()}
-              className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors"
-            >
-              {isExtracting ? "🔄 Extraction..." : "🚀 Extraire la recette"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
   
   // 🎨 COMPOSANT APERÇU AMÉLIORÉ
   const PreviewSection = () => {
@@ -970,6 +988,19 @@ if (resultsWithLists.length > 0) {
               NB : Si toutefois le processus échoue vous pouvez réessayer une seconde fois
           </p>
           </p>
+          {/* ✅ Bouton ANNULER */}
+        <button
+          onClick={() => {
+            console.warn('🛑 Annulation manuelle par l\'utilisateur');
+            resetForm();
+            setIsProcessing(false);
+            setMode('choice');
+            showToast('Analyse annulée', 'info');
+          }}
+          className="mt-4 px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-medium transition-colors active:scale-95"
+        >
+          Annuler
+        </button>
         </div>
       </div>
     );
@@ -1020,6 +1051,7 @@ if (resultsWithLists.length > 0) {
           {/* Mode 3 : Scan recette manuscrite */}
              <div 
               onClick={() => setMode('scan')}
+              resetForm();
               className="group bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-green-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
             <div className="text-center space-y-3 md:space-y-4">
@@ -1113,7 +1145,7 @@ if (resultsWithLists.length > 0) {
               }}
               className="hidden"
             />
-            <div className="bg-primary-500 text-white px-8 py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
+            <div className="bg-primary-500 text-white px-8 py-4 rounded-lg hover:bg-primary-600 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
               <Upload className="w-5 h-5" />
               Choisir une image
             </div>
@@ -1212,7 +1244,7 @@ if (resultsWithLists.length > 0) {
                   }}
                   className="hidden"
                 />
-                <div className="bg-green-500 text-green-50 px-8 py-4 rounded-lg hover:bg-green-200 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
+                <div className="bg-green-600 text-green-50 px-8 py-4 rounded-lg hover:bg-green-700 transition-colors font-medium cursor-pointer inline-flex items-center gap-3">
                   <FileText className="w-5 h-5" />
                   {scannedImages.length === 0 
                     ? "Démarrer le scan"
@@ -1222,13 +1254,12 @@ if (resultsWithLists.length > 0) {
             </div>
           )}
 
-           <div className="text-center mt-8 mx-auto border-secondary-200 rounded-lg p-4">
-            <h4 className="font-medium text-orange-800 mb-2">Conseils pour un bon scan</h4>
-            <ul className="text-center text-sm text-secondary-600 text-left space-y-1">
+           <div className="text-center text-pretty mt-8 border-secondary-200 rounded-lg p-4">
+            <h4 className="font-medium text-gray-800 mb-2">Conseils pour un bon scan</h4>
+            <ul className="bg-secondary-50 p-2 text-sm text-secondary-800  space-y-1">
                 <li>• Les pages seront analysées dans l'ordre d'ajout</li>
-                <li>• Les étapes seront numérotées automatiquement</li>
                 <li>• Assurez-vous que le texte est bien lisible</li>
-                <li>• Éclairage uniforme sans ombres</li>
+                <li>• Et que l'éclairage est uniforme sans ombres</li>
             </ul>
           </div>
 
@@ -1237,11 +1268,11 @@ if (resultsWithLists.length > 0) {
               <div className="bg-blue-50 border-2 mt-6 border-blue-200 rounded-xl p-6 mb-4">
                 <h3 className="font-semibold text-sm text-blue-900 mb-3 flex items-center gap-2">
                   <ImageIcon className="w-5 h-5" />
-                  Photo du plat final (optionnelle)
+                  Photo du plat(optionnelle)
                 </h3>
                 
                 <p className="text-sm text-blue-700 mb-4">
-                  Ajoutez une photo du plat pour illustrer votre recette. 
+                  Ajoutez une photo du plat pour illustrer la recette. 
                 </p>
                 
                 {/* Zone d'upload photo */}
