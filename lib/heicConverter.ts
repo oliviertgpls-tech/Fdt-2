@@ -17,7 +17,7 @@ export async function convertHEICtoJPEG(file: File): Promise<File> {
       blob: file,
       toType: 'image/jpeg',
       quality: 0.9,
-      multiple: false
+      multiple: true
     });
     
     const timeoutPromise = new Promise((_, reject) => {
@@ -25,7 +25,7 @@ export async function convertHEICtoJPEG(file: File): Promise<File> {
     });
     
     const result = await Promise.race([conversionPromise, timeoutPromise]);
-    const convertedBlob = Array.isArray(result) ? result[0] : result as Blob;
+    
     
     if (!convertedBlob || convertedBlob.size === 0) {
       throw new Error('Blob converti vide');

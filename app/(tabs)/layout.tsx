@@ -88,7 +88,7 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
             {/* Mobile : Bouton nouvelle recette à droite */}
             <Link
               href="/add"
-              className="md:hidden border text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors"
+              className="md:hidden border text-blue-600 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               +
             </Link>
