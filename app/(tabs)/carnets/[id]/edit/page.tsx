@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Plus, Eye, Trash2, ArrowLeft, Edit3 } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { useParams, useRouter } from "next/navigation";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import Link from 'next/link';
 import { useToast } from '@/components/Toast';
 
@@ -613,16 +614,15 @@ export default function CarnetEditPage() {
                       </div>
                     </div>
                     
-                    {/* Image */}
-                    {recipe.imageUrl && (
-                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-                        <img 
-                          src={recipe.imageUrl}
-                          alt={recipe.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
+                  {/* Image avec placeholder automatique */}
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <OptimizedImage
+                      src={recipe.imageVersions || recipe.imageUrl}
+                      alt={recipe.title}
+                      size="medium"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                     
                     {/* Contenu */}
                     <div className="flex-1 min-w-0">

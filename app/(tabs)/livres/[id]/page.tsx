@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader, GripVertical } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { ImageSearch } from '@/components/ImageSearch';
 import { useToast } from '@/components/Toast';
 
@@ -1299,10 +1300,11 @@ const handleDragEnd = async (event: DragEndEvent) => {
                     onClick={() => handleAddRecipeToBook(book.id, recipe.id)}
                       >
                     <div className="flex items-center justify-left gap-2 sm:gap-3">
-                      <img 
-                        src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'}
-                        alt={recipe.title}
-                        className="w-14 h-20 object-cover rounded-lg"
+                      <OptimizedImage
+                          src={recipe.imageVersions || recipe.imageUrl}
+                          alt={recipe.title}
+                          size="medium"
+                          className="w-14 h-20 object-cover rounded-lg"
                         />
                         <div className="flex-1">
                             <h5 className="text-base md:text-wrap justify-left font-medium text-accent-900">{recipe.title}</h5>

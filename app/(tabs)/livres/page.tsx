@@ -5,6 +5,7 @@ import { Plus, Eye, Download, X, Loader } from 'lucide-react';
 import { useRecipes } from "@/contexts/RecipesProvider";
 import Link from 'next/link';
 import { CreateBookModal } from '@/components/CreateBookModal';
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { useToast } from '@/components/Toast';
 import { useRef } from 'react';
 
@@ -290,10 +291,11 @@ function BooksLoadingSkeleton() {
               >
                 <div className="items-center flex gap-3 md:gap-4">
                   <div className="relative">
-                    <img 
-                      src={recipe.imageUrl || 'https://images.unsplash.com/photo-1546548970-71785318a17b?q=80&w=100'} 
+                   <OptimizedImage
+                      src={recipe.imageVersions || recipe.imageUrl}
                       alt={recipe.title}
-                      className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"
+                      size="medium"
+                      className="w-10 h-12 object-cover rounded-sm"
                     />
                     {selectedRecipes.includes(recipe.id) && (
                       <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">

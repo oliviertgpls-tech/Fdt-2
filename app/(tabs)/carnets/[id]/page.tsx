@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ArrowLeft, Edit3, Plus, Trash2, Clock4, Share, Carrot } from "lucide-react";
 import { useToast } from '@/components/Toast';
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { ConfirmModal } from '@/components/ConfirmModal';
 
 export default function CarnetPage() {
@@ -191,16 +192,16 @@ export default function CarnetPage() {
                 href={`/recipes/${recipe.id}`}
                 className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200"
               >
-                {/* Image */}
-                {recipe.imageUrl && (
-                  <div className="aspect-[4/3] bg-gray-100">
-                    <img 
-                      src={recipe.imageUrl}
-                      alt={recipe.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                    />
-                  </div>
-                )}
+              {/* Image avec placeholder automatique */}
+            
+               <div className="aspect-[4/3] overflow-hidden">
+                <OptimizedImage
+                  src={recipe.imageVersions || recipe.imageUrl}
+                  alt={recipe.title}
+                  size="medium"
+                  className="w-full h-full object-cover"
+                   />
+                </div>
                 
                 {/* Contenu */}
                 <div className="p-4 space-y-2">
