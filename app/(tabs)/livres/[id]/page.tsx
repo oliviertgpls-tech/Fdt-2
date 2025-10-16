@@ -113,6 +113,7 @@ function SortableRecipeItem({
 export default function BookPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
+  const { showToast } = useToast();
 
   // Sensors pour le drag & drop (desktop + mobile)
   const sensors = useSensors(
@@ -140,7 +141,7 @@ export default function BookPage() {
     deleteBook
   } = useRecipes();
 
-  const { showToast } = useToast();
+ 
   
   // États locaux
   const [bookDescription, setBookDescription] = useState('');
@@ -245,75 +246,86 @@ export default function BookPage() {
   };
 
     // FONCTION D'UPLOAD pour les images de couverture AVEC CONVERSION HEIC
-    const handleCoverImageUpload = async (file: File) => {
-      setIsUploadingCover(true);
+const handleCoverImageUpload = async (file: File) => {
+  setIsUploadingCover(true);
+  
+  try {
+    console.log('📤 Upload image de couverture...', file.name);
+    
+    // 🆕 Import et conversion
+    const { isHEICFile, convertHEICtoJPEG } = await import('@/lib/heicConverter');
+    
+    let processedFile = file;
+    
+    // 🔍 Vérifier si c'est un HEIC
+    if (isHEICFile(file)) {
+      showToast('📸 Conversion de la photo iPhone...', 'info');
       
       try {
-        console.log('📤 Upload image de couverture...', file.name);
+        // ✅ Appel direct de convertHEICtoJPEG (qui throw des erreurs)
+        processedFile = await convertHEICtoJPEG(file);
+        showToast('✅ Photo convertie !', 'success');
         
-        // 🔄 CONVERSION HEIC → JPEG si nécessaire
-        let processedFile = file;
-        
-        if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
-          console.log('🔄 Conversion HEIC → JPEG en cours...');
-          try {
-            // Import dynamique de la librairie (chargée uniquement si nécessaire)
-            const heic2any = (await import('heic2any')).default;
-            
-            const convertedBlob = await heic2any({
-              blob: file,
-              toType: 'image/jpeg',
-              quality: 0.9
-            });
-            
-            // heic2any peut retourner un tableau de Blobs, on prend le premier
-            const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-            
-            processedFile = new File(
-              [blob], 
-              file.name.replace(/\.heic$/i, '.jpg'),
-              { type: 'image/jpeg' }
-            );
-            console.log('✅ Conversion HEIC réussie');
-          } catch (error) {
-            console.error('❌ Erreur conversion HEIC:', error);
-            showToast('Erreur lors de la conversion HEIC, tentative avec le fichier original...', 'error');
-            // On continue avec le fichier original en cas d'échec
-          }
-        }
-        
-        // Upload du fichier (converti ou original)
-        const formData = new FormData();
-        formData.append('file', processedFile);
-        
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('✅ Upload couverture réussi:', result);
-        
-        if (result.success) {
-          setCoverImageUrl(result.originalUrl);
-          setCoverImageVersions(result.versions || null);
-          showToast('Image de couverture uploadée !', 'success');
-        } else {
-          throw new Error(result.message || 'Erreur upload');
-        }
-        
-      } catch (error: any) {
-        console.error('💥 Erreur upload couverture:', error);
-        showToast('Erreur lors de l\'upload de l\'image', 'error');
-      } finally {
-        setIsUploadingCover(false);
+        } catch (conversionError: any) {
+      console.error('❌ Conversion impossible:', conversionError.message);
+      
+      // 🎯 Message court et clair
+      if (conversionError.message.includes('HEIC_TOO_RECENT') || conversionError.message.includes('ERR_LIBHEIF')) {
+        showToast('❌ Format iPhone trop récent. Ré-exportez en JPEG ou copie-ecran depuis Photos', 'error');
+      } else if (conversionError.message.includes('HEIC_TIMEOUT') || conversionError.message.includes('Timeout')) {
+        showToast('❌ Photo trop lourde. Essayez une autre photo', 'error');
+      } else {
+        showToast('❌ Conversion impossible. Utilisez une photo en JPEG', 'error');
       }
-    };
+      
+      setIsUploadingCover(false);
+      return;
+    }
+    }
+    
+    // Upload du fichier (converti ou original si pas HEIC)
+    const formData = new FormData();
+    formData.append('file', processedFile);
+    
+    console.log('📤 Envoi vers API...');
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('✅ Upload réussi:', result);
+    
+    if (result.success) {
+      setCoverImageUrl(result.originalUrl);
+      setCoverImageVersions(result.versions || null);
+      showToast('Image de couverture uploadée !', 'success');
+      
+      // Sauvegarder dans le livre
+      if (book) {
+        updateBook(book.id, { 
+          coverImageUrl: result.originalUrl,
+          coverImageVersions: result.versions 
+        });
+      }
+    } else {
+      throw new Error(result.message || 'Erreur upload');
+    }
+    
+  } catch (error: any) {
+    console.error('💥 Erreur upload couverture:', error);
+    showToast(`❌ ${error.message}`, 'error');
+  } finally {
+    setIsUploadingCover(false);
+  }
+};
+
+
 
   // Génération PDF
   const generatePreviewPDF = async () => {

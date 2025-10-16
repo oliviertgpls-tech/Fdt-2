@@ -152,12 +152,12 @@ export default function CarnetEditPage() {
     }
   }, [currentCarnet]);
 
-  // Initialiser l'ordre local des recettes
-  React.useEffect(() => {
-    if (currentCarnet?.recipeIds && localRecipeIds.length === 0) {
-      setLocalRecipeIds(currentCarnet.recipeIds);
-    }
-  }, [currentCarnet?.recipeIds]);
+    // Initialiser et synchroniser l'ordre local des recettes
+    React.useEffect(() => {
+      if (!isDragging && currentCarnet?.recipeIds) {
+        setLocalRecipeIds(currentCarnet.recipeIds);
+      }
+    }, [currentCarnet?.recipeIds, isDragging]);
 
 
   // Gestion du cas où le carnet n'existe pas
@@ -191,11 +191,6 @@ export default function CarnetEditPage() {
         actualCarnet.recipeIds && actualCarnet.recipeIds.includes(recipe.id)
       );
   
-    React.useEffect(() => {
-    if (!isDragging && actualCarnet?.recipeIds) {
-      setLocalRecipeIds(actualCarnet.recipeIds);
-    }
-  }, [actualCarnet?.recipeIds, isDragging]);
 
   // Recettes disponibles (pas encore dans le carnet)
   const availableRecipes = recipes.filter(recipe => {
@@ -598,7 +593,7 @@ export default function CarnetEditPage() {
                       : 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50'
                   }`}
                 >
-                  <div className="flex gap-3">
+                  <div className="flex items-center gap-3">
                     {/* Checkbox visuel */}
                     <div className="flex items-center pt-1">
                       <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
@@ -615,12 +610,12 @@ export default function CarnetEditPage() {
                     </div>
                     
                   {/* Image avec placeholder automatique */}
-                  <div className="aspect-[4/3] overflow-hidden">
+                  <div className="relative">
                     <OptimizedImage
                       src={recipe.imageVersions || recipe.imageUrl}
                       alt={recipe.title}
                       size="medium"
-                      className="w-full h-full object-cover"
+                      className="w-14 h-20 object-cover rounded-sm"
                     />
                   </div>
                     

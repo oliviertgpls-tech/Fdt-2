@@ -295,7 +295,7 @@ function BooksLoadingSkeleton() {
                       src={recipe.imageVersions || recipe.imageUrl}
                       alt={recipe.title}
                       size="medium"
-                      className="w-10 h-12 object-cover rounded-sm"
+                      className="w-14 h-20 object-cover rounded-sm"
                     />
                     {selectedRecipes.includes(recipe.id) && (
                       <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-secondary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">

@@ -89,7 +89,7 @@ async analyzePhotoToRecipe(
       throw new Error('Analyse annulée');
     }
     console.error('💥 Erreur analyse photo:', error);
-    throw new Error('Impossible d\'analyser cette image');
+    throw new Error('Image non conforme essayez JPEG ou une copie d\'ecran');
   }
 }
 
@@ -155,20 +155,61 @@ async analyzeManuscriptToRecipe(
   }
 }
 
-  // 🛠️ HELPER : Convertir File en base64
-  private fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
-        // Enlever le préfixe "data:image/...;base64,"
-        const base64Data = base64.split(',')[1];
-        resolve(base64Data);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
+    // 🛠️ HELPER : Convertir File en base64 (avec support HEIC)
+    private async fileToBase64(file: File): Promise<string> {
+      // 🔄 Conversion HEIC si nécessaire
+      let processedFile = file;
+      
+      const isHEIC = 
+        file.type === 'image/heic' || 
+        file.type === 'image/heif' || 
+        file.name.toLowerCase().endsWith('.heic') ||
+        file.name.toLowerCase().endsWith('.heif');
+      
+      if (isHEIC) {
+        console.log('🔄 Conversion HEIC pour IA...');
+        try {
+          const heic2any = (await import('heic2any')).default;
+          
+          const conversionPromise = heic2any({
+            blob: file,
+            toType: 'image/jpeg',
+            quality: 0.9,
+            multiple: false
+          });
+          
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Timeout')), 15000);
+          });
+          
+          const result = await Promise.race([conversionPromise, timeoutPromise]);
+          const convertedBlob = Array.isArray(result) ? result[0] : result as Blob;
+          
+          processedFile = new File(
+            [convertedBlob],
+            file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg'),
+            { type: 'image/jpeg' }
+          );
+          
+          console.log('✅ Conversion HEIC IA réussie');
+        } catch (error: any) {
+          console.error('❌ Erreur conversion HEIC:', error);
+          throw new Error('HEIC_CONVERSION_FAILED');
+        }
+      }
+      
+      // Conversion en base64
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          const base64Data = base64.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(processedFile);
+      });
+    }
 
   // 🧹 DÉDUPLICATION INTELLIGENTE DES INGRÉDIENTS
   async deduplicateIngredients(ingredients: string[]): Promise<string[]> {

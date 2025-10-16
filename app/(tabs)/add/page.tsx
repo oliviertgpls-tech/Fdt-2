@@ -20,264 +20,6 @@ type UploadResult = {
   message: string;
 }
 
-// Service IA OpenAI avec debug
-class OpenAIService {
-  private apiKey: string;
-  private baseUrl = 'https://api.openai.com/v1';
-
-  constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || '';
-    console.log('🔑 OpenAI Key disponible:', this.apiKey ? 'OUI' : 'NON');
-    console.log('🔑 Début de la clé:', this.apiKey ? this.apiKey.substring(0, 7) + '...' : 'MANQUANTE');
-  }
-
-  async analyzePhotoToRecipe(imageFile: File, firstName: string): Promise<{
-    title: string;
-    author: string;
-    prepMinutes: number;
-    servings: string;
-    ingredients: string[];
-    steps: string;
-    confidence: number;
-  }> {
-    console.log('🚀 Début analyse photo...');
-    
-    if (!this.apiKey) {
-      console.error('❌ Clé OpenAI manquante');
-      throw new Error('Clé OpenAI manquante dans les variables d\'environnement');
-    }
-
-    if (!this.apiKey.startsWith('sk-')) {
-      console.error('❌ Format de clé OpenAI invalide');
-      throw new Error('Format de clé OpenAI invalide (doit commencer par sk-)');
-    }
-
-    try {
-      console.log('📸 Conversion de l\'image en base64...');
-      const base64Image = await this.fileToBase64(imageFile);
-      console.log('✅ Image convertie, taille:', base64Image.length, 'caractères');
-      
-      console.log('🌐 Appel API OpenAI...');
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: `Analysez cette photo de plat et créez une recette complète au format JSON.
-
-INSTRUCTIONS :
-- Identifiez le plat principal visible
-- Estimez les ingrédients probables
-- Proposez une méthode de préparation réaliste
-- Donnez un niveau de confiance (0-100)
-
-FORMAT DE RÉPONSE (JSON uniquement) :
-{
-  "title": "Nom du plat",
-  "author": "${firstName}",
-  "prepMinutes": 30,
-  "servings": "4",
-  "ingredients": ["ingrédient 1", "ingrédient 2"],
-  "steps": "Étape 1...\\n\\nÉtape 2...",
-  "confidence": 85
-}`
-                },
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`,
-                    detail: "high"
-                  }
-                }
-              ]
-            }
-          ],
-          max_tokens: 1000,
-          temperature: 0.7
-        })
-      });
-
-      console.log('📡 Réponse API reçue, status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Erreur API OpenAI:', response.status, errorText);
-        throw new Error(`Erreur API OpenAI: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
-      console.log('✅ Données reçues:', data);
-      
-      const content = data.choices[0]?.message?.content;
-      console.log('📝 Contenu de la réponse:', content);
-      
-      if (!content) {
-        throw new Error('Pas de réponse de l\'IA');
-      }
-
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        console.error('❌ Pas de JSON trouvé dans:', content);
-        throw new Error('Format de réponse invalide - pas de JSON détecté');
-      }
-
-      const result = JSON.parse(jsonMatch[0]);
-      console.log('🎉 Analyse terminée avec succès:', result);
-      return result;
-      
-    } catch (error) {
-      console.error('💥 Erreur complète:', error);
-      throw error;
-    }
-  }
-
-async analyzeManuscriptToRecipe(imageFile: File, firstName: string): Promise<{   
-    title: string;
-    author: string;
-    prepMinutes: number;
-    servings: string;
-    ingredients: string[];
-    steps: string;
-    confidence: number;
-  }> {
-    console.log('🚀 Début analyse manuscrit...');
-    
-    if (!this.apiKey) {
-      throw new Error('Clé OpenAI manquante');
-    }
-
-    try {
-      const base64Image = await this.fileToBase64(imageFile);
-      
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: `Lisez cette recette manuscrite et structurez-la au format JSON.
-
-INSTRUCTIONS :
-- Lisez tout le texte visible (titre, ingrédients, étapes)
-- Extrayez et structurez les informations
-- Corrigez l'orthographe si nécessaire
-- Estimez temps et portions si non mentionnés
-
-FORMAT DE RÉPONSE (JSON uniquement) :
-{
-  "title": "Titre de la recette",
-  "author": "${firstName}",
-  "prepMinutes": 30,
-  "servings": "4",
-  "ingredients": ["ingrédient 1", "ingrédient 2"],
-  "steps": "Étape 1...\\n\\nÉtape 2...",
-  "confidence": 90
-}`
-                },
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`,
-                    detail: "high"
-                  }
-                }
-              ]
-            }
-          ],
-          max_tokens: 1200,
-          temperature: 0.3
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Erreur API OpenAI OCR:', response.status, errorText);
-        throw new Error(`Erreur API OpenAI: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const content = data.choices[0]?.message?.content;
-      
-      if (!content) {
-        throw new Error('Pas de réponse de l\'IA');
-      }
-
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('Format de réponse invalide');
-      }
-
-      return JSON.parse(jsonMatch[0]);
-      
-    } catch (error) {
-      console.error('Erreur analyse manuscrit:', error);
-      throw error;
-    }
-  }
-
- // NOUVELLE VERSION (avec import dynamique)
-private async fileToBase64(file: File): Promise<string> {
-  // 🔄 Conversion HEIC → JPEG si nécessaire
-  let processedFile = file;
-  
-  if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
-    console.log('🔄 Conversion HEIC → JPEG en cours...');
-    try {
-      // ✨ IMPORT DYNAMIQUE : charge la librairie uniquement ici, côté client
-      const heic2any = (await import('heic2any')).default;
-      
-      const convertedBlob = await heic2any({
-        blob: file,
-        toType: 'image/jpeg',
-        quality: 0.9
-      });
-      
-      // heic2any peut retourner un tableau de Blobs, on prend le premier
-      const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-      
-      processedFile = new File(
-        [blob], 
-        file.name.replace(/\.heic$/i, '.jpg'),
-        { type: 'image/jpeg' }
-      );
-      console.log('✅ Conversion HEIC réussie');
-    } catch (error) {
-      console.error('❌ Erreur conversion HEIC:', error);
-      // On continue avec le fichier original en cas d'échec
-    }
-  }
-  
-  // 📤 Conversion en base64
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      const base64Data = base64.split(',')[1];
-      resolve(base64Data);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(processedFile);
-  });
-}
-  }
-
 // Composant pour recherche d'images Unsplash simplifié
 function ImageSearch({ onImageSelect, initialQuery = "" }: {
   onImageSelect: (imageUrl: string) => void;
@@ -346,7 +88,7 @@ function ImageSearch({ onImageSelect, initialQuery = "" }: {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-blue-200 transition-colors"
+        className="flex items-center text-sm gap-2 px-4 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
       >
         <ImageIcon className="w-4 h-4" />
         Ou choisir une image libre de droits
@@ -496,55 +238,43 @@ const handleImageUpload = async (file: File): Promise<UploadResult | null> => {
   
   try {
     console.log('📤 Upload optimisé en cours...', file.name);
-    console.log('📦 Taille fichier:', (file.size / 1024 / 1024).toFixed(2), 'Mo');
     console.log('📦 Type fichier:', file.type);
     
-    // 🆕 CONVERSION HEIC → JPEG (pour iPhone)
+    // 🆕 CONVERSION HEIC ROBUSTE
+    const { isHEICFile, convertHEICtoJPEG } = await import('@/lib/heicConverter');
+    
     let processedFile = file;
     
-    if (file.name.toLowerCase().endsWith('.heic') || 
-        file.name.toLowerCase().endsWith('.heif') || 
-        file.type === '' || 
-        file.type === 'image/heic') {
-      
-      console.log('🔄 Format HEIC détecté, conversion en JPEG...');
+    if (isHEICFile(file)) {
+      showToast('📸 Conversion photo iPhone...', 'info');
       
       try {
-        const heic2any = (await import('heic2any')).default;
-        const convertedBlob = await heic2any({
-          blob: file,
-          toType: 'image/jpeg',
-          quality: 0.9
-        });
+        processedFile = await convertHEICtoJPEG(file);
+        showToast('✅ Photo convertie !', 'success');
+      } catch (conversionError: any) {
+        console.error('❌ Conversion impossible:', conversionError.message);
         
-        const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        if (conversionError.message.includes('HEIC_TOO_RECENT') || conversionError.message.includes('ERR_LIBHEIF')) {
+          showToast('❌ Format iPhone trop récent. Ré-exportez en JPEG depuis Photos', 'error');
+        } else if (conversionError.message.includes('Timeout')) {
+          showToast('❌ Photo trop lourde. Essayez une autre photo', 'error');
+        } else {
+          showToast('❌ Conversion impossible. Utilisez une photo JPEG', 'error');
+        }
         
-        processedFile = new File(
-          [blob], 
-          file.name.replace(/\.heic$/i, '.jpg'),
-          { type: 'image/jpeg' }
-        );
-        
-        console.log('✅ Conversion HEIC → JPEG réussie');
-        showToast('📸 Conversion iPhone → JPEG...', 'success');
-        
-      } catch (conversionError) {
-        console.error('❌ Erreur conversion HEIC:', conversionError);
-        showToast('Format photo iPhone non supporté', 'error');
-        return null;
+        setIsUploading(false);
+        return null; // ← STOP
       }
     }
     
+    // Upload du fichier converti
     const formData = new FormData();
-    formData.append('file', processedFile); // ← Utilise processedFile au lieu de file
+    formData.append('file', processedFile);
     
     const response = await fetch('/api/upload', {
       method: 'POST',
       body: formData
     });
-    
-    
-    console.log('📡 Réponse API upload, status:', response.status);
     
     if (!response.ok) {
       const errorData = await response.json();
@@ -553,24 +283,19 @@ const handleImageUpload = async (file: File): Promise<UploadResult | null> => {
     }
     
     const result: UploadResult = await response.json();
-    console.log('✅ Résultat upload:', result);
     
     if (result.success) {
-      // 🆕 Stocker les versions optimisées
       setImageVersions(result.versions);
-      // Garder compatibilité avec l'ancien système
       setImageUrl(result.originalUrl);
-      
-      console.log('✅ Image URL sauvegardée:', result.originalUrl);
-      showToast('Photo uploadée avec succès !', 'success');
+      showToast('✅ Photo uploadée !', 'success');
       return result;
     } else {
       throw new Error(result.message || 'Erreur upload');
     }
     
   } catch (error: any) {
-    console.error('💥 Erreur complète dans handleImageUpload:', error);
-    showToast(`Erreur upload : ${error.message}`, 'error');
+    console.error('💥 Erreur upload:', error);
+    showToast(`❌ ${error.message}`, 'error');
     return null;
   } finally {
     setIsUploading(false);
@@ -889,7 +614,6 @@ const handlePhotoUpload = async (file: File) => {
     
     // 3️⃣ Upload de la photo (AVEC VÉRIFICATION DU RÉSULTAT)
     console.log('📤 Upload de la photo en cours...');
-    showToast('Upload de la photo...', 'info');
     
     const uploadResult = await handleImageUpload(file);
     
@@ -1466,25 +1190,15 @@ const handlePhotoUpload = async (file: File) => {
           </div>
         </div>
 
-        {/* 🔄 SECTION PHOTO MISE À JOUR avec optimisations */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 ml-1 mb-2">
+        {/* SECTION PHOTO MISE À JOUR avec optimisations */}
+        <div className="space-y-3">
+          <label className="text-sm font-semibold text-gray-700 ml-1 mb-2">
             Photo
           </label>
-          
+            <div className="border border-gray-200 rounded-lg p-4 space-y-3">
           <div className="space-y-3">
-            <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => {
-                setImageUrl(e.target.value);
-                setImageVersions(null); // Reset versions si URL manuelle
-              }}
-    
-            />
-            
-            <div className="flex flex-wrap gap-3">
-              <label className="flex items-center mt-2 mb-2 gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors cursor-pointer">
+            <div className="flex flex-wrap gap-3 justify-center">
+              <label className="flex  items-center mt-2 mb-2 gap-2 px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-100 transition-colors cursor-pointer">
                 <input
                   type="file"
                   accept="image/*"
@@ -1495,7 +1209,7 @@ const handlePhotoUpload = async (file: File) => {
                   className="hidden"
                   disabled={isUploading}
                 />
-                <div className="inline-flex items-center">
+                <div className="flex justify-center items-center">
                 <Camera className="w-4 h-4 mr-2"/>{isUploading ? "Optimisation..." : "Ajouter ma photo"}
                 </div>
               </label>
@@ -1508,12 +1222,13 @@ const handlePhotoUpload = async (file: File) => {
                 initialQuery={title}
               />
             </div>
+            </div>
             
             {/* 🆕 APERÇU OPTIMISÉ */}
             <PreviewSection />
           </div>
           
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="w-full h-fulltext-xs text-gray-500 mt-2">
           </p>
         </div>
 
