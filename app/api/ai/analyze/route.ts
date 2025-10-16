@@ -78,13 +78,13 @@ export async function POST(request: NextRequest) {
       "confidence": 85
     }`;
 
-    if (!response.ok) {
-      const error = await response.text();
+    if (!Response.ok) {
+      const error = await Response.text();
       console.error('Erreur OpenAI:', error);
-      return NextResponse.json({ error: 'Erreur OpenAI' }, { status: response.status });
+      return NextResponse.json({ error: 'Erreur OpenAI' }, { status: Response.status });
     }
 
-    const data = await response.json();
+    const data = await Response.json();
     const content = data.choices[0]?.message?.content;
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     const result = JSON.parse(jsonMatch[0]);
