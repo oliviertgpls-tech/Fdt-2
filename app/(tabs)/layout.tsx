@@ -45,12 +45,15 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
       <RecipesProvider>
         <div className="min-h-screen bg-primary-50">
           <header className="sticky top-0 z-50 border-b bg-white backdrop-blur shadow-md">
-            <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6 py-3">
-              <Link href="/recipes" className="font-semibold text-base md:text-lg">
+           <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-6 py-3">
+  
+            {/* Desktop : Logo + Menu + rien à droite */}
+            <div className="hidden md:flex items-center gap-8 flex-1">
+              <Link href="/recipes" className="font-semibold text-lg">
                 RICIPIZ
               </Link>
               
-              <div className="hidden md:flex items-center gap-6 text-sm">
+              <div className="flex items-center gap-6 text-sm">
                 <Link href="/recipes" className="hover:text-orange-600 transition-colors">
                   Mes Recettes
                 </Link>
@@ -64,16 +67,32 @@ function ProtectedContent({ children }: { children: React.ReactNode }) {
                   Mon compte
                 </Link>
               </div>
+            </div>
 
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden flex flex-col gap-1 p-2"
-              >
-                <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-                <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-                <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-              </button>
-            </nav>
+            {/* Mobile : Burger à gauche */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden flex flex-col gap-1 p-2"
+            >
+              <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
+              <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+              <span className={`w-5 h-0.5 bg-gray-600 transition-all ${isMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
+            </button>
+
+            {/* Mobile : Logo au centre */}
+            <Link href="/recipes" className=" md:hidden font-semibold text-base">
+              RiCiPiZ
+            </Link>
+
+            {/* Mobile : Bouton nouvelle recette à droite */}
+            <Link
+              href="/add"
+              className="md:hidden border text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors"
+            >
+              +
+            </Link>
+
+          </nav>
 
             {isMenuOpen && (
               <div className="md:hidden border-t bg-white/95 backdrop-blur">
