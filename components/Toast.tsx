@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { X, CheckCircle, AlertCircle, Info, TriangleAlert } from 'lucide-react';
 
-type ToastType = 'success' | 'error' | 'info';
+type ToastType = 'success' | 'error' | 'info'| 'warning';
 
 interface Toast {
   id: string;
@@ -88,6 +88,8 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: () => void }) 
         return `${baseStyles} bg-red-50 border-red-200 text-red-800`;
       case 'info':
         return `${baseStyles} bg-blue-50 border-blue-200 text-blue-800`;
+      case 'warning':
+      return `${baseStyles} bg-accent-300 border-accent-400 text-accent-800`;
       default:
         return `${baseStyles} bg-gray-50 border-gray-200 text-gray-800`;
     }
@@ -99,6 +101,8 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: () => void }) 
         return <CheckCircle className="w-5 h-5 text-green-600" />;
       case 'error':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case 'warning':
+      return <TriangleAlert className="w-5 h-5 text-accent-600" />;
       case 'info':
         return <Info className="w-5 h-5 text-blue-600" />;
     }
