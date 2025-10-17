@@ -1,6 +1,7 @@
 'use client'
 
 import { SessionProvider } from "next-auth/react"
+import { RecipesProvider } from "@/contexts/RecipesProvider"
 
 export function Providers({
   children,
@@ -12,7 +13,9 @@ export function Providers({
       refetchInterval={0}
       refetchOnWindowFocus={false}
     >
-      {children}
+      <RecipesProvider>
+        {children}
+      </RecipesProvider>
     </SessionProvider>
   )
 }
