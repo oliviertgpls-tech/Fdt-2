@@ -215,7 +215,7 @@ function StatCard({ icon, label, value, color }: any) {
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} text-white rounded-lg p-6`}>
+    <div className={`bg-gradient-to-br text-white rounded-lg p-6`}>
       <div className="flex items-center justify-between mb-2">
         {icon}
         <span className="text-3xl font-bold">{value}</span>
