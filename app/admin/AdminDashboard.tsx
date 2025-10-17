@@ -250,19 +250,3 @@ function StatCard({
     </div>
   );
 }
-
-📝 Commandes Git
-bashgit add app/admin/AdminDashboard.tsx
-git commit -m "fix: use static Tailwind classes for gradient colors"
-git push
-
-💡 Concept dev : Tailwind et classes dynamiques
-Pourquoi colors[color] ne marche pas ?
-Tailwind fonctionne en scannant ton code au build pour trouver les classes utilisées :
-
-✅ className="bg-blue-500" → Tailwind voit "bg-blue-500" et l'inclut
-❌ className={colors[color]} → Tailwind ne peut pas deviner la valeur à l'exécution
-
-Solution : Écrire toutes les classes en dur pour que Tailwind les voie pendant le scan.
-
-Ça devrait compiler maintenant ! 🚀RéessayerClaude peut faire des erreurs. Assurez-vous de vérifier ses réponses.
