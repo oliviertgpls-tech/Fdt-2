@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     description: 'Créez et partagez vos recettes familiales. Transformez-les en magnifiques livres de cuisine à transmettre.',
     images: [
       {
-        url: 'https://res.cloudinary.com/dkqxlm9sv/image/upload/v1758549610/famille-cuisine_zluiks.jpg', // ← CHANGE par ton URL
+        url: 'https://res.cloudinary.com/dkqxlm9sv/image/upload/v1758549610/famille-cuisine_zluiks.jpg',
         width: 1200,
         height: 630,
         alt: 'Ricipiz - Recettes familiales',
@@ -29,18 +29,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Ricipiz - Votre patrimoine culinaire',
     description: 'Transformez vos recettes familiales en livres de cuisine magnifiques',
-    images: ['https://res.cloudinary.com/dkqxlm9sv/image/upload/v1758549610/famille-cuisine_zluiks.jpg'], // ← CHANGE par ton URL
+    images: ['https://res.cloudinary.com/dkqxlm9sv/image/upload/v1758549610/famille-cuisine_zluiks.jpg'],
   },
 
-  // 📱 Mobile & PWA
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-  },
-  
   // 🎨 Thème
-  themeColor: '#ea580c', // Orange de ton site
+  themeColor: '#ea580c',
   
   // 🔍 SEO supplémentaire
   keywords: ['recettes', 'cuisine', 'famille', 'livre de recettes', 'patrimoine culinaire', 'recettes familiales'],
@@ -67,7 +60,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-white text-gray-900">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )
