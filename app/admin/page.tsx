@@ -14,18 +14,26 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [sessions, setSessions] = useState<any[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  // ✅ AJOUTÉ : Attendre que le composant soit monté côté client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Rediriger si pas connecté
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (mounted && status === 'unauthenticated') {
       router.push('/auth/signin');
     }
-  }, [status, router]);
+  }, [status, router, mounted]);
 
   // Charger les stats au montage
   useEffect(() => {
-    loadSessions();
-  }, []);
+    if (mounted && status === 'authenticated') {
+      loadSessions();
+    }
+  }, [mounted, status]);
 
   const loadSessions = async () => {
     try {
@@ -88,58 +96,68 @@ export default function AdminPage() {
     }
   };
 
-  if (status === 'loading') {
+  // ✅ AJOUTÉ : Afficher un loader tant que le composant n'est pas monté
+  if (!mounted || status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader className="w-8 h-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  // Si pas authentifié, afficher un loader (le useEffect va rediriger)
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             🔧 Administration
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm md:text-base">
             Connecté en tant que <span className="font-medium">{session?.user?.email}</span>
           </p>
         </div>
 
         {/* Stats globales */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           <StatCard
-            icon={<FileText className="w-8 h-8" />}
+            icon={<FileText className="w-6 h-6 md:w-8 md:h-8" />}
             label="Recettes"
             value={recipes.length}
             color="blue"
           />
           <StatCard
-            icon={<NotebookPen className="w-8 h-8" />}
+            icon={<NotebookPen className="w-6 h-6 md:w-8 md:h-8" />}
             label="Carnets"
             value={notebooks.length}
             color="purple"
           />
           <StatCard
-            icon={<BookOpen className="w-8 h-8" />}
+            icon={<BookOpen className="w-6 h-6 md:w-8 md:h-8" />}
             label="Livres"
             value={books.length}
             color="green"
           />
           <StatCard
-            icon={<Users className="w-8 h-8" />}
-            label="Sessions actives"
+            icon={<Users className="w-6 h-6 md:w-8 md:h-8" />}
+            label="Sessions"
             value={sessions.filter(s => !s.isExpired).length}
             color="orange"
           />
         </div>
 
         {/* Actions de maintenance */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Database className="w-5 h-5" />
             Maintenance
           </h2>
@@ -148,7 +166,7 @@ export default function AdminPage() {
             <button
               onClick={handleResetSessions}
               disabled={loading}
-              className="w-full md:w-auto px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+              className="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               <Trash2 className="w-4 h-4" />
               Réinitialiser toutes les sessions
@@ -157,14 +175,14 @@ export default function AdminPage() {
             <button
               onClick={handleCleanupUserSessions}
               disabled={loading}
-              className="w-full md:w-auto px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 flex items-center gap-2"
+              className="w-full px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               <Users className="w-4 h-4" />
               Nettoyer sessions d'un utilisateur
             </button>
 
             {message && (
-              <div className={`p-3 rounded-lg ${
+              <div className={`p-3 rounded-lg text-sm ${
                 message.includes('✅') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
               }`}>
                 {message}
@@ -174,31 +192,35 @@ export default function AdminPage() {
         </div>
 
         {/* Liste des sessions */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">
             Sessions actives ({sessions.filter(s => !s.isExpired).length})
           </h2>
 
-          <div className="space-y-2">
-            {sessions.map((session, idx) => (
-              <div
-                key={idx}
-                className={`p-3 rounded-lg border ${
-                  session.isExpired 
-                    ? 'bg-gray-50 border-gray-200 text-gray-500' 
-                    : 'bg-green-50 border-green-200 text-green-900'
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{session.userEmail}</span>
-                  <span className="text-sm">
-                    {session.isExpired ? '❌ Expirée' : '✅ Active'} - 
-                    Expire: {new Date(session.expires).toLocaleString('fr-FR')}
-                  </span>
+          {sessions.length === 0 ? (
+            <p className="text-gray-500 text-sm">Aucune session trouvée</p>
+          ) : (
+            <div className="space-y-2">
+              {sessions.map((session, idx) => (
+                <div
+                  key={idx}
+                  className={`p-3 rounded-lg border ${
+                    session.isExpired 
+                      ? 'bg-gray-50 border-gray-200 text-gray-500' 
+                      : 'bg-green-50 border-green-200 text-green-900'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <span className="font-medium text-sm">{session.userEmail}</span>
+                    <span className="text-xs sm:text-sm">
+                      {session.isExpired ? '❌ Expirée' : '✅ Active'} - 
+                      Expire: {new Date(session.expires).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -215,12 +237,12 @@ function StatCard({ icon, label, value, color }: any) {
   };
 
   return (
-    <div className={`bg-gradient-to-br text-white rounded-lg p-6`}>
+    <div className={`bg-gradient-to-br ${colors[color]} text-white rounded-lg p-4 md:p-6`}>
       <div className="flex items-center justify-between mb-2">
         {icon}
-        <span className="text-3xl font-bold">{value}</span>
+        <span className="text-2xl md:text-3xl font-bold">{value}</span>
       </div>
-      <p className="text-sm opacity-90">{label}</p>
+      <p className="text-xs md:text-sm opacity-90">{label}</p>
     </div>
   );
 }
