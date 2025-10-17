@@ -9,7 +9,12 @@ import { Loader, Database, Trash2, Users, BookOpen, NotebookPen, FileText } from
 export function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { recipes, notebooks, books } = useRecipes();
+  // Données globales (tous users) pour l'admin
+const [globalStats, setGlobalStats] = useState({
+totalRecipes: 0,
+totalNotebooks: 0,
+totalBooks: 0,
+});
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -48,11 +53,18 @@ export function AdminDashboard() {
   };
 
   const loadAdvancedStats = async () => {
+ const loadAdvancedStats = async () => {
   try {
     const res = await fetch('/api/admin/stats');
     const data = await res.json();
     if (!data.error) {
       setAdvancedStats(data);
+      // Mettre à jour aussi les stats globales
+      setGlobalStats({
+        totalRecipes: data.raw?.totalRecipes || 0,
+        totalNotebooks: data.raw?.totalNotebooks || 0,
+        totalBooks: data.raw?.totalBooks || 0,
+      });
     }
   } catch (error) {
     console.error('Erreur chargement stats avancées:', error);
@@ -139,33 +151,33 @@ export function AdminDashboard() {
           </p>
         </div>
 
-        {/* Stats globales - Données brutes */}
-<div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-  <StatCard
-    icon={<FileText className="w-6 h-6 md:w-8 md:h-8" />}
-    label="Recettes totales"
-    value={recipes.length}
-    color="blue"
-  />
-  <StatCard
-    icon={<NotebookPen className="w-6 h-6 md:w-8 md:h-8" />}
-    label="Carnets totaux"
-    value={notebooks.length}
-    color="purple"
-  />
-  <StatCard
-    icon={<BookOpen className="w-6 h-6 md:w-8 md:h-8" />}
-    label="Livres totaux"
-    value={books.length}
-    color="green"
-  />
-  <StatCard
-    icon={<Users className="w-6 h-6 md:w-8 md:h-8" />}
-    label="Sessions actives"
-    value={sessions.filter(s => !s.isExpired).length}
-    color="orange"
-  />
-</div>
+    {/* Stats globales - Données brutes */}
+    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+    <StatCard
+        icon={<FileText className="w-6 h-6 md:w-8 md:h-8" />}
+        label="Recettes totales"
+        value={globalStats.totalRecipes}
+        color="blue"
+    />
+    <StatCard
+        icon={<NotebookPen className="w-6 h-6 md:w-8 md:h-8" />}
+        label="Carnets totaux"
+        value={globalStats.totalNotebooks}
+        color="purple"
+    />
+    <StatCard
+        icon={<BookOpen className="w-6 h-6 md:w-8 md:h-8" />}
+        label="Livres totaux"
+        value={globalStats.totalBooks}
+        color="green"
+    />
+    <StatCard
+        icon={<Users className="w-6 h-6 md:w-8 md:h-8" />}
+        label="Sessions actives"
+        value={sessions.filter(s => !s.isExpired).length}
+        color="orange"
+    />
+    </div>
 
     {/* Stats avancées - Moyennes par user */}
     <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
