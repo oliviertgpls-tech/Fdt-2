@@ -219,6 +219,7 @@ export function AdminDashboard() {
   );
 }
 
+
 // Composant carte de statistique
 function StatCard({ 
   icon, 
@@ -231,15 +232,16 @@ function StatCard({
   value: number;
   color: 'blue' | 'purple' | 'green' | 'orange';
 }) {
-  const colors = {
-    blue: 'from-blue-500 to-blue-600',
-    purple: 'from-purple-500 to-purple-600',
-    green: 'from-green-500 to-green-600',
-    orange: 'from-orange-500 to-orange-600',
-  };
+  // Classes complètes en dur pour que Tailwind les détecte
+  let gradientClass = '';
+  
+  if (color === 'blue') gradientClass = 'bg-gradient-to-br from-blue-500 to-blue-600';
+  if (color === 'purple') gradientClass = 'bg-gradient-to-br from-purple-500 to-purple-600';
+  if (color === 'green') gradientClass = 'bg-gradient-to-br from-green-500 to-green-600';
+  if (color === 'orange') gradientClass = 'bg-gradient-to-br from-orange-500 to-orange-600';
 
   return (
-    <div className={`bg-gradient-to-br ${colors[color]} text-white rounded-lg p-4 md:p-6`}>
+    <div className={`${gradientClass} text-white rounded-lg p-4 md:p-6`}>
       <div className="flex items-center justify-between mb-2">
         {icon}
         <span className="text-2xl md:text-3xl font-bold">{value}</span>
@@ -248,3 +250,19 @@ function StatCard({
     </div>
   );
 }
+
+📝 Commandes Git
+bashgit add app/admin/AdminDashboard.tsx
+git commit -m "fix: use static Tailwind classes for gradient colors"
+git push
+
+💡 Concept dev : Tailwind et classes dynamiques
+Pourquoi colors[color] ne marche pas ?
+Tailwind fonctionne en scannant ton code au build pour trouver les classes utilisées :
+
+✅ className="bg-blue-500" → Tailwind voit "bg-blue-500" et l'inclut
+❌ className={colors[color]} → Tailwind ne peut pas deviner la valeur à l'exécution
+
+Solution : Écrire toutes les classes en dur pour que Tailwind les voie pendant le scan.
+
+Ça devrait compiler maintenant ! 🚀RéessayerClaude peut faire des erreurs. Assurez-vous de vérifier ses réponses.
