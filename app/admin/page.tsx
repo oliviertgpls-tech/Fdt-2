@@ -228,7 +228,17 @@ export default function AdminPage() {
 }
 
 // Composant carte de statistique
-function StatCard({ icon, label, value, color }: any) {
+function StatCard({ 
+  icon, 
+  label, 
+  value, 
+  color 
+}: { 
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  color: 'blue' | 'purple' | 'green' | 'orange';
+}) {
   const colors = {
     blue: 'from-blue-500 to-blue-600',
     purple: 'from-purple-500 to-purple-600',
