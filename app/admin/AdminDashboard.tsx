@@ -3,42 +3,35 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useRecipes } from '@/contexts/RecipesProvider';
 import { Loader, Database, Trash2, Users, BookOpen, NotebookPen, FileText } from 'lucide-react';
 
 export function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
   // Données globales (tous users) pour l'admin
-const [globalStats, setGlobalStats] = useState({
-totalRecipes: 0,
-totalNotebooks: 0,
-totalBooks: 0,
-});
+  const [globalStats, setGlobalStats] = useState({
+    totalRecipes: 0,
+    totalNotebooks: 0,
+    totalBooks: 0,
+  });
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [sessions, setSessions] = useState<any[]>([]);
 
   const [advancedStats, setAdvancedStats] = useState({
-  totalUsers: 0,
-  avgRecipesPerUser: 0,
-  avgNotebooksPerUser: 0,
-  avgBooksPerUser: 0,
-});
+    totalUsers: 0,
+    avgRecipesPerUser: 0,
+    avgNotebooksPerUser: 0,
+    avgBooksPerUser: 0,
+  });
 
-  // Rediriger si pas connecté
-    useEffect(() => {
-    if (status === 'authenticated') {
-        loadSessions();
-        loadAdvancedStats();
-    }
-    }, [status]);
-
-  // Charger les stats au montage
+  // Charger les données au montage
   useEffect(() => {
     if (status === 'authenticated') {
       loadSessions();
+      loadAdvancedStats();
     }
   }, [status]);
 
@@ -53,23 +46,22 @@ totalBooks: 0,
   };
 
   const loadAdvancedStats = async () => {
- const loadAdvancedStats = async () => {
-  try {
-    const res = await fetch('/api/admin/stats');
-    const data = await res.json();
-    if (!data.error) {
-      setAdvancedStats(data);
-      // Mettre à jour aussi les stats globales
-      setGlobalStats({
-        totalRecipes: data.raw?.totalRecipes || 0,
-        totalNotebooks: data.raw?.totalNotebooks || 0,
-        totalBooks: data.raw?.totalBooks || 0,
-      });
+    try {
+      const res = await fetch('/api/admin/stats');
+      const data = await res.json();
+      if (!data.error) {
+        setAdvancedStats(data);
+        // Mettre à jour aussi les stats globales
+        setGlobalStats({
+          totalRecipes: data.raw?.totalRecipes || 0,
+          totalNotebooks: data.raw?.totalNotebooks || 0,
+          totalBooks: data.raw?.totalBooks || 0,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur chargement stats avancées:', error);
     }
-  } catch (error) {
-    console.error('Erreur chargement stats avancées:', error);
-  }
-};
+  };
 
   const handleResetSessions = async () => {
     if (!confirm('⚠️ Supprimer TOUTES les sessions actives ? (déconnexion générale)')) return;
@@ -151,79 +143,79 @@ totalBooks: 0,
           </p>
         </div>
 
-    {/* Stats globales - Données brutes */}
-    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-    <StatCard
-        icon={<FileText className="w-6 h-6 md:w-8 md:h-8" />}
-        label="Recettes totales"
-        value={globalStats.totalRecipes}
-        color="blue"
-    />
-    <StatCard
-        icon={<NotebookPen className="w-6 h-6 md:w-8 md:h-8" />}
-        label="Carnets totaux"
-        value={globalStats.totalNotebooks}
-        color="purple"
-    />
-    <StatCard
-        icon={<BookOpen className="w-6 h-6 md:w-8 md:h-8" />}
-        label="Livres totaux"
-        value={globalStats.totalBooks}
-        color="green"
-    />
-    <StatCard
-        icon={<Users className="w-6 h-6 md:w-8 md:h-8" />}
-        label="Sessions actives"
-        value={sessions.filter(s => !s.isExpired).length}
-        color="orange"
-    />
-    </div>
-
-    {/* Stats avancées - Moyennes par user */}
-    <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
-    <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-        📊 Statistiques utilisateurs
-        <span className="text-sm font-normal text-gray-500">(hors compte test)</span>
-    </h2>
-    
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
-        <div className="text-3xl font-bold text-indigo-900 mb-1">
-            {advancedStats.totalUsers}
-        </div>
-        <div className="text-sm text-indigo-700">
-            Utilisateurs uniques
-        </div>
+        {/* Stats globales - Données brutes */}
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          <StatCard
+            icon={<FileText className="w-6 h-6 md:w-8 md:h-8" />}
+            label="Recettes totales"
+            value={globalStats.totalRecipes}
+            color="blue"
+          />
+          <StatCard
+            icon={<NotebookPen className="w-6 h-6 md:w-8 md:h-8" />}
+            label="Carnets totaux"
+            value={globalStats.totalNotebooks}
+            color="purple"
+          />
+          <StatCard
+            icon={<BookOpen className="w-6 h-6 md:w-8 md:h-8" />}
+            label="Livres totaux"
+            value={globalStats.totalBooks}
+            color="green"
+          />
+          <StatCard
+            icon={<Users className="w-6 h-6 md:w-8 md:h-8" />}
+            label="Sessions actives"
+            value={sessions.filter(s => !s.isExpired).length}
+            color="orange"
+          />
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-        <div className="text-3xl font-bold text-blue-900 mb-1">
-            {advancedStats.avgRecipesPerUser}
-        </div>
-        <div className="text-sm text-blue-700">
-            Recettes moy. / user
-        </div>
-        </div>
+        {/* Stats avancées - Moyennes par user */}
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
+          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            📊 Statistiques utilisateurs
+            <span className="text-sm font-normal text-gray-500">(hors compte test)</span>
+          </h2>
+          
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
+              <div className="text-3xl font-bold text-indigo-900 mb-1">
+                {advancedStats.totalUsers}
+              </div>
+              <div className="text-sm text-indigo-700">
+                Utilisateurs uniques
+              </div>
+            </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-        <div className="text-3xl font-bold text-purple-900 mb-1">
-            {advancedStats.avgNotebooksPerUser}
-        </div>
-        <div className="text-sm text-purple-700">
-            Carnets moy. / user
-        </div>
-        </div>
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+              <div className="text-3xl font-bold text-blue-900 mb-1">
+                {advancedStats.avgRecipesPerUser}
+              </div>
+              <div className="text-sm text-blue-700">
+                Recettes moy. / user
+              </div>
+            </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-        <div className="text-3xl font-bold text-green-900 mb-1">
-            {advancedStats.avgBooksPerUser}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+              <div className="text-3xl font-bold text-purple-900 mb-1">
+                {advancedStats.avgNotebooksPerUser}
+              </div>
+              <div className="text-sm text-purple-700">
+                Carnets moy. / user
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+              <div className="text-3xl font-bold text-green-900 mb-1">
+                {advancedStats.avgBooksPerUser}
+              </div>
+              <div className="text-sm text-green-700">
+                Livres moy. / user
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="text-sm text-green-700">
-            Livres moy. / user
-        </div>
-        </div>
-    </div>
-    </div>
 
         {/* Actions de maintenance */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 md:p-6">
@@ -297,7 +289,6 @@ totalBooks: 0,
   );
 }
 
-
 // Composant carte de statistique
 function StatCard({ 
   icon, 
@@ -310,7 +301,6 @@ function StatCard({
   value: number;
   color: 'blue' | 'purple' | 'green' | 'orange';
 }) {
-  // Classes complètes en dur pour que Tailwind les détecte
   let gradientClass = '';
   
   if (color === 'blue') gradientClass = 'bg-gradient-to-br from-blue-500 to-blue-600';
