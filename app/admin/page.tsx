@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { Loader, Database, Trash2, Users, BookOpen, NotebookPen, FileText } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
