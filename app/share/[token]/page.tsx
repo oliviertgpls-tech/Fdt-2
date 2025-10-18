@@ -64,9 +64,10 @@ export default async function SharedRecipePage({
         {recipe.imageUrl && (
           <div className="mb-6 rounded-xl overflow-hidden">
             <OptimizedImage 
-              src={recipe.imageUrl}
-              alt={recipe.title}
-              className="w-full aspect-[4/3] object-cover"
+                size="large"
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className="w-full aspect-[4/3] object-cover"
             />
           </div>
         )}
