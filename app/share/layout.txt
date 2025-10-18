@@ -1,0 +1,14 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Recette partagée - RiCiPiZ',
+  description: 'Découvrez cette délicieuse recette familiale',
+}
+
+export default function ShareLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return <>{children}</>
+}
