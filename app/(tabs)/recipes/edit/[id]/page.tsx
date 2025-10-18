@@ -361,20 +361,20 @@ export default function EditRecipePage() {
           <div className="inlne-flex items-center">
             <label className="text-sm font-semibold text-gray-700 mb-2">
               
-              <Carrot className="h-4"/>Ingrédients
+              <Carrot className="h-4 w-4"/>
+              <span>Ingrédients</span>
             </label>
             <textarea
               rows={6}
               value={ingredients}
               onChange={(e) => setIngredients(e.target.value)}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none resize-none"
-              placeholder="Tapez chaque ingrédient sur une nouvelle ligne :
-
-200g de farine
-3 œufs
-100ml de lait
-1 pincée de sel"
-            />
+              placeholder="Tapez chaque ingrédient sur une ligne :
+                200g de farine
+                3 œufs
+                100ml de lait
+                1 pincée de sel"
+                />
             <p className="text-xs text-gray-500 mt-1">
               Un ingrédient par ligne, c'est tout !
             </p>
@@ -383,7 +383,8 @@ export default function EditRecipePage() {
           {/* 🆕 TAGS INTERACTIFS */}
 <div>
   <label className="block text-sm font-semibold text-gray-700 mb-2">
-    <Tag /> Tags
+    <Tag /> 
+    <span>Tags</span>
   </label>
   
   {/* Conteneur des tags + input */}
@@ -427,7 +428,7 @@ export default function EditRecipePage() {
           {/* Étapes - SIMPLE textarea */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <Edit3 Instructions
+              <Edit3 Instructions />
             </label>
             <textarea
               rows={8}

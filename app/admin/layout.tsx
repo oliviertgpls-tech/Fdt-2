@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;npm run devicePixelRatio
+export const revalidate = 0;
 
 export default function AdminLayout({
   children,
