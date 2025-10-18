@@ -39,8 +39,8 @@ RÈGLES DE DÉDUPLICATION STRICTES :
 2. Élimine les mentions partielles dans les instructions
    Exemple : "sel" + "sel et poivre" → garde "sel et poivre"
 
-3. Si un ingrédient est une sous-partie d'un autre, garde le plus complet
-   Exemple : "coriandre" + "une botte de coriandre fraîche" → garde "une botte de coriandre fraîche"
+3. Si un ingrédient est une sous-partie d'un autre, garde un seul ingrédient qui te parait le plus pertinent 
+   Exemple : "coriandre" + "une botte de coriandre fraîche" → garde "1 Botte de coriandre fraîche"
 
 4. Les versions avec quantités sont TOUJOURS prioritaires
    Exemple : "sucre" + "100g de sucre" → garde "100g de sucre"

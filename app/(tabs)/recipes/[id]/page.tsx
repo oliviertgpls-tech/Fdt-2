@@ -6,6 +6,7 @@ import { useRecipes } from "@/contexts/RecipesProvider";
 import { OptimizedImage } from "@/components/OptimizedImage"; // 🆕 IMPORT
 import { Plus, Eye, Trash2, ArrowLeft, Edit3, Clock4, Utensils, Share, Check} from 'lucide-react';
 import Link from "next/link";
+import { useToast } from '@/components/Toast';
 
 
 export default function RecipeDetailPage() {
@@ -13,6 +14,8 @@ export default function RecipeDetailPage() {
   const router = useRouter();
   const { recipes, deleteRecipe, books, addRecipeToBook } = useRecipes();
   const recipe = recipes.find((r) => r.id === id);
+  const [isSharing, setIsSharing] = useState(false);
+  const { showToast } = useToast();
 
   // État pour gérer l'étape courante
   const [currentStep, setCurrentStep] = useState(0);
@@ -159,6 +162,33 @@ export default function RecipeDetailPage() {
         </div>
       </div>
     );
+  };
+
+  // Fonction pour générer et copier le lien de partage
+  const handleShare = async () => {
+    setIsSharing(true);
+    
+    try {
+      const response = await fetch(`/api/recipes/${id}/share`, {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création du lien');
+      }
+      
+      const data = await response.json();
+      
+      // Copier le lien dans le presse-papier
+      await navigator.clipboard.writeText(data.url);
+      
+      showToast('Lien copié dans le presse-papier !', 'success');
+    } catch (error) {
+      console.error('Erreur partage:', error);
+      showToast('Erreur lors de la création du lien de partage', 'error');
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   return (
@@ -416,13 +446,18 @@ export default function RecipeDetailPage() {
               <Trash2 className="w-4 h-4 mr-2"/> Supprimer
                </div>
             </button>
-             <button className="bg-transparent over:bg-blue-100">
-               <div className="inline-flex items-center gap-2  mr-3 over:bg-blue-100">
-               
-                <Share className="w-4 h-4 ml-4 text-blue-700 ml-2 mb-1 over:text-blue-800"/> <span className="text-sm text-blue-800"
-                >Partager</span>
-                  </div>
-                </button>
+              <button 
+                onClick={handleShare}
+                disabled={isSharing}
+                className="bg-transparent hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                <div className="inline-flex items-center gap-2 mr-3">
+                  <Share className="w-4 h-4 ml-4 text-blue-700 ml-2 mb-1 hover:text-blue-800" />
+                  <span className="text-sm text-blue-800">
+                    {isSharing ? 'Génération...' : 'Partager'}
+                  </span>
+                </div>
+              </button>
             <Link
               href={`/recipes/edit/${recipe.id}`}
               className="inline-flex bg-accent-300 text-accent-800 items-center px-4 py-2 text-base rounded-lg hover:bg-accent-400 transition-colors font-medium text-center"

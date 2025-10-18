@@ -29,6 +29,7 @@ model Recipe {
   // Relations
   notebookRecipes NotebookRecipe[]
   bookRecipes     BookRecipe[]
+  sharedRecipes   SharedRecipe[] 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -126,6 +127,7 @@ model User {
   recipes       Recipe[]
   notebooks     Notebook[]
   books         Book[]
+  sharedRecipes SharedRecipe[]
 }
 
 model VerificationToken {
@@ -134,4 +136,20 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// 🔗 Partage de recettes
+model SharedRecipe {
+  id         String   @id @default(cuid())
+  token      String   @unique  // Token public aléatoire
+  recipeId   String
+  ownerId    String   // User qui partage
+  viewCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  
+  // Relations
+  recipe     Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  owner      User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  @@index([token])
 }

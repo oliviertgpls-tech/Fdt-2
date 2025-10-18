@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useRecipes } from "@/contexts/RecipesProvider";
 import { ImageSearch } from "@/components/ImageSearch";
 import type { Recipe } from "@/lib/types";
-import { Plus, Eye, Trash2, Edit3, Clock4, Utensils, Save, Carrot} from 'lucide-react';
+import { Plus, Eye, Trash2, Edit3, Clock4, Utensils, Save, Tag, Carrot} from 'lucide-react';
 import { useToast } from '@/components/Toast';
 
 export default function EditRecipePage() {
@@ -353,7 +353,7 @@ export default function EditRecipePage() {
             </div>
             
             <p className="text-xs text-gray-500 mt-2">
-              💡 Prenez une photo, cherchez sur Unsplash ou collez un lien !
+              Prenez une photo, cherchez sur Unsplash ou collez un lien !
             </p>
           </div>
 
@@ -376,14 +376,14 @@ export default function EditRecipePage() {
 1 pincée de sel"
             />
             <p className="text-xs text-gray-500 mt-1">
-              💡 Un ingrédient par ligne, c'est tout !
+              Un ingrédient par ligne, c'est tout !
             </p>
           </div>
 
           {/* 🆕 TAGS INTERACTIFS */}
 <div>
   <label className="block text-sm font-semibold text-gray-700 mb-2">
-    🏷️ Tags
+    <Tag /> Tags
   </label>
   
   {/* Conteneur des tags + input */}
@@ -427,7 +427,7 @@ export default function EditRecipePage() {
           {/* Étapes - SIMPLE textarea */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              📋 Instructions
+              <Edit3 Instructions
             </label>
             <textarea
               rows={8}
