@@ -191,7 +191,6 @@ export default function EditRecipePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
             <div className="text-center space-y-4">
-              <div className="text-3xl">✍️</div>
               <h3 className="text-lg font-semibold text-gray-800">
                 Saisie des étapes
               </h3>
@@ -378,18 +377,19 @@ export default function EditRecipePage() {
             <p className="text-xs text-gray-500 mt-1">
               Un ingrédient par ligne, c'est tout !
             </p>
-          </div>
+        </div>
+    </div>
 
-          {/* 🆕 TAGS INTERACTIFS */}
-<div>
-  <label className="block text-sm font-semibold text-gray-700 mb-2">
-    <Tag /> 
-    <span>Tags</span>
-  </label>
-  
+  {/* 🆕 TAGS INTERACTIFS */}
+    <div>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <Tag /> 
+        <span>Tags</span>
+      </label>
+      
   {/* Conteneur des tags + input */}
-  <div className="w-full rounded-lg border border-gray-300 px-3 py-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 min-h-[48px] flex flex-wrap gap-2 items-center">
-    
+      <div className="w-full rounded-lg border border-gray-300 px-3 py-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 min-h-[48px] flex flex-wrap gap-2 items-center">
+        
     {/* Tags existants */}
     {tags.map((tag) => (
       <span
