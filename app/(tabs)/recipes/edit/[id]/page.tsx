@@ -428,7 +428,8 @@ export default function EditRecipePage() {
           {/* Étapes - SIMPLE textarea */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              <Edit3 Instructions />
+              <Edit3 className="w-4 h-4/>
+              <span> Instructions</span>
             </label>
             <textarea
               rows={8}
