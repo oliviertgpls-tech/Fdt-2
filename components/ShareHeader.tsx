@@ -12,7 +12,6 @@ export function ShareHeader({ ownerName }: ShareHeaderProps) {
         {/* Logo + baseline */}
         <div>
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <ChefHat className="w-8 h-8 text-orange-500" />
             <span className="font-bold text-xl">RiCiPiZ</span>
           </Link>
           {ownerName && (

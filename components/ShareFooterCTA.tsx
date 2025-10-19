@@ -9,21 +9,9 @@ export function ShareFooterCTA() {
       </h3>
       
       <p className="text-gray-600 mb-6 max-w-lg mx-auto">
-        Créez votre compte pour sauvegarder vos recettes familiales, 
+        Créez votre compte RiCiPiZ pour sauvegarder vos recettes familiales, 
         organiser vos carnets et imprimer vos livres personnalisés
       </p>
-
-      {/* Bénéfices visuels */}
-      <div className="flex items-center justify-center gap-8 mb-6 text-sm text-gray-700">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-orange-500" />
-          <span>Carnets illimités</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Printer className="w-5 h-5 text-orange-500" />
-          <span>Impression PDF</span>
-        </div>
-      </div>
 
       <Link
         href="/auth/signin"
