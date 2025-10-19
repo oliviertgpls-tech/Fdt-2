@@ -2,43 +2,45 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ShareHeader } from '@/components/ShareHeader'
 import { ShareFooterCTA } from '@/components/ShareFooterCTA'
-import { OptimizedImage } from '@/components/OptimizedImage'
 import { Clock4, Utensils } from 'lucide-react'
-import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-  }
-}
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 async function getSharedRecipe(token: string) {
-  const sharedRecipe = await prisma.sharedRecipe.findUnique({
-    where: { token },
-    include: {
-      recipe: true,
-      owner: {
-        select: {
-          name: true,
-          email: true
+  try {
+    const sharedRecipe = await prisma.sharedRecipe.findUnique({
+      where: { token },
+      include: {
+        recipe: true,
+        owner: {
+          select: {
+            name: true,
+            email: true
+          }
         }
       }
+    })
+
+    if (!sharedRecipe) return null
+
+    // Incrémenter le compteur
+    await prisma.sharedRecipe.update({
+      where: { token },
+      data: { viewCount: { increment: 1 } }
+    })
+
+    const ownerName = sharedRecipe.owner.name || 
+                     sharedRecipe.owner.email?.split('@')[0] || 
+                     'Votre ami'
+
+    return {
+      recipe: sharedRecipe.recipe,
+      ownerName
     }
-  })
-
-  if (!sharedRecipe) return null
-
-  // Incrémenter le compteur de vues
-  await prisma.sharedRecipe.update({
-    where: { token },
-    data: { viewCount: { increment: 1 } }
-  })
-
-  return {
-    recipe: sharedRecipe.recipe,
-    ownerName: sharedRecipe.owner.name || sharedRecipe.owner.email?.split('@')[0] || 'Votre ami'
+  } catch (error) {
+    console.error('Erreur getSharedRecipe:', error)
+    throw error
   }
 }
 
@@ -60,14 +62,14 @@ export default async function SharedRecipePage({
       <ShareHeader ownerName={ownerName} />
       
       <main className="max-w-4xl mx-auto px-6 py-8">
-        {/* Image de la recette */}
+        {/* Image */}
         {recipe.imageUrl && (
           <div className="mb-6 rounded-xl overflow-hidden">
-            <OptimizedImage 
-                size="large"
-                src={recipe.imageUrl}
-                alt={recipe.title}
-                className="w-full aspect-[4/3] object-cover"
+            <img 
+              src={recipe.imageUrl}
+              alt={recipe.title}
+              className="w-full aspect-[4/3] object-cover"
+              loading="lazy"
             />
           </div>
         )}
