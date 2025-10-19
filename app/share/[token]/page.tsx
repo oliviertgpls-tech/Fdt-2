@@ -137,9 +137,9 @@ export default async function SharedRecipePage({
             {recipe.tags.map((tag, index) => (
               <span 
                 key={index}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                className="px-3 py-1 bg-secondary-100 text-secondary-600 rounded-full text-sm"
               >
-                {tag}
+                #{tag}
               </span>
             ))}
           </div>
