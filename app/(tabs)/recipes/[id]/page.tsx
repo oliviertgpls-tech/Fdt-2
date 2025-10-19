@@ -452,7 +452,7 @@ export default function RecipeDetailPage() {
                 className="bg-transparent hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <div className="inline-flex px-2 py-2 hover:bg-blue-100 items-center gap-2 mr-3">
-                  <Share className="w-4 h-4 ml-4 text-blue-700 ml-2 mb-1 hover:text-blue-800" />
+                  <Share className="w-4 h-4 ml-4 text-blue-700 ml-2 mb-1 hover:rounded-lg hover:text-blue-800" />
                   <span className="text-sm text-blue-800">
                     {isSharing ? 'Génération...' : 'Partager'}
                   </span>
