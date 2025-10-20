@@ -875,7 +875,7 @@ for (const ingredient of ingredients) {
       console.log('✅ PDF généré!', (pdfBytes.length / 1024).toFixed(0), 'KB');
       
       // Créer un blob et télécharger
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes.buffer], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
@@ -929,7 +929,7 @@ const generateCoverPDF = async () => {
     
     console.log('✅ Couverture générée!', (pdfBytes.length / 1024).toFixed(0), 'KB');
     
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blob = new Blob([pdfBytes.buffer], { type: 'application/pdf' }); // ✅ .buffer
     const url = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
