@@ -744,8 +744,7 @@ const handlePhotoUpload = async (file: File) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 px-4 md:px-0">
           
-          
-          {/* Mode 2 : Photo d'un plat */}
+            {/* Mode 2 : Photo d'un plat */}
           <div 
             onClick={() => setMode('photo')}
             className="group bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-orange-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
@@ -804,7 +803,7 @@ const handlePhotoUpload = async (file: File) => {
           <div 
             onClick={() => setMode('manual')}
             className="self-center max-w-md bg-white rounded-2xl border-2 border-gray-200 p-5 md:p-6 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer"
-          >
+            >
             <div className="text-center space-y-3 md:space-y-4">
                   <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto hover:bg-blue-200 transition-colors">
                     <Keyboard className="w-9 h-9 text-blue-500" />
@@ -825,7 +824,6 @@ const handlePhotoUpload = async (file: File) => {
               </div>
             </div>
           </div>
-        
        </div>
       </div>
     );

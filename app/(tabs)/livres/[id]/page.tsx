@@ -834,6 +834,121 @@ for (const ingredient of ingredients) {
     }
   };
 
+  // ============================================
+  // 🖨️ GÉNÉRATION PDF PRINT-READY (LULU)
+  // ============================================
+  const generatePrintPDF = async () => {
+    console.log('🖨️ generatePrintPDF appelée !');
+    if (!book) return;
+
+    if (bookRecipes.length === 0) {
+      showToast('❌ Ajoutez au moins une recette avant de générer le PDF print', 'error');
+      return;
+    }
+
+    setIsGeneratingPreview(true); // On réutilise le même state pour le spinner
+    
+    try {
+      console.log('📚 Livre:', book.title);
+      console.log('📖 Recettes:', bookRecipes.length);
+      
+      // Import dynamique de la fonction de génération
+      const { generateInteriorPDF } = await import('@/lib/pdf/interior-print');
+      
+      // Générer le PDF
+      const pdfBytes = await generateInteriorPDF({
+        bookTitle: book.title,
+        recipes: bookRecipes.map(r => ({
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          prepMinutes: r.prepMinutes,
+          servings: r.servings,
+          ingredients: r.ingredients || [],
+          steps: r.steps || '',
+          imageUrl: r.imageUrl,
+          imageVersions: r.imageVersions
+        })),
+        description: book.description
+      });
+      
+      console.log('✅ PDF généré!', (pdfBytes.length / 1024).toFixed(0), 'KB');
+      
+      // Créer un blob et télécharger
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${book.title}-INTERIOR-PRINT.pdf`;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      
+      showToast('✅ PDF print généré et téléchargé !', 'success');
+      
+    } catch (error: any) {
+      console.error('💥 Erreur génération PDF print:', error);
+      showToast(`❌ Erreur: ${error.message}`, 'error');
+    } finally {
+      setIsGeneratingPreview(false);
+    }
+  };
+
+
+  // ============================================
+// 📕 GÉNÉRATION COUVERTURE PRINT-READY (LULU)
+// ============================================
+const generateCoverPDF = async () => {
+  console.log('📕 generateCoverPDF appelée !');
+  if (!book) return;
+
+  if (bookRecipes.length === 0) {
+    showToast('❌ Ajoutez au moins une recette avant de générer la couverture', 'error');
+    return;
+  }
+
+  setIsGeneratingPreview(true);
+  
+  try {
+    // Calculer le nombre de pages intérieures
+    // (à ajuster selon ta logique exacte)
+    const interiorPageCount = 4 + bookRecipes.length; // Approximation simple
+    
+    const { generateCoverPDF } = await import('@/lib/pdf/cover-print');
+    
+    const pdfBytes = await generateCoverPDF({
+      bookTitle: book.title,
+      author: book.author,
+      description: book.description,
+      recipeCount: bookRecipes.length,
+      interiorPageCount: interiorPageCount,
+      coverImageUrl: book.coverImageUrl,
+      coverImageVersions: book.coverImageVersions
+    });
+    
+    console.log('✅ Couverture générée!', (pdfBytes.length / 1024).toFixed(0), 'KB');
+    
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${book.title}-COVER-PRINT.pdf`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    
+    showToast('✅ Couverture générée et téléchargée !', 'success');
+    
+  } catch (error: any) {
+    console.error('💥 Erreur génération couverture:', error);
+    showToast(`❌ Erreur: ${error.message}`, 'error');
+  } finally {
+    setIsGeneratingPreview(false);
+  }
+};
+
   // Fermer la modale PDF
   const closePDFModal = () => {
     setShowPDFModal(false);
@@ -1337,33 +1452,78 @@ const handleDragEnd = async (event: DragEndEvent) => {
       </div>
 
 <div className="mb-4 border-gray-500">
-      <div className="items-center justify-center m-4 mb-4 flex items-center">
-            <button
-              onClick={handleDeleteBook}
-              className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200"
-            >
-              <Trash2 className="w-4 h-6 mr-2" />
-              Supprimer
-            </button>
-            <button
-              onClick={generatePreviewPDF}
-              disabled={isGeneratingPreview}
-              className="bg-secondary-600 text-white text-sm mx-3 px-4 py-2 rounded-lg hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-            >
-              {isGeneratingPreview ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Génération...
-                </>
-              ) : (
-                <>
-                  <Eye className="w-4 h-4" />
-                  Aperçu du livre
-                </>
-              )}
-            </button>
-          </div>
-          </div>
+  <div className="items-center justify-center m-4 mb-4 flex flex-wrap items-center gap-3">
+    
+    {/* Bouton Supprimer */}
+    <button
+      onClick={handleDeleteBook}
+      className="inline-flex items-center text-sm text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 transition-colors"
+    >
+      <Trash2 className="w-4 h-6 mr-2" />
+      Supprimer
+    </button>
+    
+    {/* Bouton Aperçu (actuel) */}
+    <button
+      onClick={generatePreviewPDF}
+      disabled={isGeneratingPreview}
+      className="bg-secondary-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+    >
+      {isGeneratingPreview ? (
+        <>
+          <Loader className="w-4 h-4 animate-spin" />
+          Génération...
+        </>
+      ) : (
+        <>
+          <Eye className="w-4 h-4" />
+          Aperçu
+        </>
+      )}
+    </button>
+
+    {/* 🆕 NOUVEAU BOUTON : PDF Print */}
+    <button
+      onClick={generatePrintPDF}
+      disabled={isGeneratingPreview || bookRecipes.length === 0}
+      className="bg-green-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+      title={bookRecipes.length === 0 ? "Ajoutez d'abord des recettes" : "Générer le PDF pour impression Lulu"}
+    >
+      {isGeneratingPreview ? (
+        <>
+          <Loader className="w-4 h-4 animate-spin" />
+          Génération...
+        </>
+      ) : (
+        <>
+          <Download className="w-4 h-4" />
+          PDF Print
+        </>
+      )}
+    </button>
+
+ {/* Bouton Couverture Print */}
+<button
+  onClick={generateCoverPDF}
+  disabled={isGeneratingPreview || bookRecipes.length === 0}
+  className="bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+  title="Générer la couverture pour impression Lulu"
+>
+  {isGeneratingPreview ? (
+    <>
+      <Loader className="w-4 h-4 animate-spin" />
+      Génération...
+    </>
+  ) : (
+    <>
+      <Download className="w-4 h-4" />
+      PDF Couverture
+    </>
+  )}
+</button>
+
+  </div>
+</div>
 
       {/* Modale PDF plein écran */}
         {showPDFModal && pdfUrl && (
