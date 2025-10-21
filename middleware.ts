@@ -10,7 +10,8 @@ export function middleware(request: NextRequest) {
     path.startsWith('/auth/') ||
     path.startsWith('/api/auth/') ||
     path.startsWith('/api/admin/') ||
-    path.startsWith('/api/force-git s') ||
+    path.startsWith('/api/lulu/test-print-job') ||
+    path.startsWith('/api/force-gits') ||
     path.startsWith('/_next/') ||
     path === '/favicon.ico'
   

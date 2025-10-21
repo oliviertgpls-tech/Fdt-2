@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader, GripVertical } from 'lucide-react';
+import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader, GripVertical, Upload } from 'lucide-react';
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { ImageSearch } from '@/components/ImageSearch';
@@ -949,6 +949,66 @@ const generateCoverPDF = async () => {
   }
 };
 
+// TEST UPLOAD VERS LULU
+const testUploadToLulu = async () => {
+  console.log('🧪 testUploadToLulu appelée !');
+  if (!book) return;
+
+  if (bookRecipes.length === 0) {
+    showToast('❌ Ajoutez au moins une recette', 'error');
+    return;
+  }
+
+  setIsGeneratingPreview(true);
+  
+  try {
+    showToast('📄 Génération des PDFs...', 'info');
+
+    // 1. Générer le PDF intérieur
+    const { generateInteriorPDF } = await import('@/lib/pdf/interior-print');
+    const interiorPdfBytes = await generateInteriorPDF({
+      bookTitle: book.title,
+      recipes: bookRecipes,
+      description: book.description
+    });
+
+    console.log('✅ PDF intérieur généré');
+    showToast('📤 Upload PDF', 'info');
+
+    // 2. Convertir en base64
+    const interiorBase64 = Buffer.from(interiorPdfBytes).toString('base64');
+
+    // 3. Upload sur Cloudinary
+    const uploadResponse = await fetch('/api/lulu/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pdfBase64: interiorBase64,
+        filename: `${book.title}-interior.pdf`
+      })
+    });
+
+    if (!uploadResponse.ok) {
+      const error = await uploadResponse.json();
+      throw new Error(error.error || 'Erreur upload');
+    }
+
+   const uploadResult = await uploadResponse.json();
+    console.log('✅ PDF uploadé:', uploadResult.fileUrl);
+
+    showToast(`✅ Upload réussi ! Prêt pour impression Lulu`, 'success');
+
+    console.log('📋 URL du PDF:', uploadResult.fileUrl);
+    console.log('🎯 Tu peux maintenant créer un print job avec cette URL');
+
+  } catch (error: any) {
+    console.error('💥 Erreur test:', error);
+    showToast(`❌ Erreur: ${error.message}`, 'error');
+  } finally {
+    setIsGeneratingPreview(false);
+  }
+};
+
   // Fermer la modale PDF
   const closePDFModal = () => {
     setShowPDFModal(false);
@@ -1501,6 +1561,46 @@ const handleDragEnd = async (event: DragEndEvent) => {
         </>
       )}
     </button>
+
+    {/* 🧪 BOUTON TEST UPLOAD LULU */}
+<button
+  onClick={testUploadToLulu}
+  disabled={isGeneratingPreview || bookRecipes.length === 0}
+  className="bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+  title="Tester l'upload vers Lulu (sandbox)"
+>
+  {isGeneratingPreview ? (
+    <>
+      <Loader className="w-4 h-4 animate-spin" />
+      Test...
+    </>
+  ) : (
+    <>
+      <Upload className="w-4 h-4" />
+      Test Lulu
+    </>
+  )}
+</button>
+
+{/* 🧪 BOUTON TEST UPLOAD LULU */}
+<button
+  onClick={testUploadToLulu}
+  disabled={isGeneratingPreview || bookRecipes.length === 0}
+  className="bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+  title="Tester l'upload vers Lulu (sandbox)"
+>
+  {isGeneratingPreview ? (
+    <>
+      <Loader className="w-4 h-4 animate-spin" />
+      Test...
+    </>
+  ) : (
+    <>
+      <Upload className="w-4 h-4" />
+      Test Lulu
+    </>
+  )}
+</button>
 
  {/* Bouton Couverture Print */}
 <button
