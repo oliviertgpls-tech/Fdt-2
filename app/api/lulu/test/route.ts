@@ -6,9 +6,8 @@ export async function GET() {
     const result = await luluClient.ping();
     
     return NextResponse.json({
-      success: true,
       message: '✅ Connexion Lulu OK',
-      ...result
+      data: result
     });
   } catch (error: any) {
     console.error('❌ Erreur test Lulu:', error);
