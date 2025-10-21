@@ -1,13 +1,13 @@
 /**
  * 📄 Génération du PDF INTÉRIEUR pour impression Lulu
- * 
+ *
  * Ce fichier génère UNIQUEMENT les pages intérieures (pas la couverture).
- * Format : 6" × 9" avec bleed de 3mm
+ * Format : 8.5" × 11" (US Letter) avec bleed de 3mm
  * Polices : Incorporées (embedded) - requis par Lulu
  */
 
 import { PDFDocument, rgb, PDFPage } from 'pdf-lib';
-import { mm, LULU_6x9 } from './units';
+import { mm, LULU_8_5x11 } from './units';
 import { loadDefaultFonts, FontSet } from './fonts';
 
 // ============================================
@@ -213,16 +213,16 @@ async function drawImage(
  */
 function createPage(pdfDoc: PDFDocument): PDFPage {
   const page = pdfDoc.addPage([
-    LULU_6x9.widthWithBleed,  // 158.4mm avec bleed
-    LULU_6x9.heightWithBleed  // 234.6mm avec bleed
+    LULU_8_5x11.widthWithBleed,  // 158.4mm avec bleed
+    LULU_8_5x11.heightWithBleed  // 234.6mm avec bleed
   ]);
   
   // Fond de page
   page.drawRectangle({
     x: 0,
     y: 0,
-    width: LULU_6x9.widthWithBleed,
-    height: LULU_6x9.heightWithBleed,
+    width: LULU_8_5x11.widthWithBleed,
+    height: LULU_8_5x11.heightWithBleed,
     color: COLORS.background
   });
   
@@ -239,8 +239,8 @@ function generateGuardPage(pdfDoc: PDFDocument) {
   page.drawRectangle({
     x: 0,
     y: 0,
-    width: LULU_6x9.widthWithBleed,
-    height: LULU_6x9.heightWithBleed,
+    width: LULU_8_5x11.widthWithBleed,
+    height: LULU_8_5x11.heightWithBleed,
     color: COLORS.paper
   });
 }
@@ -256,22 +256,22 @@ async function generateSummaryWithPageNumbers(
 ) {
   // Insérer le sommaire en page 2 (index 1)
   const page = pdfDoc.insertPage(1, [
-    LULU_6x9.widthWithBleed,
-    LULU_6x9.heightWithBleed
+    LULU_8_5x11.widthWithBleed,
+    LULU_8_5x11.heightWithBleed
   ]);
   
   page.drawRectangle({
     x: 0,
     y: 0,
-    width: LULU_6x9.widthWithBleed,
-    height: LULU_6x9.heightWithBleed,
+    width: LULU_8_5x11.widthWithBleed,
+    height: LULU_8_5x11.heightWithBleed,
     color: COLORS.background
   });
   
   const marginLeft = mm(20);
   const marginTop = mm(20);
   
-  let cursorY = LULU_6x9.heightWithBleed - marginTop;
+  let cursorY = LULU_8_5x11.heightWithBleed - marginTop;
   
   // Titre "Sommaire"
   page.drawText('SOMMAIRE', {
@@ -306,7 +306,7 @@ async function generateSummaryWithPageNumbers(
     // Numéro de page (aligné à droite)
     const pageTextWidth = fonts.regular.widthOfTextAtSize(pageText, 10);
     page.drawText(pageText, {
-      x: LULU_6x9.widthWithBleed - mm(20) - pageTextWidth,
+      x: LULU_8_5x11.widthWithBleed - mm(20) - pageTextWidth,
       y: cursorY,
       size: 10,
       font: fonts.regular,
@@ -331,10 +331,10 @@ async function generateRecipePage(
   const marginRight = mm(15);  // 15mm du bord droit
   const marginTop = mm(15);    // 15mm du bord haut
   
-  let cursorY = LULU_6x9.heightWithBleed - marginTop;
+  let cursorY = LULU_8_5x11.heightWithBleed - marginTop;
   
   // === EN-TÊTE : Ligne décorative ===
-const centerX = LULU_6x9.widthWithBleed / 2;
+const centerX = LULU_8_5x11.widthWithBleed / 2;
 const lineLength = mm(30); // ✅ Même longueur que les traits du footer
 
 page.drawLine({
@@ -392,7 +392,7 @@ page.drawLine({
   const colGap = mm(10);         // 10mm entre les colonnes
   
   const leftX = marginLeft;
-  const rightX = LULU_6x9.widthWithBleed - marginRight - rightColWidth;
+  const rightX = LULU_8_5x11.widthWithBleed - marginRight - rightColWidth;
   
   // === COLONNE DROITE : INGRÉDIENTS (encadré) ===
   const boxPadding = mm(5);      // 5mm de padding
@@ -580,7 +580,7 @@ function addPageFooter(
   font: any
 ) {
   const footerY = mm(15); // 15mm du bas (dans la zone sûre)
-  const centerX = LULU_6x9.widthWithBleed / 2;
+  const centerX = LULU_8_5x11.widthWithBleed / 2;
   
   // Numéro de page
   const pageText = `${pageNumber}`;
@@ -646,12 +646,12 @@ let currentPageNumber = startingPageNumber;
   const marginTop = mm(15);
   const minY = mm(25); // Zone de sécurité en bas
   
-  let cursorY = LULU_6x9.heightWithBleed - marginTop;
+  let cursorY = LULU_8_5x11.heightWithBleed - marginTop;
   
   // === EN-TÊTE : Ligne décorative (PREMIÈRE PAGE SEULEMENT) ===
   currentPage.drawLine({
     start: { x: marginLeft, y: cursorY },
-    end: { x: LULU_6x9.widthWithBleed - marginRight, y: cursorY },
+    end: { x: LULU_8_5x11.widthWithBleed - marginRight, y: cursorY },
     thickness: 0.5,
     color: COLORS.line
   });
@@ -702,7 +702,7 @@ let currentPageNumber = startingPageNumber;
   const rightColWidth = mm(40);
   
   const leftX = marginLeft;
-  const rightX = LULU_6x9.widthWithBleed - marginRight - rightColWidth;
+  const rightX = LULU_8_5x11.widthWithBleed - marginRight - rightColWidth;
   
   // === COLONNE DROITE : INGRÉDIENTS ===
   const boxPadding = mm(3);
@@ -833,7 +833,7 @@ let currentPageNumber = startingPageNumber;
         addPageFooter(currentPage, currentPageNumber, fonts.regular);
     currentPageNumber++;
       
-      stepsY = LULU_6x9.heightWithBleed - marginTop;
+      stepsY = LULU_8_5x11.heightWithBleed - marginTop;
       
       // Titre "PRÉPARATION (suite)"
       currentPage.drawText('PRÉPARATION (suite)', {
@@ -883,7 +883,7 @@ export async function generateInteriorPDF(
   options: GenerateInteriorOptions
 ): Promise<Uint8Array> {
   console.log('📄 Génération du PDF intérieur...');
-  console.log(`   Format: ${LULU_6x9.widthWithBleed}pt × ${LULU_6x9.heightWithBleed}pt (avec bleed)`);
+  console.log(`   Format: ${LULU_8_5x11.widthWithBleed}pt × ${LULU_8_5x11.heightWithBleed}pt (avec bleed)`);
   console.log(`   Recettes: ${options.recipes.length}`);
   
   const pdfDoc = await PDFDocument.create();
