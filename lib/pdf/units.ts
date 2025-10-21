@@ -39,12 +39,13 @@ export function pt(points: number): number {
 }
 
 // ============================================
-// 📏 DIMENSIONS LULU - Format 6" × 9"
+// 📏 DIMENSIONS LULU - Format 6" × 9" (LEGACY)
 // ============================================
 
 /**
  * Format 6" × 9" (15.24cm × 22.86cm)
- * C'est le format le plus populaire pour les livres de recettes
+ * Format compact - conservé pour compatibilité
+ * ⚠️ DEPRECATED: Utilisez LULU_8_5x11 (US Letter) pour les nouveaux projets
  */
 export const LULU_6x9 = {
   // Dimensions de base (SANS bleed)
@@ -104,31 +105,31 @@ export function calculateSpineWidth(pageCount: number): number {
  */
 export function calculateCoverDimensions(interiorPageCount: number) {
   const spineWidth = calculateSpineWidth(interiorPageCount);
-  const pageWidth = LULU_6x9.width;   // 432pt = 152.4mm
-  const bleed = LULU_6x9.bleed;       // 8.5pt = 3mm
-  
+  const pageWidth = LULU_8_5x11.width;   // 612pt = 215.9mm
+  const bleed = LULU_8_5x11.bleed;       // 8.5pt = 3mm
+
   return {
     // Largeur totale : bleed + arrière + dos + avant + bleed
     totalWidth: (bleed * 2) + (pageWidth * 2) + spineWidth,
-    
+
     // Hauteur = hauteur page + bleed haut/bas
-    totalHeight: LULU_6x9.heightWithBleed,  // 665pt = 234.6mm
+    totalHeight: LULU_8_5x11.heightWithBleed,  // 809pt = 285.4mm
     
     // Position X de chaque zone (depuis la gauche)
     zones: {
       backCover: {
         x: bleed,                           // 8.5pt = 3mm
-        width: pageWidth,                   // 432pt = 152.4mm
+        width: pageWidth,                   // 612pt = 215.9mm
         label: 'Arrière (back cover)'
       },
       spine: {
-        x: bleed + pageWidth,               // 440.5pt
+        x: bleed + pageWidth,               // 620.5pt
         width: spineWidth,                  // Variable selon nb pages
         label: 'Dos (spine)'
       },
       frontCover: {
         x: bleed + pageWidth + spineWidth,  // Variable
-        width: pageWidth,                   // 432pt = 152.4mm
+        width: pageWidth,                   // 612pt = 215.9mm
         label: 'Avant (front cover)'
       }
     },
@@ -137,7 +138,7 @@ export function calculateCoverDimensions(interiorPageCount: number) {
     spineWidth,
     bleed,
     pageWidth,
-    pageHeight: LULU_6x9.height
+    pageHeight: LULU_8_5x11.height
   };
 }
 
@@ -146,21 +147,36 @@ export function calculateCoverDimensions(interiorPageCount: number) {
 // ============================================
 
 /**
- * Format 8.5" × 11" (A4 US)
- * Utile pour des livres de recettes grand format
+ * Format 8.5" × 11" (US Letter)
+ * Format standard américain pour les livres de recettes
  */
 export const LULU_8_5x11 = {
+  // Dimensions de base (SANS bleed)
   width: inch(8.5),         // 612pt = 215.9mm
   height: inch(11),         // 792pt = 279.4mm
-  bleed: mm(3),             // 8.5pt = 3mm
-  safeMargin: mm(25),       // 70.9pt = 25mm
-  
+
+  // Fond perdu (bleed) obligatoire pour Lulu
+  bleed: mm(3),             // 8.5pt = 3mm de chaque côté
+
+  // Marge de sécurité (safe area) - zone garantie sans découpe
+  safeMargin: mm(25),       // 70.9pt = 25mm du bord
+
+  // Dimensions AVEC bleed (ce qu'on envoie à Lulu)
   get widthWithBleed() {
-    return this.width + (this.bleed * 2);
+    return this.width + (this.bleed * 2);   // 629pt = 221.9mm
   },
-  
+
   get heightWithBleed() {
-    return this.height + (this.bleed * 2);
+    return this.height + (this.bleed * 2);  // 809pt = 285.4mm
+  },
+
+  // Zone utilisable pour le contenu (entre bleed et safe margin)
+  get contentWidth() {
+    return this.width - (this.safeMargin * 2);  // 470.1pt = 165.9mm
+  },
+
+  get contentHeight() {
+    return this.height - (this.safeMargin * 2); // 650.1pt = 229.4mm
   }
 };
 
@@ -202,7 +218,7 @@ export function debugDimensions(name: string, x: number, y: number, width: numbe
  * Vérifie si une zone est dans la safe area (pas de risque de découpe)
  */
 export function isInSafeArea(x: number, y: number, width: number, height: number): boolean {
-  const { bleed, safeMargin, widthWithBleed, heightWithBleed } = LULU_6x9;
+  const { bleed, safeMargin, widthWithBleed, heightWithBleed } = LULU_8_5x11;
   const minX = bleed + safeMargin;
   const maxX = widthWithBleed - bleed - safeMargin;
   const minY = bleed + safeMargin;

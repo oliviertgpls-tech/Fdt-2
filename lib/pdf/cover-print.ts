@@ -6,7 +6,7 @@
  */
 
 import { PDFDocument, rgb, PDFPage } from 'pdf-lib';
-import { mm, LULU_6x9, calculateCoverDimensions } from './units';
+import { mm, LULU_8_5x11, calculateCoverDimensions } from './units';
 import { loadDefaultFonts, FontSet } from './fonts';
 
 // ============================================
