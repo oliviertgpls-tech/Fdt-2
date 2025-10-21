@@ -336,8 +336,9 @@ async getValidationStatus(
   async getOrders(limit = 20): Promise<any[]> {
     const data = await this.request(`/print-jobs/?limit=${limit}`, {
       method: 'GET'
-    });
-    return data;
+    }) as any;
+    // L'API Lulu retourne un objet avec "results" qui contient le tableau
+    return data.results || [];
   }
 }
 
