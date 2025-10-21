@@ -6,6 +6,7 @@ import { ArrowLeft, Edit3, Trash2, Plus, Eye, Download, X, Loader, GripVertical,
 import { useRecipes } from '@/contexts/RecipesProvider';
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { ImageSearch } from '@/components/ImageSearch';
+import { generateInteriorPDF } from '@/lib/pdf/interior-print';
 import { useToast } from '@/components/Toast';
 
 import {
@@ -852,9 +853,6 @@ for (const ingredient of ingredients) {
       console.log('📚 Livre:', book.title);
       console.log('📖 Recettes:', bookRecipes.length);
       
-      // Import dynamique de la fonction de génération
-      const { generateInteriorPDF } = await import('@/lib/pdf/interior-print');
-      
       // Générer le PDF
       const pdfBytes = await generateInteriorPDF({
         bookTitle: book.title,
@@ -965,7 +963,6 @@ const testUploadToLulu = async () => {
     showToast('📄 Génération des PDFs...', 'info');
 
     // 1. Générer le PDF intérieur
-    const { generateInteriorPDF } = await import('@/lib/pdf/interior-print');
     const interiorPdfBytes = await generateInteriorPDF({
       bookTitle: book.title,
       recipes: bookRecipes,
