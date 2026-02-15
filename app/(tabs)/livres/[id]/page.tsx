@@ -974,7 +974,7 @@ const testUploadToLulu = async () => {
     showToast('📤 Upload PDF', 'info');
 
     // 📥 Téléchargement local pour vérification
-    const downloadBlob = new Blob([interiorPdfBytes], { type: 'application/pdf' });
+    const downloadBlob = new Blob([new Uint8Array(interiorPdfBytes)], { type: 'application/pdf' });
     const downloadUrl = URL.createObjectURL(downloadBlob);
     const downloadLink = document.createElement('a');
     downloadLink.href = downloadUrl;
