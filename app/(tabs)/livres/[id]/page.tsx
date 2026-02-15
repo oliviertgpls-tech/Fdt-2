@@ -974,6 +974,15 @@ const testUploadToLulu = async () => {
     showToast('📤 Upload PDF', 'info');
 
     // 📥 Téléchargement local pour vérification
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${book.title}-INTERIOR-PRINT.pdf`;
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
+    console.log('📥 PDF téléchargé localement');
+
     // 2. Convertir en base64
     const interiorBase64 = Buffer.from(interiorPdfBytes).toString('base64');
 
@@ -1562,26 +1571,6 @@ const handleDragEnd = async (event: DragEndEvent) => {
     </button>
 
     {/* 🧪 BOUTON TEST UPLOAD LULU */}
-<button
-  onClick={testUploadToLulu}
-  disabled={isGeneratingPreview || bookRecipes.length === 0}
-  className="bg-purple-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
-  title="Tester l'upload vers Lulu (sandbox)"
->
-  {isGeneratingPreview ? (
-    <>
-      <Loader className="w-4 h-4 animate-spin" />
-      Test...
-    </>
-  ) : (
-    <>
-      <Upload className="w-4 h-4" />
-      Test Lulu
-    </>
-  )}
-</button>
-
-{/* 🧪 BOUTON TEST UPLOAD LULU */}
 <button
   onClick={testUploadToLulu}
   disabled={isGeneratingPreview || bookRecipes.length === 0}
