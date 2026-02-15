@@ -46,6 +46,32 @@ export const FONT_CLASSIQUE: FontConfig = {
   }
 };
 
+ //* Style 2 : Élégant (Playfair Display + Lato)
+ //* Parfait pour un style magazine culinaire
+ //*/
+export const FONT_ELEGANT: FontConfig = {
+  name: 'Playfair Display',
+  paths: {
+    regular: '/fonts/PlayfairDisplay-Regular.ttf',
+    bold: '/fonts/PlayfairDisplay-Bold.ttf',
+    italic: '/fonts/PlayfairDisplay-Italic.ttf'
+  }
+};
+
+// * Style 3 : Moderne (Lato)
+// * Police sans empattements, très lisible
+//*/
+export const FONT_MODERNE: FontConfig = {
+  name: 'Lato',
+  paths: {
+    regular: '/fonts/Lato-Regular.ttf',
+    bold: '/fonts/Lato-Bold.ttf',
+    italic: '/fonts/Lato-Italic.ttf'
+  }
+};
+
+
+
 // ============================================
 // 🔧 FONCTIONS DE CHARGEMENT
 // ============================================
