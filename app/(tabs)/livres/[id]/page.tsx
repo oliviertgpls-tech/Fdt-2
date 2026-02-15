@@ -974,15 +974,6 @@ const testUploadToLulu = async () => {
     showToast('📤 Upload PDF', 'info');
 
     // 📥 Téléchargement local pour vérification
-    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    const downloadUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `${book.title}-INTERIOR-PRINT.pdf`;
-    link.click();
-    URL.revokeObjectURL(downloadUrl);
-    console.log('📥 PDF téléchargé localement');
-
     // 2. Convertir en base64
     const interiorBase64 = Buffer.from(interiorPdfBytes).toString('base64');
 
