@@ -883,18 +883,7 @@ for (const ingredient of ingredients) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       console.log('📥 PDF téléchargé localement');
-      
-      // Créer un blob et télécharger
-      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${book.title}-INTERIOR-PRINT.pdf`;
-      link.click();
-      
-      URL.revokeObjectURL(url);
-      
+
       showToast('✅ PDF print généré et téléchargé !', 'success');
       
     } catch (error: any) {
