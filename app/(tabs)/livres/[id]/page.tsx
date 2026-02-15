@@ -873,7 +873,7 @@ for (const ingredient of ingredients) {
       console.log('✅ PDF généré!', (pdfBytes.length / 1024).toFixed(0), 'KB');
 
       // 📥 Téléchargement local
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
